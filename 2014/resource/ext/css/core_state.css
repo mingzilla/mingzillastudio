@@ -1,0 +1,106 @@
+/* States
+prefix: .is_*, .mq_*
+------------------------- */
+
+/*Make an element unscrollable, typically this is used e.g. on the body tag when modal box .is_in*/
+.is_unscrollable {
+  overflow: hidden;
+}
+
+/*Hide element*/
+.is_hidden {
+  display: none;
+}
+
+/* mq_*
+.mq_*_hidden
+.mq_*_show
+.mq_*_show.is_span
+------------------------- */
+
+.mq_767_show,
+.row .mq_767_show {
+  display: none;
+  visibility: hidden;
+}
+
+@media (max-width: 767px) {
+
+  .mq_767_hidden,
+  .row .mq_767_hidden {
+    display: none;
+    visibility: hidden;
+  }
+
+  .mq_767_show,
+  .row .mq_767_show {
+    display: block;
+    visibility: visible;
+  }
+
+  .mq_767_show.is_span,
+  .row .mq_767_show.is_span {
+    display: inline-block;
+    visibility: visible;
+    *display: inline;
+    *zoom: 1;
+  }
+}
+
+.mq_600_show,
+.row .mq_600_show {
+  display: none;
+  visibility: hidden;
+}
+
+@media (max-width: 600px) {
+
+  .mq_600_hidden,
+  .row .mq_600_hidden {
+    display: none;
+    visibility: hidden;
+  }
+
+  .mq_600_show,
+  .row .mq_600_show {
+    display: block;
+    visibility: visible;
+  }
+
+  .mq_600_show.is_span,
+  .row .mq_600_show.is_span {
+    display: inline-block;
+    visibility: visible;
+    *display: inline;
+    *zoom: 1;
+  }
+}
+
+.mq_480_show,
+.row .mq_480_show {
+  display: none;
+  visibility: hidden;
+}
+
+@media (max-width: 480px) {
+
+  .mq_480_hidden,
+  .row .mq_480_hidden {
+    display: none;
+    visibility: hidden;
+  }
+
+  .mq_480_show,
+  .row .mq_480_show {
+    display: block;
+    visibility: visible;
+  }
+
+  .mq_480_show.is_span,
+  .row .mq_480_show.is_span {
+    display: inline-block;
+    visibility: visible;
+    *display: inline;
+    *zoom: 1;
+  }
+}

@@ -1,0 +1,45 @@
+/*This is to be used on the body to prevent page jumping by hiding the page to start with, and show after resizing is done*/
+.js_screen_hide_all {
+  visibility: hidden;
+}
+
+/*
+---------------------------------------*/
+.js_screen_size_container {
+  position: relative;
+  overflow: hidden;
+}
+
+.js_screen_size_container .js_screen_size_img_container {
+  position: relative;
+
+  /*has to be 0 height. if it does not look well, check if this has been overridden*/
+  height: 0;
+}
+
+.js_screen_size_container .js_screen_size_img_container > img {
+  position: absolute;
+}
+
+/*Best way to position item in vertical center*/
+.js_screen_size_container .js_screen_size_container__content {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  margin: auto;
+
+  /*Set custom height so that text is positioned*/
+  height: 300px;
+}
+
+/*************************************************
+CUSTOM STYLE
+*************************************************/
+/*A container created by backgrounder*/
+.js_screen_size_container .js_screen_size_img_container img {
+  /*with opacity and textile bg, you can have small image for bg*/
+  opacity: 0.8;
+}

@@ -1,0 +1,52 @@
+/*
+Provides states for bg
+*/
+
+.bg_light_pink {
+  background-color: #E0DFDC;
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#E7E6E3), color-stop(65%, #E7E6E3), to(#C5C4C1));
+  background-image: -webkit-linear-gradient(#E7E6E3, #E7E6E3 65%, #C5C4C1);
+  background-image: -moz-linear-gradient(top, #E7E6E3, #E7E6E3 65%, #C5C4C1);
+  background-image: -o-linear-gradient(#E7E6E3, #E7E6E3 65%, #C5C4C1);
+  background-image: linear-gradient(#E7E6E3, #E7E6E3 65%, #C5C4C1);
+  background-repeat: no-repeat;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#ffe7e6e3', endColorstr = '#ffc5c4c1', GradientType = 0);
+  background-color: #E0DFDC;
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#E7E6E3), color-stop(65%, #E7E6E3), to(#C5C4C1));
+  background-image: -webkit-linear-gradient(#E7E6E3, #E7E6E3 65%, #C5C4C1);
+  background-image: -moz-linear-gradient(top, #E7E6E3, #E7E6E3 65%, #C5C4C1);
+  background-image: -o-linear-gradient(#E7E6E3, #E7E6E3 65%, #C5C4C1);
+  background-image: linear-gradient(#E7E6E3, #E7E6E3 65%, #C5C4C1);
+}
+
+.bg_dark_grey {
+  background: url(../img/bg_dark_grey.png) repeat;
+}
+
+.bg_white {
+  background: url(../img/bg_wavegrid.png) repeat;
+}
+
+.bg_silver {
+  background: url(../img/bg_wavegrid_silver.png) repeat;
+}
+
+.bg_small_grid {
+  background: url(../img/bg_smallest_grid.png) repeat;
+}
+
+.bg_tiny_grid_orange {
+  background: url(../img/bg_tiny_grid_orange.png) repeat;
+}
+
+.bg_oliva_dark {
+  background: url(../img/bg_oliva_dark.png) repeat;
+}
+
+.bg_oliva_light {
+  background: url(../img/bg_oliva_light.jpg) repeat;
+}
+
+.bg_light_grey {
+  background: url(../img/bg_light_grey.png) repeat;
+}

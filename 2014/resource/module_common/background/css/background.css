@@ -1,0 +1,123 @@
+/*********************************************************************************************
+top level class:
+.bg_repeated
+.bg_cover - bg needs to be big enough as it doesn't expand in IE8
+.bg_full_width_box > img.bg
+
+states:
+is_bg_framed
+is_bg_***
+*********************************************************************************************/
+
+/*********************************************************************************************/
+
+/*
+repeated bg:
+Don't use this approach on the html tag - fixed position would break the scroll bar, opacity would make everything transparent
+
+usage:
+add the below right after body tag:
+dynamic bg:
+<div class="bg_repeated" style="background-image:url();"></div>
+defined bg:
+<div class="bg_repeated spring is_bg_015"></div>
+*/
+
+div.bg_repeated {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -9999;
+}
+
+/*********************************************************************************************/
+
+/*
+full screen bg:
+Don't use this approach on the html tag - fixed position would break the scroll bar, opacity would make everything transparent
+
+usage:
+add the below right after body tag (this allows adding opacity. IE8 puts the image in the middle when it is small):
+dynamic bg:
+<div class="bg_cover" style="background-image:url();"></div>
+defined bg:
+<div class="bg_cover spring is_bg_015"></div>
+*/
+
+div.bg_cover {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-size: cover;
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+  z-index: -9999;
+}
+
+/*********************************************************************************************/
+
+/*
+full width bg:
+
+usage:
+<div class="bg_full_width_box">
+  <img class="bg" src="image.jpg" />
+</div>
+*/
+
+/* background - site: .bg_full_width_box > img.bg*/
+.bg_full_width_box,
+.bg_full_width_box img.bg {
+  /*both need to have low z-index, so that both appear below background of other elements*/
+  z-index: -8000;
+}
+
+.bg_full_width_box {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.bg_full_width_box img.bg {
+  position: absolute;
+  width: 100%;
+  height: auto;
+}
+
+/*********************************************************************************************/
+
+/* bg states
+-------------------------------------*/
+.is_bg_015 {
+  opacity: 0.15;
+  filter: Alpha(Opacity = 15);
+  -ms-filter: "Alpha(Opacity=15)";
+}
+
+.is_bg_070 {
+  opacity: 0.7;
+  filter: Alpha(Opacity = 70);
+  -ms-filter: "Alpha(Opacity=70)";
+}
+
+.is_bg_090 {
+  opacity: 0.9;
+  filter: Alpha(Opacity = 90);
+  -ms-filter: "Alpha(Opacity=90)";
+}
+
+.is_bg_093 {
+  opacity: 0.93;
+  filter: Alpha(Opacity = 93);
+  -ms-filter: "Alpha(Opacity=93)";
+}
+
+.is_bg_framed {
+  box-shadow: inset 0 0 70px black;
+}

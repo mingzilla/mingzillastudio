@@ -1,0 +1,56 @@
+/*******************************************************************
+Overrides Bootstrap- This part of override is needed for every single site, so that the layout has a fresh start and easier to style.
+The target is for the site to nearly not needing to provide margin, padding, height, width, and freely use bootstrap span*, row with with a clean start.
+- Tidy up site style by searching for top, bottom, left, right and clean them to an extreme manner.
+
+Tablet to desktop
+@media (max-width: 979px) {}
+Tablet
+@media (max-width: 767px) {}
+Landscape phones
+@media (max-width: 480px) {}
+*******************************************************************/
+
+/* No more IE 7
+-------------------------------------*/
+html.no-generatedcontent.no-hashchange.no-rgba {
+  background-color: #000000;
+}
+
+.no-generatedcontent.no-hashchange.no-rgba body {
+  display: none; /*I don't want to maintain IE 7 any more*/
+}
+
+/* .scroll_x, .scroll_y
+-------------------------------------*/
+.scroll_x {
+  overflow-x: scroll;
+}
+
+.scroll_y {
+  overflow-y: scroll;
+}
+
+/* Displays dl as table (supports ie >= 7)
+Refer to this link for proper usage of dl: http://www.maxdesign.com.au/articles/definition/
+Use dl.dl-horizontal if standard dl layout is more suitable in small screens
+-------------------------------------*/
+dl.dl_as_table > dt {
+  float: left;
+  clear: left;
+}
+
+dl.dl_as_table > dd {
+  float: none; /*This allows the dl container to wrap the whole table in all browsers without setting to float layout*/
+}
+
+/*space
+-------------------------------------*/
+.container_horizontal_space {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.vertical_break {
+  margin-bottom: 20px;
+}

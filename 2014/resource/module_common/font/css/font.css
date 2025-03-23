@@ -1,0 +1,87 @@
+/*Add shadow support for fonts
+-----------------------*/
+.has_hover_shadow:hover {
+  text-shadow: 2px 2px 4px #444;
+}
+
+/*Fonts
+All the fonts in here use important, it means by specifically say I want this font, I do want it.
+-----------------------*/
+.font_finger_paint {
+  font-family: 'font_finger_paint_66' !important;
+}
+
+.font_sisters {
+  font-family: 'font_sisters_132' !important;
+}
+
+.font_milonga {
+  font-family: 'font_milonga_33' !important;
+}
+
+.font_rock_salt {
+  font-family: 'font_rock_salt_74' !important;
+}
+
+.font_passero_one {
+  font-family: 'font_passero_one_9' !important;
+}
+
+.font_orbitron {
+  font-family: 'font_orbitron_17' !important;
+}
+
+.font_denk_one {
+  font-family: 'font_denk_one_12' !important;
+}
+
+/*Font imports
+-----------------------*/
+@font-face {
+  font-family: 'font_finger_paint_66';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Finger Paint'), local('FingerPaint-Regular'), url(font_finger_paint_66.woff) format('woff');
+}
+
+@font-face {
+  font-family: 'font_sisters_132';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Finger Paint'), local('FingerPaint-Regular'), url(font_sisters_132.woff) format('woff');
+}
+
+@font-face {
+  font-family: 'font_milonga_33';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Finger Paint'), local('FingerPaint-Regular'), url(font_milonga_33.woff) format('woff');
+}
+
+@font-face {
+  font-family: 'font_rock_salt_74';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Finger Paint'), local('FingerPaint-Regular'), url(font_rock_salt_74.woff) format('woff');
+}
+
+@font-face {
+  font-family: 'font_passero_one_9';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Finger Paint'), local('FingerPaint-Regular'), url(font_passero_one_9.woff) format('woff');
+}
+
+@font-face {
+  font-family: 'font_orbitron_17';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Orbitron-Light'), local('Orbitron-Regular'), url(font_orbitron_17.woff) format('woff');
+}
+
+@font-face {
+  font-family: 'font_denk_one_12';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Denk One'), local('DenkOne-Regular'), url(font_denk_one_12.woff) format('woff');
+}

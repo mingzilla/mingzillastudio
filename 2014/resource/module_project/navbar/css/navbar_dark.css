@@ -1,0 +1,55 @@
+/*
+Top level class: .m_navbar_dark
+
+Structure:
+.m_navbar_dark
+  .nav_icon
+  .nav_text
+-------------------------------*/
+
+/*sizing*/
+.m_navbar_dark {
+  height: 40px;
+  line-height: 40px;
+}
+
+.m_navbar_dark .nav_icon,
+.m_navbar_dark .nav_text {
+  margin-right: 10px;
+}
+
+/* background and color */
+.m_navbar_dark {
+  background-color: #191919;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.m_navbar_dark,
+.m_navbar_dark a {
+  color: #FFFFFF;
+}
+
+/* links */
+.m_navbar_dark a {
+  -webkit-transition: all 0.5s linear 0s;
+  -moz-transition: all 0.5s linear 0s;
+  -ms-transition: all 0.5s linear 0s;
+  -o-transition: all 0.5s linear 0s;
+  transition: all 0.5s linear 0s;
+}
+
+.m_navbar_dark a:hover {
+  cursor: pointer;
+  color: #ffa500;
+}
+
+/* nav text */
+.m_navbar_dark .nav_text {
+  padding: 10px;
+  font-family: Futura, 'Helvetica Neue', 'Lucida Grande', Arial;
+}
+
+/* social_panel */
+.m_navbar_dark .m_bottom_social_panel .social_panel_title {
+  width: 150px;
+}
