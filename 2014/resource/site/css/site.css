@@ -110,6 +110,10 @@ page_section
   position: relative;
 }
 
+.page_section.is-text-only .caption {
+  min-height: 120px;
+}
+
 .page_section .thumbnail .external_link {
   color: #5a5a5a;
   border: 1px solid #5a5a5a;
