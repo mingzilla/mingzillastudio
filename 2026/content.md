@@ -8,7 +8,7 @@ Challenge: How can I go to bed and my agent teams do work for me reliably?
 
 ```mermaid
 flowchart LR
-    %% Node definitions
+%% Node definitions
     A["Agent Team"]
 
     subgraph ROLES["Roles and Communication"]
@@ -47,7 +47,7 @@ flowchart LR
         Q --> N --> O --> P
     end
 
-    %% Arrow connections
+%% Arrow connections
     A --> ROLES
     A --> PROCESS
     A --> RELIABILITY
@@ -60,7 +60,7 @@ Challenge: How can I manage skills when there are 50+
 
 ```mermaid
 flowchart LR
-    %% Node definitions
+%% Node definitions
     A["Skill Management"]
 
     subgraph DEPENDENCIES["Dependencies"]
@@ -78,7 +78,7 @@ flowchart LR
         G["Projects - Projects using skills"]
     end
 
-    %% Arrow connections
+%% Arrow connections
     A --> DEPENDENCIES
     A --> SEGREGATION
 ```
@@ -89,7 +89,7 @@ Challenge: How can we optimize skills, keep it shorter and runs more reliably
 
 ```mermaid
 flowchart LR
-    %% Node definitions
+%% Node definitions
     A["Skill Optimisation"]
 
     subgraph DIAGNOSING["Skill Diagnosing"]
@@ -115,7 +115,7 @@ flowchart LR
         H --> I
     end
 
-    %% Arrow connections
+%% Arrow connections
     A --> DIAGNOSING
     A --> CLEANING
     A --> RESPONSIBILITY
@@ -129,7 +129,7 @@ Challenge: How can we process data for an unfamiliar domain (e.g. how do we know
 
 ```mermaid
 flowchart LR
-    %% Node definitions
+%% Node definitions
     A["Unfamiliar Domain Research"]
 
     subgraph RESEARCH["RESEARCH"]
@@ -140,7 +140,7 @@ flowchart LR
         B --> C --> D
     end
 
-    %% Arrow connections
+%% Arrow connections
     A --> RESEARCH
 ```
 
@@ -150,14 +150,13 @@ Challenge: Can we make sure we have all the data first
 
 ```mermaid
 flowchart LR
-    %% Node definitions
+%% Node definitions
     A["Data Discovery"]
     B["API Harvest"]
     C["PDF Download"]
     D["PDF Conversion"]
     E["Investment Analysis"]
-
-    %% Arrow connections
+%% Arrow connections
     A --> B --> C --> D --> E
 ```
 
@@ -169,7 +168,7 @@ Visualisation: "Text -> Table"
 
 ```mermaid
 flowchart LR
-    %% Node definitions
+%% Node definitions
     A["File Classification"]
 
     subgraph RESEARCH["RESEARCH"]
@@ -185,14 +184,14 @@ flowchart LR
         F["Generation"]
     end
 
-    %% Arrow connections
+%% Arrow connections
     A --> RESEARCH
     C --> DIMENSIONS
 ```
 
 ```mermaid
 flowchart LR
-    %% Node definitions
+%% Node definitions
     A["File Split"]
 
     subgraph RESEARCH["RESEARCH"]
@@ -204,15 +203,14 @@ flowchart LR
     end
 
     E["Slice to Shards"]
-
-    %% Arrow connections
+%% Arrow connections
     A --> RESEARCH
     D --> E
 ```
 
 ```mermaid
 flowchart LR
-    %% Node definitions
+%% Node definitions
     A["File Extract"]
 
     subgraph RESEARCH["RESEARCH"]
@@ -225,8 +223,7 @@ flowchart LR
     end
 
     F["Extract Fields"]
-
-    %% Arrow connections
+%% Arrow connections
     A --> RESEARCH
     E --> F
 ```
@@ -237,14 +234,13 @@ Challenge: How can we finish processing millions of long text with LLM very fast
 
 ```mermaid
 flowchart LR
-    %% Node definitions
+%% Node definitions
     A["Web Text"]
     B["Clean Text"]
     C["Prompt Engineering"]
     D["Summary - 1.5s/site"]
     E["Similarity Analysis"]
-
-    %% Arrow connections
+%% Arrow connections
     A --> B --> C --> D --> E
 ```
 
@@ -293,12 +289,11 @@ Challenge: How can I consume knowledge quickly if a video has content relevant t
 
 ```mermaid
 flowchart LR
-    %% Node definitions
+%% Node definitions
     A["Video Transcript Download"]
     B["Convert to Human Friendly Content"]
     C["Relevant Analysis"]
-
-    %% Arrow connections
+%% Arrow connections
     A --> B --> C
 ```
 
@@ -365,3 +360,22 @@ flowchart LR
 ## Knowledge Sharing
 
 Content Creator: 200+ Videos, 6k+ Subscribers (mid 2026)
+
+---
+
+| Challenge                                              | What this does                                                                                                                                                                               |
+|--------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Co-work Agent Team**                                 | Enables multiple AI agents to work together autonomously over long-running tasks, with defined roles, workflows, reviews, handovers and reliability controls.                                |
+| **Skill Management**                                   | Organises large libraries of AI skills into clear dependency layers and separates operational, authoring and project-specific skills for easier maintenance and reuse.                       |
+| **Skill Optimisation**                                 | Diagnoses and improves AI skills to make them shorter, faster, cheaper and more reliable, while deciding which responsibilities belong in prompts versus code.                               |
+| **Whole UK Investment Data Processing**                | Builds a structured understanding of an unfamiliar domain by researching its taxonomy, decision logic and rules before applying them to large-scale data processing.                         |
+| **PDF Discovery and Processing Pipeline**              | Discovers, collects, downloads and converts source documents into a consistent pipeline so the required data is available before analysis begins.                                            |
+| **PDF Extracted Text to Tables – File Classification** | Classifies large volumes of files by characteristics such as type, format and generation method so the correct processing approach can be selected automatically.                            |
+| **PDF Extracted Text to Tables – File Split**          | Analyses document structures and automatically splits large files into logical, processable shards using repeatable decision rules.                                                          |
+| **PDF Extracted Text to Tables – File Extract**        | Analyses document shards, normalises their structures and extracts required fields into structured data using scalable, rule-based processing.                                               |
+| **LLM Summary for Millions of Websites**               | Cleans and processes large volumes of web text through an optimised LLM pipeline to generate fast, accurate summaries and enable downstream similarity analysis.                             |
+| **UI and Test Automation at Scale**                    | Structures UI automation into reusable elements, flows, tasks and wrappers so automated tests and interactions can adapt to application changes without rewriting the entire system.         |
+| **Videos to Knowledge Base**                           | Converts videos into searchable, human-friendly knowledge by extracting transcripts, restructuring the content and identifying the information most relevant to the user.                    |
+| **Automation – Handle UK Tax Return**                  | Automates the end-to-end tax-document workflow, from collecting and organising source files through extraction, verification and report generation, with repeatable and accurate processing. |
+| **Similarity Search at Scale (Vector DB)**             | Builds and operates a vector database capable of storing and searching more than 10 million records while balancing storage size, creation speed and query performance.                      |
+| **Smart Search at Scale (Micro Services)**             | Provides scalable search across more than 10 million records using a distributed architecture with load balancing, multiple APIs, caching and a database backend.                            |
