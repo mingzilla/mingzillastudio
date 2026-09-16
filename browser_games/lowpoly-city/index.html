@@ -581,7 +581,10 @@ function buildPlayer() {
    CAMERA + PROJECTION
    ========================================================================= */
 
-const PITCH = 0.60;
+/* Camera elevation, radians above the ground plane. Small = flatter, which
+   foreshortens the ground and shows you far more of the valley in the same
+   screen height. Raise it toward 1.2 for a near plan view. */
+const PITCH = 0.44;
 const SINP = Math.sin(PITCH), COSP = Math.cos(PITCH);
 const cam = { x: 0, y: 0, z: 0, c: 1, s: 0, yaw: 0.5, zoom: 44, target: 44 };
 const view = { w: 0, h: 0, dpr: 1 };
@@ -828,6 +831,13 @@ const WORLD_SCALE = 2;
    a zoomed-out valley turns into a smudge of outlines. */
 let OUTLINE_PX = 0;
 const OUTLINE_INK = "#3a3128";
+
+/* How far in front of its tile an entity sorts. A hex is HEX_SIZE across, and
+   the player is only a fraction of that, so standing anywhere near a hex edge
+   puts your body over the NEXT hex — which is nearer, draws later, and paints
+   straight over you. Sorting entities a full hex-width nearer than their own
+   tile makes them win against every tile that can overlap them. */
+const DEPTH_BIAS = HEX_SIZE * 2.4;
 function updateOutline() {
   OUTLINE_PX = Math.max(0.9, Math.min(2.4, cam.zoom * 0.036));
 }
@@ -889,14 +899,16 @@ function updateEntities(dt) {
 
 const SHADOW_PTS = d3.range(8).map(i => {
   const a = i * Math.PI / 4;
-  return [Math.cos(a) * 0.30, Math.sin(a) * 0.30 * 0.78];
+  return [Math.cos(a) * 0.30 * WORLD_SCALE, Math.sin(a) * 0.30 * WORLD_SCALE * 0.78];
 });
 function drawPlayer() {
   for (let i = 0; i < 8; i++) {
     project(player.x + SHADOW_PTS[i][0], player.y + SHADOW_PTS[i][1], player.z + 0.02, PBUF[i]);
   }
   fillBuf(8, CIDX.shadow, [0, 0, 1], 0.18);
-  drawFaces(player.faces, player.x, player.y, player.z, 1);
+  /* the player is built in the same units as every entity, so it takes the same
+     world scale — without this it stays at half size while the valley doubles */
+  drawFaces(player.faces, player.x, player.y, player.z, WORLD_SCALE);
 }
 
 function render() {
@@ -915,7 +927,7 @@ function render() {
     if (PBUF[0].x < -margin || PBUF[0].x > view.w + margin ||
         PBUF[0].y < -margin || PBUF[0].y > view.h + margin) { t._vis = false; continue; }
     t._vis = true;
-    t._d = PBUF[0].d - 0.01;                 // entities on it draw just after it
+    t._d = PBUF[0].d - DEPTH_BIAS;           // entities on it draw just after it
     drawPush(PBUF[0].d, 0, t);
   }
 
@@ -928,10 +940,10 @@ function render() {
     project(e.x, e.y, e.z, PBUF[0]);
     if (PBUF[0].x < -margin || PBUF[0].x > view.w + margin ||
         PBUF[0].y < -margin || PBUF[0].y > view.h + margin) continue;
-    drawPush(mobile ? PBUF[0].d - 0.02 : e.owner._d, 1, e);
+    drawPush(mobile ? PBUF[0].d - DEPTH_BIAS : e.owner._d, 1, e);
   }
 
-  playerDepth = project(player.x, player.y, player.z, PBUF[0]).d - 0.02;
+  playerDepth = project(player.x, player.y, player.z, PBUF[0]).d - DEPTH_BIAS;
   drawPush(playerDepth, 2, null);
 
   DRAW.sort((p, q) => q.d - p.d);

@@ -55,9 +55,11 @@ function treeFaces(e, kind, h) {
     h.blob(f, L[0] * s, L[1] * s, L[2] * s, L[3] * s, L[4] * s, 6, r + L[5], C[tone[L[6]]]);
   }
 
-  // far-distance version: one lobe, so a whole forest stays cheap
-  const big = e.canopy[e.canopy.length - 1];
-  h.blob(g, 0, 0, 0.56 * s, 0.30 * s, 0.62 * s, 5, r, C[tone.body]);
+  /* Far-distance version. One lobe, but a big one in the body colour with a
+     rounded six-sided profile — a small dark five-sided blob reads as a flat
+     diamond from above, which is exactly how you see most of a forest. */
+  h.blob(g, 0, 0, 0.54 * s, 0.34 * s, 0.72 * s, 6, r, C[tone.body]);
+  h.blob(g, 0, 0, 0.74 * s, 0.22 * s, 0.30 * s, 6, r + 0.4, C[tone.crown]);
 
   e.faces = f;
   e.simple = g;
