@@ -4,12 +4,18 @@
 
 const SQ3 = Math.sqrt(3);
 
-const hexCenter = (q, r) => ({ x: SQ3 * (q + r / 2), y: 1.5 * r });
+/* Tile circumradius in world units. Everything positional in the world comes
+   off this, so changing it here rescales the land without touching a single
+   entity: a bigger HEX_SIZE means each hex holds more room at the same
+   building sizes. */
+const HEX_SIZE = 2;
+
+const hexCenter = (q, r) => ({ x: HEX_SIZE * SQ3 * (q + r / 2), y: HEX_SIZE * 1.5 * r });
 const key = (q, r) => q + "," + r;
 
 function worldToAxial(x, y) {
-  const fq = (SQ3 / 3) * x - y / 3;
-  const fr = (2 / 3) * y;
+  const fq = (SQ3 / 3 * x - y / 3) / HEX_SIZE;
+  const fr = (2 / 3 * y) / HEX_SIZE;
   const cx = fq, cz = fr, cy = -cx - cz;
   let rx = Math.round(cx), ry = Math.round(cy), rz = Math.round(cz);
   const dx = Math.abs(rx - cx), dy = Math.abs(ry - cy), dz = Math.abs(rz - cz);
@@ -22,7 +28,7 @@ function worldToAxial(x, y) {
 /* corner i sits at 60i - 30 degrees, radius 1 */
 const CORNER = d3.range(6).map(i => {
   const a = Math.PI / 180 * (60 * i - 30);
-  return { x: Math.cos(a), y: Math.sin(a), a };
+  return { x: HEX_SIZE * Math.cos(a), y: HEX_SIZE * Math.sin(a), a };
 });
 
 const DIRS = [[1, 0], [1, -1], [0, -1], [-1, 0], [-1, 1], [0, 1]];

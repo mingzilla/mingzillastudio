@@ -2,7 +2,6 @@
 
 defEntity({
   key: "lighthouse", group: "building", label: "Lighthouse",
-  sizeMul: 2,          // twice the size of everything else
   spawn: {
     mode: "scatter", biomes: [BIOME.SAND], density: 0.02, min: 2, max: 3,
     gap: 14,

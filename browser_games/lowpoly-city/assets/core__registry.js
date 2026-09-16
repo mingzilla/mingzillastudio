@@ -54,7 +54,7 @@ function defEntity(def) {
    on, since the jitter can push it over an edge. */
 function tileSpot(t, spread) {
   const ang = rr(0, Math.PI * 2);
-  const rad = spread * Math.sqrt(rnd());
+  const rad = spread * HEX_SIZE * Math.sqrt(rnd());   // spread is tile-relative
   const x = t.cx + Math.cos(ang) * rad, y = t.cy + Math.sin(ang) * rad;
   const w = worldToAxial(x, y);
   return { x, y, owner: tiles.get(key(w.q, w.r)) || t };

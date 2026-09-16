@@ -52,7 +52,7 @@ function quadrupedFaces(e, h) {
    home if it can't find anywhere legal. */
 function pickTarget(e, h) {
   for (let tries = 0; tries < 8; tries++) {
-    const a = h.rnd() * Math.PI * 2, d = h.rr(1.0, 4.0);
+    const a = h.rnd() * Math.PI * 2, d = h.rr(1.0, 4.0) * HEX_SIZE;
     const tx = e.homeX + Math.cos(a) * d, ty = e.homeY + Math.sin(a) * d;
     const t = tileAtWorld(tx, ty);
     if (t && walkable(t)) { e.tx = tx; e.ty = ty; return; }

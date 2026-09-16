@@ -202,9 +202,10 @@ const STEP = 0.85;                       // height quantum
 const PLAIN = STEP;                      // flat land sits one step above the sea
 const HILL_STEPS = 5;
 const HILL_H = HILL_STEPS * STEP;
-const HILL_R = 9.0;                      // hill radius in world units
+const HILL_R = 9.0 * HEX_SIZE;           // hill radius, in world units
 const BASE_Z = SEA - 2.2;                // underside of the diorama block
 const RIM_IN = 0.82, RIM_OUT = 1.02;     // where the coast falls away
+const MIN_ZOOM = 6, MAX_ZOOM = 96;       // wide enough to still see the whole island
 
 /* the terrain-scouting `where` rules in the asset files need these */
 Object.assign(H, { STEP, PLAIN, SEA, BASE_Z });
@@ -224,7 +225,7 @@ function buildWorld(seed) {
   tiles = new Map(); tileList = []; entities = [];
 
   const R = HEX_R;
-  const span = SQ3 * R * 0.95;
+  const span = SQ3 * HEX_SIZE * R * 0.95;
 
   /* one hill, parked a little off centre at a random bearing */
   const hillAng = rng() * Math.PI * 2, hillDist = span * 0.34;
@@ -482,7 +483,8 @@ function spawnScatter(def, rule) {
   let placed = 0;
   for (const t of pool) {
     if (placed >= want) break;
-    if (rule.gap && taken.some(s => Math.hypot(s.cx - t.cx, s.cy - t.cy) < rule.gap)) continue;
+    const gap = (rule.gap || 0) * HEX_SIZE;
+    if (gap && taken.some(s => Math.hypot(s.cx - t.cx, s.cy - t.cy) < gap)) continue;
     if (spawnEntity(def.key, t)) { taken.push(t); placed++; }
   }
 }
@@ -581,7 +583,7 @@ function buildPlayer() {
 
 const PITCH = 0.60;
 const SINP = Math.sin(PITCH), COSP = Math.cos(PITCH);
-const cam = { x: 0, y: 0, z: 0, c: 1, s: 0, yaw: 0.5, zoom: 52, target: 52 };
+const cam = { x: 0, y: 0, z: 0, c: 1, s: 0, yaw: 0.5, zoom: 44, target: 44 };
 const view = { w: 0, h: 0, dpr: 1 };
 
 function project(x, y, z, out) {
@@ -768,6 +770,34 @@ function drawFaces(faces, ox, oy, oz, scale, alpha) {
   for (let i = 0; i < nf; i++) { const k = FKEY[i]; BIDX[BSTART[k] + BCOUNT[k]++] = i; }
 
   if (alpha !== undefined) ctx.globalAlpha = alpha;
+
+  /* Outline pass. Every face is re-drawn pushed a couple of pixels out from the
+     shape's centre, all in one path, so only the union shows — which reads as a
+     single ink line around the silhouette rather than a wireframe over the
+     facets. One extra fill per entity, whatever its face count. */
+  if (OUTLINE_PX > 0 && nf > 0) {
+    let sx = 0, sy = 0, sn = 0;
+    for (let i = 0; i < nf; i++) {
+      const n = FCNT[i], base = i * 8;
+      for (let q = 0; q < n; q++) { sx += FBUF[base + q * 2]; sy += FBUF[base + q * 2 + 1]; sn++; }
+    }
+    const ecx = sx / sn, ecy = sy / sn;
+    ctx.beginPath();
+    for (let i = 0; i < nf; i++) {
+      const n = FCNT[i], base = i * 8;
+      for (let q = 0; q < n; q++) {
+        const x = FBUF[base + q * 2], y = FBUF[base + q * 2 + 1];
+        const dx = x - ecx, dy = y - ecy;
+        const L = Math.hypot(dx, dy) || 1;
+        const px = x + dx / L * OUTLINE_PX, py = y + dy / L * OUTLINE_PX;
+        if (q === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      }
+      ctx.closePath();
+    }
+    ctx.fillStyle = OUTLINE_INK;
+    ctx.fill();
+  }
+
   for (let i = 0; i < nused; i++) {
     const k = BUSED_LIST[i];
     ctx.beginPath();
@@ -787,12 +817,33 @@ function drawFaces(faces, ox, oy, oz, scale, alpha) {
   if (alpha !== undefined) ctx.globalAlpha = 1;
 }
 
-/* A tree two hundred metres away covers a dozen pixels, so it doesn't need two
-   cones and a canopy. Distance LOD is most of the frame budget here. */
-const LOD_R2 = 9.5 * 9.5;
-const ANIM_R2 = 28 * 28;
+/* One multiplier for every entity in the world. HEX_SIZE scales the land; this
+   scales what stands on it, so the two move together. Without it, doubling
+   HEX_SIZE leaves houses, trees and sheep the same absolute size on tiles that
+   are twice as wide, and everything looks shrunken. */
+const WORLD_SCALE = 2;
+
+/* Ink line around every entity, in screen pixels. Held roughly constant as you
+   zoom so the illustration keeps the same weight, but clamped at the bottom or
+   a zoomed-out valley turns into a smudge of outlines. */
+let OUTLINE_PX = 0;
+const OUTLINE_INK = "#3a3128";
+function updateOutline() {
+  OUTLINE_PX = Math.max(0.9, Math.min(2.4, cam.zoom * 0.036));
+}
+
+/* A tree two hundred metres away covers a dozen pixels, so it doesn't need a
+   full canopy. Distance LOD is most of the frame budget here.
+
+   Every threshold below is in WORLD units, so they all scale with HEX_SIZE.
+   Leave them fixed and doubling the land quietly pushes the entire scene past
+   the LOD radius, at which point every tree in the valley renders as its
+   single-blob fallback and the woods turn into dark diamonds. */
+const LOD_R2 = (9.5 * HEX_SIZE) ** 2;
+const ANIM_R2 = (28 * HEX_SIZE) ** 2;
+const FADE_R2 = (2.6 * HEX_SIZE) ** 2;
+const LOD_ZOOM = 44 / HEX_SIZE;
 const TREE_KEYS = { pine: 1, leaf: 1, autumn: 1 };
-const FADE_R2 = 2.6 * 2.6;
 
 /* Walking into a wood swallows the character completely, so anything standing
    between the camera and the player drops back to a ghost. */
@@ -804,9 +855,9 @@ function occluderAlpha(e) {
 }
 
 function drawEntity(e) {
-  const lod = (cam.zoom < 44 || !e._near) && e.simple && e.simple.length;
+  const lod = (cam.zoom < LOD_ZOOM || !e._near) && e.simple && e.simple.length;
   const grow = e.birth >= 0 ? Math.min(1, (now - e.birth) / 0.35) : 1;
-  const s = e.s * e.sizeMul * (0.45 + 0.55 * grow) * (1 + (1 - grow) * 0.3);
+  const s = e.s * e.sizeMul * WORLD_SCALE * (0.45 + 0.55 * grow) * (1 + (1 - grow) * 0.3);
   const alpha = occluderAlpha(e);
   if (!lod && e.dyn && e.dyn.length) drawFaces(e.dyn, e.x, e.y, e.z, s, alpha);
   drawFaces(lod ? e.simple : e.faces, e.x, e.y, e.z, s, alpha);
@@ -853,6 +904,7 @@ function render() {
   ctx.fillRect(0, 0, view.w, view.h);
 
   updateLight();
+  updateOutline();
   DRAW.length = 0;
   drawN = 0;
   const margin = 1.5 * cam.zoom;
@@ -911,7 +963,7 @@ window.addEventListener("blur", () => { for (const k in keys) keys[k] = false; }
 
 canvas.addEventListener("wheel", ev => {
   ev.preventDefault();
-  cam.target = Math.max(16, Math.min(90, cam.target * (ev.deltaY > 0 ? 0.9 : 1.11)));
+  cam.target = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, cam.target * (ev.deltaY > 0 ? 0.9 : 1.11)));
 }, { passive: false });
 
 const uiToggle = document.getElementById("uiToggle");
@@ -964,8 +1016,8 @@ function update(dt) {
   if (turn) cam.yaw += turn * dt * 1.9;
   cam.c = Math.cos(cam.yaw); cam.s = Math.sin(cam.yaw);
 
-  if (keys["="] || keys["+"]) cam.target = Math.min(90, cam.target * (1 + dt * 1.7));
-  if (keys["-"] || keys["_"]) cam.target = Math.max(16, cam.target / (1 + dt * 1.7));
+  if (keys["="] || keys["+"]) cam.target = Math.min(MAX_ZOOM, cam.target * (1 + dt * 1.7));
+  if (keys["-"] || keys["_"]) cam.target = Math.max(MIN_ZOOM, cam.target / (1 + dt * 1.7));
   cam.zoom += (cam.target - cam.zoom) * Math.min(1, dt * 8);
 
   const ix = (keys["d"] || keys["arrowright"] ? 1 : 0) - (keys["a"] || keys["arrowleft"] ? 1 : 0);

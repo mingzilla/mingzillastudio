@@ -2,7 +2,6 @@
 
 defEntity({
   key: "church", group: "building", label: "Church",
-  sizeMul: 2,          // twice the size of everything else
   spawn: {
     mode: "scatter", biomes: [BIOME.GRASS], density: 0.01, min: 1, max: 2,
     gap: 9,

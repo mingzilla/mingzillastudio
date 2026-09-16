@@ -1,35 +1,64 @@
 /* =========================================================================
    nature__tree.js — pine | leaf | autumn
    =========================================================================
-   Three keys, one shape builder. Which one grows where is driven by the
-   tile's `season` value, a slow noise field baked at world-gen time, so whole
-   regions of the valley turn over to autumn at once instead of speckling.
+   Three keys, one shape builder. Which grows where is driven by the tile's
+   `season` value, a slow noise field baked at world-gen time, so whole regions
+   turn over to autumn at once instead of speckling.
 
-   `simple` is the far-distance version. The renderer swaps to it once a tree
-   is past the LOD radius, which buys back most of the frame budget.
+   The canopy is a CLUSTER of rounded lobes rather than a single solid. That is
+   what gives the illustrated look: overlapping domes read as a leafy mass,
+   where one cone reads as a geometric solid. The lobes are picked once at
+   create time and stored on the entity, so a tree is random but stable.
+
+   Colour runs dark at the skirt, mid in the body, light on the crown — the
+   light direction would do some of that on its own, but stacking it deliberately
+   makes the clumps readable from directly above, which is how you mostly see them.
    ========================================================================= */
 
 const AUTUMN_ABOVE = 0.66;
 
+const TREE_TONE = {
+  pine:   { skirt: "pineC", body: "pineA", crown: "pineB" },
+  leaf:   { skirt: "leafC", body: "leafA", crown: "leafB" },
+  autumn: { skirt: "autumnB", body: "autumnA", crown: "autumnC" }
+};
+
+/* Lobes are [dx, dy, dz, radius, height, extraRot, which] where `which` picks
+   skirt / body / crown. */
+function makeCanopy(kind, r) {
+  const lobes = [];
+  if (kind === "pine") {
+    // a rounded conifer: stacked domes tapering upward
+    for (let i = 0; i < 3; i++) {
+      const t = i / 2;
+      lobes.push([0, 0, 0.30 + t * 0.34, 0.28 - t * 0.105, 0.32 - t * 0.085, r * i, i === 2 ? "crown" : "body"]);
+    }
+  } else {
+    lobes.push([0, 0, 0.52, 0.29, 0.33, r, "body"]);
+    const n = 2 + (r < 0.5 ? 1 : 0);
+    for (let i = 0; i < n; i++) {
+      const a = r * 6.28 + i * 6.28 / n;
+      lobes.push([Math.cos(a) * 0.17, Math.sin(a) * 0.17, 0.42, 0.19, 0.24, a, "skirt"]);
+    }
+    lobes.push([0, 0, 0.70, 0.16, 0.19, r * 2, "crown"]);
+  }
+  return lobes;
+}
+
 function treeFaces(e, kind, h) {
   const f = [], g = [];
-  const s = e.s, r = e.rot, C = h.CIDX;
+  const s = e.s, r = e.rot, C = h.CIDX, tone = TREE_TONE[kind];
 
-  h.prism(f, 0, 0, 0, 0.30 * s, 0.072 * s, 5, r, C.trunk);
+  h.prism(f, 0, 0, 0, 0.24 * s, 0.055 * s, 4, r, C.trunk);
 
-  if (kind === "pine") {
-    const c = [C.pineA, C.pineB, C.pineC][e.tone];
-    h.cone(f, 0, 0, 0.14 * s, 0.35 * s, 0.72 * s, 6, r, c);
-    h.cone(f, 0, 0, 0.58 * s, 0.24 * s, 0.62 * s, 6, r + 0.5, c);
-    h.cone(g, 0, 0, 0.18 * s, 0.34 * s, 1.02 * s, 5, r, c);
-  } else {
-    const pal = kind === "autumn"
-      ? [C.autumnA, C.autumnB, C.autumnC]
-      : [C.leafA, C.leafB, C.leafC];
-    const c = pal[e.tone];
-    h.blob(f, 0, 0, 0.72 * s, 0.40 * s, 0.64 * s, 6, r + 0.3, c);
-    h.blob(g, 0, 0, 0.74 * s, 0.38 * s, 0.58 * s, 5, r, c);
+  for (const L of e.canopy) {
+    h.blob(f, L[0] * s, L[1] * s, L[2] * s, L[3] * s, L[4] * s, 6, r + L[5], C[tone[L[6]]]);
   }
+
+  // far-distance version: one lobe, so a whole forest stays cheap
+  const big = e.canopy[e.canopy.length - 1];
+  h.blob(g, 0, 0, 0.56 * s, 0.30 * s, 0.62 * s, 5, r, C[tone.body]);
+
   e.faces = f;
   e.simple = g;
 }
@@ -46,9 +75,9 @@ function defTree(key, label, forestChance, grassChance) {
       if (!h.dryLand(spot.owner)) return null;
       const e = {
         x: spot.x, y: spot.y, z: spot.owner.rz, owner: spot.owner,
-        s: h.rr(0.72, 1.18), rot: h.rnd() * Math.PI * 2,
-        tone: Math.floor(h.rnd() * 3)
+        s: h.rr(0.78, 1.24), rot: h.rnd() * Math.PI * 2
       };
+      e.canopy = makeCanopy(key, h.rnd());
       treeFaces(e, key, h);
       return e;
     }

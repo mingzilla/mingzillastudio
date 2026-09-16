@@ -2,7 +2,6 @@
 
 defEntity({
   key: "keep", group: "building", label: "Keep",
-  sizeMul: 2,          // twice the size of everything else
   spawn: {
     mode: "scatter", biomes: [BIOME.GRASS], density: 0.008, min: 1, max: 3,
     gap: 12,

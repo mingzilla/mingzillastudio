@@ -15,11 +15,18 @@ const COLORS = {
   rock:"#9ea4a9", rockDark:"#7f868d",
   soil:"#b5895c", base:"#96704c",
   trunk:"#7a5230",
-  pineA:"#3f7d45", pineB:"#356e3c", pineC:"#4a8c50",
-  leafA:"#4f8f3f", leafB:"#5da345", leafC:"#3d7a34",
-  autumnA:"#d9793a", autumnB:"#c85a34", autumnC:"#e0a13c",
-  wallA:"#f2e4ca", wallB:"#e6d3b3",
-  roofA:"#c9503c", roofB:"#b8432f", roofC:"#8a5aa0", roofD:"#c98a3a",
+  /* Deeper, more olive greens than the first pass. The reference art reads as
+     illustrated countryside rather than bright cartoon — the canopies sit dark
+     against the fields so the clumps stay legible from above. */
+  pineA:"#4a8040", pineB:"#5b9448", pineC:"#3d6b38",
+  leafA:"#679a44", leafB:"#7bad52", leafC:"#548340",
+  autumnA:"#c8722c", autumnB:"#b25c24", autumnC:"#d99a35",
+  wallA:"#f2e3c3", wallB:"#e8d0a6", wallC:"#dcc7a4",
+  /* saturated, and deliberately mixed — the reference roofs are red, orange,
+     blue, teal and green scattered through the same village */
+  roofA:"#c94f3a", roofB:"#b8432f", roofC:"#4f86ad", roofD:"#d98a35",
+  roofE:"#4a9a8a", roofF:"#6a9a52",
+  window:"#403a31", door:"#7d5a3c",
   cropA:"#d9b955", cropB:"#b99a3f",
   river:"#5cb2de",
   plank:"#b08a5c", timber:"#7d5a3c",
