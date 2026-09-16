@@ -23,6 +23,7 @@ description: Decisions for building a low-poly Dorfromantik-style browser game �
 - `WORLD_SCALE` = everything standing on the land
 - `sizeMul` in an entity file = that entity only, on top of WORLD_SCALE
 - drawn size is `e.s × sizeMul × WORLD_SCALE`, and `sizeMul` is linear, so 2 is exactly twice
+- anything drawn OUTSIDE the entity pipeline needs that multiplier by hand. the player is the usual casualty — it is drawn by its own function, so change WORLD_SCALE and the character stays half size while the valley grows around it
 - keep people and animals smaller than buildings — that contrast is what reads as scale
 
 ## Terrain
@@ -47,8 +48,9 @@ description: Decisions for building a low-poly Dorfromantik-style browser game �
 - batch faces by colour AND light band into one path per bucket — one fill per bucket
 - backface-cull; every primitive is convex
 - distance LOD, and scale every LOD and animation radius by `HEX_SIZE`. leave them fixed and a bigger world silently pushes the whole scene past the LOD
-- entities sort just in front of their own tile, biased by about a hex width, or the next tile paints over them
+- entities sort just in front of their own tile. on flat ground that is enough on its own; the extra bias only earns its keep at cliff edges, where a higher tile nearer the camera would otherwise paint over what stands behind it
 - mobile entities sort on their own depth, static ones on their tile
+- if a character looks half-buried in the ground, suspect SCALE before sorting. a shrunken character samples the ground above its own head, which looks exactly like being painted over and sends you chasing depth order for nothing
 
 ## Behaviour
 - store NOTHING in the browser — no localStorage, no cookies. refresh returns to the default
