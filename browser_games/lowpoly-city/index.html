@@ -222,6 +222,7 @@ const RUN_SPEED = 16.8;
 /* the terrain-scouting `where` rules in the asset files need these */
 Object.assign(H, { STEP, PLAIN, SEA, BASE_Z });
 
+
 let tiles = new Map();
 let tileList = [];
 let entities = [];
@@ -692,6 +693,8 @@ function fillBuf(n, ci, normal, alpha, seam) {
 function facing(n) { return n[0] * cam.s + n[1] * cam.c < 0.02; }
 
 const NRM = [0, 0, 0];       // scratch face normal, reused — see the note on PBUF
+const _scr = { x: 0, y: 0, d: 0 };   // scratch screen point for H.screenOf
+
 
 function drawTile(t) {
   const zt = t.rz;
@@ -856,6 +859,17 @@ function updateOutline() {
   OUTLINE_PX = Math.max(0.9, Math.min(2.4, cam.zoom * 0.036));
 }
 
+/* Entities may paint themselves directly instead of returning 3D faces. That is
+   how the 2D billboard trees work — see nature__tree.js. This has to run down
+   here, after ctx / cam / view / WORLD_SCALE exist; doing it up with the other
+   H properties hits the temporal dead zone. */
+Object.assign(H, {
+  ctx, cam, view, WORLD_SCALE,
+  INK: OUTLINE_INK,
+  /* screen position of a world point, in the SHARED _scr — read it and let it go */
+  screenOf: (x, y, z) => project(x, y, z, _scr)
+});
+
 /* A tree two hundred metres away covers a dozen pixels, so it doesn't need a
    full canopy. Distance LOD is most of the frame budget here.
 
@@ -879,10 +893,14 @@ function occluderAlpha(e) {
 }
 
 function drawEntity(e) {
-  const lod = (cam.zoom < LOD_ZOOM || !e._near) && e.simple && e.simple.length;
   const grow = e.birth >= 0 ? Math.min(1, (now - e.birth) / 0.35) : 1;
   const s = e.s * e.sizeMul * WORLD_SCALE * (0.45 + 0.55 * grow) * (1 + (1 - grow) * 0.3);
   const alpha = occluderAlpha(e);
+
+  /* a 2D entity paints itself, always facing the camera */
+  if (e.def.draw2d) { e.def.draw2d(e, s, alpha, H); return; }
+
+  const lod = (cam.zoom < LOD_ZOOM || !e._near) && e.simple && e.simple.length;
   if (!lod && e.dyn && e.dyn.length) drawFaces(e.dyn, e.x, e.y, e.z, s, alpha);
   drawFaces(lod ? e.simple : e.faces, e.x, e.y, e.z, s, alpha);
 }
