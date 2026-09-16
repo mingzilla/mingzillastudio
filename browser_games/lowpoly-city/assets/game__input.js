@@ -11,6 +11,7 @@ window.addEventListener("keydown", ev => {
   if (ev.code === "Space" && !ev.repeat) plantTree();
   if (ev.key === "r" || ev.key === "R") newValley();
   if (ev.key === "h" || ev.key === "H") toggleUI();
+  if (ev.key === "m" || ev.key === "M") toggleSound();
 });
 window.addEventListener("keyup", ev => { keys[ev.key.toLowerCase()] = false; keys[ev.code] = false; });
 window.addEventListener("blur", () => { for (const k in keys) keys[k] = false; });

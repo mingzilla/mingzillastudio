@@ -72,7 +72,7 @@
   body.ui-off #seedbar{opacity:0;transform:translateY(-8px);pointer-events:none}
   body.ui-off #hint{opacity:0;transform:translate(-50%,-8px);pointer-events:none}
 
-  #uiToggle{
+  #uiToggle,#sndToggle{
     position:fixed;top:14px;right:14px;z-index:11;
     width:34px;height:34px;padding:0;border-radius:10px;
     background:var(--panel);border:1px solid var(--edge);color:var(--ink);
@@ -80,9 +80,11 @@
     box-shadow:0 6px 18px rgba(60,50,30,.16);
     opacity:.5;transition:opacity .2s;
   }
-  #uiToggle:hover{opacity:1}
-  body.ui-off #uiToggle{opacity:.22}
-  body.ui-off #uiToggle:hover{opacity:1}
+  /* the sound button sits to the left of the panel one */
+  #sndToggle{right:56px}
+  #uiToggle:hover,#sndToggle:hover{opacity:1}
+  body.ui-off #uiToggle,body.ui-off #sndToggle{opacity:.22}
+  body.ui-off #uiToggle:hover,body.ui-off #sndToggle:hover{opacity:1}
   @media (prefers-reduced-motion:reduce){#hud,#seedbar,#hint{transition:none}}
 
   /* ---------------------------------------------------------------
@@ -172,6 +174,7 @@
     <kbd>Space</kbd><span>plant a tree</span>
     <kbd>&minus; +</kbd><span>zoom</span>
     <kbd>H</kbd><span>hide this panel</span>
+    <kbd>M</kbd><span>mute the animals</span>
   </div>
   <div id="stats">
     <span>fps <b id="sFps">–</b></span>
@@ -184,6 +187,7 @@
 </div>
 
 <button id="uiToggle" type="button" title="Hide the panel (H)" aria-label="Hide or show the panel">&#9776;</button>
+<button id="sndToggle" type="button" title="Mute (M)" aria-label="Mute the animals">&#128266;</button>
 
 <div id="seedbar">
   <label for="seed">seed</label>
@@ -277,6 +281,7 @@
 <!-- input, and the loop that ties it together -->
 <script src="assets/game__input.js"></script>
 <script src="assets/game__touch.js"></script>
+<script src="assets/game__sound.js"></script>
 <script src="assets/game__movement.js"></script>
 <script src="assets/game__boot.js"></script>
 </body>

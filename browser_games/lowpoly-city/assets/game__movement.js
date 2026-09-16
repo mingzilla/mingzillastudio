@@ -59,6 +59,7 @@ function update(dt) {
 
   buildPlayer();
   updateEntities(dt);
+  updateAnimalSounds();
 
   cam.x += (player.x - cam.x) * Math.min(1, dt * 6);
   cam.y += (player.y - cam.y) * Math.min(1, dt * 6);
