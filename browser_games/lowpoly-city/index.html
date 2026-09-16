@@ -207,6 +207,13 @@ const BASE_Z = SEA - 2.2;                // underside of the diorama block
 const RIM_IN = 0.82, RIM_OUT = 1.02;     // where the coast falls away
 const MIN_ZOOM = 6, MAX_ZOOM = 96;       // wide enough to still see the whole island
 
+/* Walking toward or away from the camera is foreshortened by the pitch: at 0.28
+   rad a step along the depth axis covers about half the screen distance the same
+   step covers across it, so up/down feels sluggish next to left/right. Scaling
+   the depth axis of the input compensates for the look without touching the
+   sideways speed. Exact screen-space parity would be 1/sin(PITCH) ~= 3.6. */
+const DEPTH_SPEED = 2;
+
 /* the terrain-scouting `where` rules in the asset files need these */
 Object.assign(H, { STEP, PLAIN, SEA, BASE_Z });
 
@@ -1038,12 +1045,14 @@ function update(dt) {
   player.run = running ? 1 : 0;
 
   if (ix || iy) {
-    /* Screen intent -> world. Screen-up is "away from the camera", which is
-       +ry, so W has to come through as +iy. */
-    let dx = ix * cam.c + iy * cam.s;
-    let dy = -ix * cam.s + iy * cam.c;
-    const L = Math.hypot(dx, dy);
-    dx /= L; dy /= L;
+    /* Normalise in SCREEN space first, then boost the toward/away axis, then
+       rotate into the world. Normalising after the rotation would cancel the
+       boost straight back out. */
+    const mag = Math.hypot(ix, iy);
+    const sx = ix / mag;
+    const sy = iy / mag * DEPTH_SPEED;
+    let dx = sx * cam.c + sy * cam.s;
+    let dy = -sx * cam.s + sy * cam.c;
 
     const step = (running ? 8.4 : 4.4) * dt;
     if (tryMove(player.x + dx * step, player.y + dy * step)) { /* clean */ }

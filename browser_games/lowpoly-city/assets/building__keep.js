@@ -2,6 +2,7 @@
 
 defEntity({
   key: "keep", group: "building", label: "Keep",
+  sizeMul: 2,          // on top of WORLD_SCALE — independent of people and animals
   spawn: {
     mode: "scatter", biomes: [BIOME.GRASS], density: 0.008, min: 1, max: 3,
     gap: 12,

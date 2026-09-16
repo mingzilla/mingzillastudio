@@ -2,6 +2,7 @@
 
 defEntity({
   key: "church", group: "building", label: "Church",
+  sizeMul: 2,          // on top of WORLD_SCALE — independent of people and animals
   spawn: {
     mode: "scatter", biomes: [BIOME.GRASS], density: 0.01, min: 1, max: 2,
     gap: 9,

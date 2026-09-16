@@ -12,6 +12,7 @@
 
 defEntity({
   key: "windmill", group: "building", label: "Windmill",
+  sizeMul: 2,          // on top of WORLD_SCALE — independent of people and animals
   spawn: {
     mode: "scatter", biomes: [BIOME.GRASS, BIOME.FIELD],
     density: 0.012, min: 2, max: 4, gap: 11,

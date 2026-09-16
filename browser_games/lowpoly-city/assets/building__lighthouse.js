@@ -2,6 +2,7 @@
 
 defEntity({
   key: "lighthouse", group: "building", label: "Lighthouse",
+  sizeMul: 2,          // on top of WORLD_SCALE — independent of people and animals
   spawn: {
     mode: "scatter", biomes: [BIOME.SAND], density: 0.02, min: 2, max: 3,
     gap: 14,

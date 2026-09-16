@@ -2,6 +2,7 @@
 
 defEntity({
   key: "barn", group: "building", label: "Barn",
+  sizeMul: 2,          // on top of WORLD_SCALE — independent of people and animals
   spawn: {
     mode: "scatter", biomes: [BIOME.GRASS, BIOME.FIELD],
     density: 0.012, min: 2, max: 5, gap: 7,

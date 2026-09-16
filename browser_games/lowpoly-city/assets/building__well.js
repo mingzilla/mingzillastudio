@@ -2,6 +2,7 @@
 
 defEntity({
   key: "well", group: "building", label: "Well",
+  sizeMul: 2,          // on top of WORLD_SCALE — independent of people and animals
   spawn: { kind: "village-centre", biomes: [BIOME.GRASS] },
   create({ t, h }) {
     const s = h.rr(0.85, 1.05), rot = h.rnd() * 6.28;
