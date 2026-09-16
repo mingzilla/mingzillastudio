@@ -16,6 +16,7 @@ const WALLS = ["wallA", "wallB", "wallC"];
 
 defEntity({
   key: "house", group: "building", label: "House",
+  sizeMul: 2,          // on top of WORLD_SCALE — independent of people and animals
   spawn: { kind: "village", biomes: [BIOME.GRASS] },
   create({ t, h }) {
     const s = h.rr(0.9, 1.1);

@@ -68,6 +68,7 @@ function treeFaces(e, kind, h) {
 function defTree(key, label, forestChance, grassChance) {
   defEntity({
     key, group: "nature", label,
+    sizeMul: 2,        // on top of WORLD_SCALE — independent of people and animals
     spawn: [
       { mode: "perTile", biomes: [BIOME.FOREST], chance: forestChance, count: [1, 2] },
       { mode: "perTile", biomes: [BIOME.GRASS],  chance: grassChance,  count: [1, 1] }
