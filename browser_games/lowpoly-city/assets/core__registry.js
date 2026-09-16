@@ -12,6 +12,8 @@
        nature__tree.js         tree, bush, rock
        vehicle__boat.js        something that moves on water
        core__*.js              shared plumbing, not an entity
+       game__*.js              the game around them: land, camera, drawing,
+                               input, the loop. Loaded last, in topic order.
 
    A definition looks like this:
 
@@ -69,8 +71,8 @@ function tileAtWorld(x, y) {
 /* Everything an entity definition is allowed to use, handed over as `h` so the
    asset files never reach for globals directly.
 
-   index.html adds a few more once it has defined them: STEP, PLAIN, SEA and
-   BASE_Z, which the terrain-scouting `where` rules need. */
+   game__terrain.js adds a few more once it has defined them: STEP, PLAIN, SEA
+   and BASE_Z, which the terrain-scouting `where` rules need. */
 const H = {
   prism, cone, blob, box, slab, gableRoof, off, push, faceNormal,
   CIDX, COLORS,

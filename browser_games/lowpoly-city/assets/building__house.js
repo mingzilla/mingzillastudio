@@ -6,9 +6,9 @@
    flush with the walls reads as a plain prism, and the reference art leans
    hard on that shadow line.
 
-   Houses are not scattered; the village builder in index.html picks a flat open
-   tile and fills in the ring around it. `kind: "village"` marks a building as
-   one that wants neighbours rather than open country.
+   Houses are not scattered; the village builder in game__placement.js picks a
+   flat open tile and fills in the ring around it. `kind: "village"` marks a
+   building as one that wants neighbours rather than open country.
    ========================================================================= */
 
 const ROOFS = ["roofA", "roofB", "roofC", "roofD", "roofE", "roofF"];

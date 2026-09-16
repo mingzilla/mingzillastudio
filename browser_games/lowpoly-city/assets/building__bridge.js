@@ -1,7 +1,7 @@
 /* =========================================================================
    building__bridge.js — the only way across a river
    =========================================================================
-   Not placed by the scatter rules. index.html marks one or two river tiles
+   Not placed by the scatter rules. game__river.js marks one or two river tiles
    as `t.bridge` while carving, sets `t.bridgeRot` square across the flow,
    and spawns one of these on each. Without them the river can cut the island
    in two and strand you.
