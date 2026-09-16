@@ -30,19 +30,34 @@ function audio() {
   if (actx) return actx;
   const Ctor = window.AudioContext || window.webkitAudioContext;
   if (!Ctor) return null;
+  /* Ask for the playback session, so a phone with the ringer switch off still
+     plays. Without this line Web Audio on iOS is silent for anyone whose
+     phone is on silent — which is most people, most of the time — and no
+     amount of unlocking will bring it back. */
+  if (navigator.audioSession) navigator.audioSession.type = "playback";
   actx = new Ctor();
   master = actx.createGain();
-  master.gain.value = 0.30;
+  master.gain.value = 0.45;      // phone speakers are small and this is quiet material
   master.connect(actx.destination);
   return actx;
 }
 
-/* Called from the first gesture. iOS will not let a page make a sound until
-   this has happened inside a real event handler, so it hangs off the same
-   events the game already listens for. */
+/* Called from every kind of first contact with the page. iOS wants more than a
+   resume(): it wants to see a source actually started inside the handler, so
+   one silent sample goes out with the first one. resume() alone works on some
+   versions and silently fails on others, which is the worst kind of bug. */
+let primed = false;
+
 function wakeAudio() {
   const a = audio();
-  if (a && a.state !== "running" && a.resume) a.resume();
+  if (!a) return;
+  if (a.state !== "running" && a.resume) a.resume();
+  if (primed) return;
+  primed = true;
+  const b = a.createBufferSource();
+  b.buffer = a.createBuffer(1, 1, a.sampleRate);
+  b.connect(a.destination);
+  b.start(0);
 }
 
 function noiseFor(a) {
@@ -160,5 +175,10 @@ function toggleSound(force) {
 /* No init call: the button ships in the right state, and building the context
    here would make a suspended one on page load for nothing. It waits for the
    first gesture, which is the only way a browser will let it start anyway. */
+/* Every route in: a tap, a touch on a browser that will not give us pointer
+   events, a key, a click, and coming back from the background. */
 window.addEventListener("pointerdown", wakeAudio);
+window.addEventListener("touchstart", wakeAudio, { passive: true });
 window.addEventListener("keydown", wakeAudio);
+window.addEventListener("click", wakeAudio);
+document.addEventListener("visibilitychange", () => { if (!document.hidden) wakeAudio(); });
