@@ -13,7 +13,13 @@ const LOD_R2 = (9.5 * HEX_SIZE) ** 2;
 const ANIM_R2 = (28 * HEX_SIZE) ** 2;
 const FADE_R2 = (2.6 * HEX_SIZE) ** 2;
 const LOD_ZOOM = 44 / HEX_SIZE;
-const TREE_KEYS = { pine: 1, leaf: 1, autumn: 1 };
+/* Every tree key, and nothing else. A tree missing from here still grows, but
+   it stops counting as one and — worse — stops fading out when it comes
+   between the camera and the player. */
+const TREE_KEYS = {
+  pine: 1, leaf: 1, autumn: 1,
+  fir: 1, birch: 1, palm: 1, cypress: 1, blossom: 1, dead: 1
+};
 
 /* Walking into a wood swallows the character completely, so anything standing
    between the camera and the player drops back to a ghost. */

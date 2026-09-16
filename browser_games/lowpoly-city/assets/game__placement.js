@@ -64,6 +64,14 @@ function placeVillages() {
   }
 }
 
+/* Anything marked `kind: "village"` wants neighbours rather than open country.
+   Houses are the filler; every other kind is placed at most once per village,
+   so a village gets one tavern rather than six. Adding another one is a matter
+   of writing the file and marking its spawn — nothing here needs to know. */
+const VILLAGE_EXTRA = DEFS.filter(d =>
+  d.spawn && !Array.isArray(d.spawn) &&
+  d.spawn.kind === "village" && d.key !== "house");
+
 function makeVillage(centre) {
   spawnEntity("well", centre);
   const homes = [centre];
@@ -71,11 +79,16 @@ function makeVillage(centre) {
     const n = tiles.get(key(centre.q + d[0], centre.r + d[1]));
     if (n && n.biome === BIOME.GRASS && rnd() < 0.6) homes.push(n);
   }
+  const extras = shuffleSeeded(VILLAGE_EXTRA.slice());
+  let next = 0;
   homes.forEach((t, i) => {
     if (i > 0 && rnd() < 0.22) return;
     const spot = tileSpot(t, i === 0 ? 0.18 : 0.48);
     if (spot.owner.biome !== BIOME.GRASS) return;
-    const e = spawnEntity("house", spot.owner);
+    /* never on the centre tile — that one is the well's */
+    const use = i > 0 && next < extras.length && rnd() < 0.55
+      ? extras[next++].key : "house";
+    const e = spawnEntity(use, spot.owner);
     if (e) { e.x = spot.x; e.y = spot.y; }
   });
 }

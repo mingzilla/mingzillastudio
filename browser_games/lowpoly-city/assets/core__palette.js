@@ -40,7 +40,20 @@ const COLORS = {
   goat:"#c9bda6", goatHorn:"#8a7d68",
   bird:"#3b4250", birdWing:"#59626f",
   coat:"#d94f43", trousers:"#3f4a5a", skin:"#f0cba0", hat:"#f5efe0",
-  shadow:"#2f4a26"
+  shadow:"#2f4a26",
+  /* Trees past the first three. Each is a skirt/body/crown trio like pine and
+     leaf, so a new shape only has to bring its own three names. */
+  firA:"#2f5d3a", firB:"#3d7047", firC:"#27492f",
+  birchBark:"#e6e2d6", birchA:"#8ec25c", birchB:"#a8d271", birchC:"#74a349",
+  palmTrunk:"#a8815a", palmA:"#4f9a52", palmB:"#68b366", palmC:"#3d7a43",
+  cypA:"#31543f", cypB:"#3e6449", cypC:"#254232",
+  blossomA:"#eeaec6", blossomB:"#f6cede", blossomC:"#dd8fae",
+  deadBark:"#6b5b4a", deadWood:"#8d7d69",
+  /* bushes */
+  hedgeA:"#47763a", hedgeB:"#589047",
+  flowerA:"#e8d44f", flowerB:"#e07a9a", flowerC:"#f2f0e2",
+  /* the ruin on the hill */
+  marbleA:"#f4f1e8", marbleB:"#e4dfd2", marbleC:"#cec7b6"
 };
 
 const CNAMES = Object.keys(COLORS);
