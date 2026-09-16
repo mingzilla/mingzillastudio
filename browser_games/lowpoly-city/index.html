@@ -129,7 +129,7 @@
 
 <div id="seedbar">
   <label for="seed">seed</label>
-  <input id="seed" value="7" inputmode="numeric">
+  <input id="seed" value="7" inputmode="numeric" autocomplete="off" spellcheck="false">
   <button id="regen">New valley</button>
 </div>
 
@@ -1101,7 +1101,14 @@ const sTrees = document.getElementById("sTrees");
 const sBeasts = document.getElementById("sBeasts");
 const sBuilds = document.getElementById("sBuilds");
 const sWhere = document.getElementById("sWhere");
+/* Nothing is written to localStorage, sessionStorage or cookies — a refresh
+   always rebuilds the default valley. This constant plus autocomplete="off" on
+   the input is only here because browsers will sometimes restore a form field
+   on reload, which would otherwise look like saved state. */
+const DEFAULT_SEED = "7";
 const seedInput = document.getElementById("seed");
+
+function resetSeedField() { seedInput.value = DEFAULT_SEED; }
 
 function newValley() {
   const raw = String(seedInput.value || "7").trim();
@@ -1130,6 +1137,7 @@ seedInput.addEventListener("keydown", ev => { if (ev.key === "Enter") newValley(
 window.addEventListener("resize", resize);
 
 resize();
+resetSeedField();
 newValley();
 showHint("Walk about. Press <b>Space</b> to plant a tree.");
 
