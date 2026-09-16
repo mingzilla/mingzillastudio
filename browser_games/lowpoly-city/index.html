@@ -35,7 +35,7 @@
   }
   #stats{
     margin-top:10px;padding-top:9px;border-top:1px solid var(--edge);
-    font-size:11.5px;opacity:.72;display:flex;gap:12px;flex-wrap:wrap;
+    font-size:11.5px;opacity:.72;display:flex;gap:10px;flex-wrap:wrap;
     font-variant-numeric:tabular-nums;
   }
   #stats b{font-weight:700}
@@ -64,6 +64,25 @@
   }
   #hint.on{opacity:1}
 
+  /* Hide-everything mode. Opacity rather than display so nothing reflows. */
+  #hud,#seedbar,#hint{transition:opacity .25s ease,transform .25s ease}
+  body.ui-off #hud,
+  body.ui-off #seedbar,
+  body.ui-off #hint{opacity:0;transform:translateY(-8px);pointer-events:none}
+
+  #uiToggle{
+    position:fixed;top:14px;right:14px;z-index:11;
+    width:34px;height:34px;padding:0;border-radius:10px;
+    background:var(--panel);border:1px solid var(--edge);color:var(--ink);
+    font-size:15px;line-height:1;cursor:pointer;display:grid;place-items:center;
+    box-shadow:0 6px 18px rgba(60,50,30,.16);
+    opacity:.5;transition:opacity .2s;
+  }
+  #uiToggle:hover{opacity:1}
+  body.ui-off #uiToggle{opacity:.22}
+  body.ui-off #uiToggle:hover{opacity:1}
+  @media (prefers-reduced-motion:reduce){#hud,#seedbar,#hint{transition:none}}
+
   #fail{
     position:fixed;inset:0;z-index:50;display:none;
     align-items:center;justify-content:center;text-align:center;
@@ -74,7 +93,7 @@
   #fail p{margin:0;font-size:14px;line-height:1.5;opacity:.75}
 
   @media (max-width:640px){
-    #hud{max-width:220px;padding:10px 11px}
+    #hud{max-width:230px;padding:10px 11px}
     .keys{font-size:11.5px}
     #stats{display:none}
   }
@@ -94,15 +113,19 @@
     <kbd>Shift</kbd><span>run</span>
     <kbd>Space</kbd><span>plant a tree</span>
     <kbd>&minus; +</kbd><span>zoom</span>
+    <kbd>H</kbd><span>hide this panel</span>
   </div>
   <div id="stats">
     <span>fps <b id="sFps">–</b></span>
     <span>tiles <b id="sTiles">–</b></span>
     <span>trees <b id="sTrees">–</b></span>
-    <span>folk <b id="sFolk">–</b></span>
+    <span>beasts <b id="sBeasts">–</b></span>
+    <span>builds <b id="sBuilds">–</b></span>
     <span id="sWhere">–</span>
   </div>
 </div>
+
+<button id="uiToggle" type="button" title="Hide the panel (H)" aria-label="Hide or show the panel">&#9776;</button>
 
 <div id="seedbar">
   <label for="seed">seed</label>
@@ -115,12 +138,46 @@
 <div id="fail">
   <div>
     <h2>Couldn't load D3</h2>
-    <p>The page pulls d3 v7 from a CDN, so it needs an internet connection the first time.
-       Check the network and reload.</p>
+    <p>The page pulls d3 v7 from a CDN, so it needs an internet connection the first
+       time. Check the network and reload.</p>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+
+<!-- shared plumbing -->
+<script src="assets/core__palette.js"></script>
+<script src="assets/core__random.js"></script>
+<script src="assets/core__hex.js"></script>
+<script src="assets/core__biome.js"></script>
+<script src="assets/core__primitives.js"></script>
+<script src="assets/core__creature.js"></script>
+<script src="assets/core__registry.js"></script>
+
+<!-- trees, scrub, rock -->
+<script src="assets/nature__tree.js"></script>
+<script src="assets/nature__bush.js"></script>
+<script src="assets/nature__rock.js"></script>
+
+<!-- buildings -->
+<script src="assets/building__house.js"></script>
+<script src="assets/building__church.js"></script>
+<script src="assets/building__barn.js"></script>
+<script src="assets/building__well.js"></script>
+<script src="assets/building__keep.js"></script>
+<script src="assets/building__lighthouse.js"></script>
+<script src="assets/building__windmill.js"></script>
+<script src="assets/building__bridge.js"></script>
+
+<!-- things that move -->
+<script src="assets/vehicle__boat.js"></script>
+<script src="assets/animal__sheep.js"></script>
+<script src="assets/animal__cow.js"></script>
+<script src="assets/animal__deer.js"></script>
+<script src="assets/animal__goat.js"></script>
+<script src="assets/animal__hen.js"></script>
+<script src="assets/animal__bird.js"></script>
+
 <script>
 "use strict";
 
@@ -130,283 +187,71 @@ if (typeof d3 === "undefined") {
 }
 
 /* =========================================================================
-   1.  PALETTE
-   Faces store a colour index and a world normal. The colour actually drawn
-   is looked up from a table of flat light bands, so shading a face costs one
-   array index — no per-frame colour maths, no string building.
+   TERRAIN SHAPE
+   =========================================================================
+   The valley is one flat plain with a single hill on it. Almost everything
+   sits at PLAIN; the hill is the only thing with real height, which is what
+   gives the waterfall somewhere to fall from and keeps the frame cheap —
+   flat ground means most tiles share two edges with neighbours at the same
+   height, so there is no cliff face to draw.
    ========================================================================= */
 
-const COLORS = {
-  grassA:"#84bd52", grassB:"#78b148", grassC:"#8fc95e", grassD:"#6ea43f",
-  forestFloor:"#5f9440",
-  sand:"#dfcf9f",
-  water:"#3f9fd4", waterDeep:"#2f86bd",
-  rock:"#9ea4a9", rockDark:"#7f868d",
-  soil:"#b5895c", base:"#96704c",
-  trunk:"#7a5230",
-  pineA:"#3f7d45", pineB:"#356e3c", pineC:"#4a8c50",
-  leafA:"#4f8f3f", leafB:"#5da345", leafC:"#3d7a34",
-  autumnA:"#d9793a", autumnB:"#c85a34", autumnC:"#e0a13c",
-  wallA:"#f2e4ca", wallB:"#e6d3b3",
-  roofA:"#c9503c", roofB:"#b8432f", roofC:"#8a5aa0", roofD:"#c98a3a",
-  cropA:"#d9b955", cropB:"#b99a3f",
-  river:"#5cb2de",
-  plank:"#b08a5c", timber:"#7d5a3c",
-  churchWall:"#f4efe2", churchRoof:"#7b6fa6", gold:"#e0b23c",
-  millWall:"#eadfc4", stone:"#bdb6a8",
-  barnWall:"#bf5b41", barnRoof:"#7e5c46",
-  lamp:"#ffd469",
-  hull:"#8a5a3a", trim:"#c9563f",
-  sheep:"#f6f3e8", cow:"#f7f3ea", cowPatch:"#403c37",
-  deer:"#b07a48", deerLight:"#e2c9a4", hen:"#f1e7d0", comb:"#d9503c",
-  goat:"#c9bda6", goatHorn:"#8a7d68",
-  coat:"#d94f43", trousers:"#3f4a5a", skin:"#f0cba0", hat:"#f5efe0",
-  shadow:"#2f4a26"
-};
+const HEX_R = 28;
+const SEA = 0;
+const STEP = 0.85;                       // height quantum
+const PLAIN = STEP;                      // flat land sits one step above the sea
+const HILL_STEPS = 5;
+const HILL_H = HILL_STEPS * STEP;
+const HILL_R = 9.0;                      // hill radius in world units
+const BASE_Z = SEA - 2.2;                // underside of the diorama block
+const RIM_IN = 0.82, RIM_OUT = 1.02;     // where the coast falls away
 
-const CNAMES = Object.keys(COLORS);
-const CIDX = {};
-CNAMES.forEach((k, i) => CIDX[k] = i);
-
-/* Six flat bands. The low-poly staple: no gradients on the geometry itself. */
-const BAND_K = [0.50, 0.64, 0.78, 0.92, 1.05, 1.18];
-const SHADES = CNAMES.map(k => {
-  const c = d3.hsl(COLORS[k]);
-  return BAND_K.map(b => d3.hsl(c.h, c.s, Math.max(0.05, Math.min(0.97, c.l * b))).formatHex());
-});
-
-/* =========================================================================
-   2.  SEEDED RANDOM + NOISE
-   d3.randomLcg gives a reproducible stream, so a seed always builds the same
-   valley. d3.shuffle isn't seedable, so shuffleSeeded does its own.
-   ========================================================================= */
-
-let rng = d3.randomLcg(1);
-const rnd = () => rng();
-const rr = (a, b) => a + (b - a) * rng();
-const ri = (a, b) => Math.floor(a + (b - a + 1) * rng());
-
-function shuffleSeeded(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1));
-    const t = arr[i]; arr[i] = arr[j]; arr[j] = t;
-  }
-  return arr;
-}
-
-const PERM = new Uint8Array(512);
-function buildPerm() {
-  const p = shuffleSeeded(d3.range(256));
-  for (let i = 0; i < 512; i++) PERM[i] = p[i & 255];
-}
-const hash2 = (ix, iy) => PERM[(PERM[ix & 255] + (iy & 255)) & 255] / 255;
-
-function smoothstep(e0, e1, x) {
-  const t = Math.max(0, Math.min(1, (x - e0) / (e1 - e0)));
-  return t * t * (3 - 2 * t);
-}
-function noise2(x, y) {
-  const ix = Math.floor(x), iy = Math.floor(y);
-  const fx = smoothstep(0, 1, x - ix), fy = smoothstep(0, 1, y - iy);
-  const a = hash2(ix, iy), b = hash2(ix + 1, iy), c = hash2(ix, iy + 1), d = hash2(ix + 1, iy + 1);
-  return (a * (1 - fx) + b * fx) * (1 - fy) + (c * (1 - fx) + d * fx) * fy;
-}
-function fbm(x, y, oct) {
-  let v = 0, amp = 0.5, f = 1, norm = 0;
-  for (let i = 0; i < oct; i++) { v += amp * noise2(x * f, y * f); norm += amp; amp *= 0.5; f *= 2.03; }
-  return v / norm;
-}
-
-/* =========================================================================
-   3.  HEX GRID  (pointy-top, axial)
-   ========================================================================= */
-
-const SQ3 = Math.sqrt(3);
-const HEX_R = 19;
-const SEA = 0;                     // water sits here
-const STEP = 0.50;                 // terrain height quantum
-const BASE_Z = SEA - 2.0;          // underside of the diorama block
-
-const hexCenter = (q, r) => ({ x: SQ3 * (q + r / 2), y: 1.5 * r });
-const key = (q, r) => q + "," + r;
-
-function worldToAxial(x, y) {
-  const fq = (SQ3 / 3) * x - y / 3;
-  const fr = (2 / 3) * y;
-  let cx = fq, cz = fr, cy = -cx - cz;
-  let rx = Math.round(cx), ry = Math.round(cy), rz = Math.round(cz);
-  const dx = Math.abs(rx - cx), dy = Math.abs(ry - cy), dz = Math.abs(rz - cz);
-  if (dx > dy && dx > dz) rx = -ry - rz;
-  else if (dy > dz) ry = -rx - rz;
-  else rz = -rx - ry;
-  return { q: rx, r: rz };
-}
-
-const CORNER = d3.range(6).map(i => {
-  const a = Math.PI / 180 * (60 * i - 30);
-  return { x: Math.cos(a), y: Math.sin(a), a };
-});
-
-const DIRS = [[1, 0], [1, -1], [0, -1], [-1, 0], [-1, 1], [0, 1]];
-
-/* Which neighbour lies across edge i? Derived from the corner geometry so
-   the two can't quietly drift apart. */
-const EDGE_TO_DIR = d3.range(6).map(i => {
-  const a = CORNER[i].a, b = CORNER[(i + 1) % 6].a;
-  const mid = Math.atan2(Math.sin(a) + Math.sin(b), Math.cos(a) + Math.cos(b));
-  let best = 0, bestD = 9;
-  DIRS.forEach((d, k) => {
-    const n = hexCenter(d[0], d[1]);
-    const ang = Math.atan2(n.y, n.x);
-    const diff = Math.abs(((ang - mid + Math.PI * 3) % (Math.PI * 2)) - Math.PI);
-    if (diff < bestD) { bestD = diff; best = k; }
-  });
-  return best;
-});
-
-/* =========================================================================
-   4.  LOW-POLY PRIMITIVES
-   Each appends flat-shaded faces to `out`. A face is {p:[[x,y,z]..], n:[..], c:idx}.
-   Coordinates are local to the entity; the renderer offsets by the entity origin.
-   Only triangles and quads are produced, which the renderer relies on.
-   ========================================================================= */
-
-function faceNormal(p) {
-  const ax = p[1][0] - p[0][0], ay = p[1][1] - p[0][1], az = p[1][2] - p[0][2];
-  const bx = p[2][0] - p[0][0], by = p[2][1] - p[0][1], bz = p[2][2] - p[0][2];
-  const nx = ay * bz - az * by, ny = az * bx - ax * bz, nz = ax * by - ay * bx;
-  const L = Math.hypot(nx, ny, nz) || 1;
-  return [nx / L, ny / L, nz / L];
-}
-function push(out, pts, ci) { out.push({ p: pts, n: faceNormal(pts), c: ci }); }
-
-function prism(out, cx, cy, z0, z1, rad, sides, rot, ci) {
-  const ring = [];
-  for (let i = 0; i < sides; i++) {
-    const a = rot + i * Math.PI * 2 / sides;
-    ring.push([cx + Math.cos(a) * rad, cy + Math.sin(a) * rad]);
-  }
-  for (let i = 0; i < sides; i++) {
-    const j = (i + 1) % sides;
-    push(out, [
-      [ring[i][0], ring[i][1], z0], [ring[j][0], ring[j][1], z0],
-      [ring[j][0], ring[j][1], z1], [ring[i][0], ring[i][1], z1]
-    ], ci);
-  }
-}
-
-function cone(out, cx, cy, z0, rad, height, sides, rot, ci) {
-  const apex = [cx, cy, z0 + height];
-  const ring = [];
-  for (let i = 0; i < sides; i++) {
-    const a = rot + i * Math.PI * 2 / sides;
-    ring.push([cx + Math.cos(a) * rad, cy + Math.sin(a) * rad, z0]);
-  }
-  for (let i = 0; i < sides; i++) push(out, [ring[i], ring[(i + 1) % sides], apex], ci);
-}
-
-/* bipyramid — the chunky low-poly blob, with a little irregularity */
-function blob(out, cx, cy, cz, rad, height, sides, rot, ci) {
-  const top = [cx, cy, cz + height * 0.58];
-  const bot = [cx, cy, cz - height * 0.42];
-  const ring = [];
-  for (let i = 0; i < sides; i++) {
-    const a = rot + i * Math.PI * 2 / sides;
-    const j = 0.84 + 0.30 * hash2(Math.round(cx * 13 + i * 7), Math.round(cy * 13));
-    ring.push([cx + Math.cos(a) * rad * j, cy + Math.sin(a) * rad * j, cz]);
-  }
-  for (let i = 0; i < sides; i++) {
-    const j = (i + 1) % sides;
-    push(out, [ring[i], ring[j], top], ci);
-    push(out, [ring[j], ring[i], bot], ci);
-  }
-}
-
-function box(out, cx, cy, z0, hx, hy, h, rot, ci) {
-  const c = Math.cos(rot), s = Math.sin(rot);
-  const cs = [[-hx, -hy], [hx, -hy], [hx, hy], [-hx, hy]]
-    .map(([x, y]) => [cx + x * c - y * s, cy + x * s + y * c]);
-  const z1 = z0 + h;
-  for (let i = 0; i < 4; i++) {
-    const j = (i + 1) % 4;
-    push(out, [
-      [cs[i][0], cs[i][1], z0], [cs[j][0], cs[j][1], z0],
-      [cs[j][0], cs[j][1], z1], [cs[i][0], cs[i][1], z1]
-    ], ci);
-  }
-  push(out, cs.map(p => [p[0], p[1], z1]), ci);
-}
-
-/* a point offset in the entity's own rotated frame */
-function off(rot, dx, dy) {
-  const c = Math.cos(rot), s = Math.sin(rot);
-  return [dx * c - dy * s, dx * s + dy * c];
-}
-
-/* flat double-sided quad — sails and awnings have no thickness worth modelling,
-   but they must not vanish when the camera swings behind them */
-function slab(out, a, b, c, d, ci) {
-  push(out, [a, b, c, d], ci);
-  push(out, [d, c, b, a], ci);
-}
-
-/* gabled roof: a triangular prism, which is what most roofs actually are */
-function gableRoof(out, cx, cy, z0, hx, hy, h, rot, ci) {
-  const P = (x, y, z) => { const [ox, oy] = off(rot, x, y); return [cx + ox, cy + oy, z]; };
-  const z1 = z0 + h;
-  const a0 = P(-hx, -hy, z0), a1 = P(hx, -hy, z0);
-  const b0 = P(-hx, hy, z0), b1 = P(hx, hy, z0);
-  const r0 = P(-hx, 0, z1), r1 = P(hx, 0, z1);
-  push(out, [a0, a1, r1, r0], ci);      // pitch facing -y
-  push(out, [r0, r1, b1, b0], ci);      // pitch facing +y
-  push(out, [a0, r0, b0], ci);          // gable ends
-  push(out, [a1, b1, r1], ci);
-}
-
-/* =========================================================================
-   5.  WORLD
-   ========================================================================= */
-
-const BIOME = { WATER: 0, SAND: 1, GRASS: 2, FOREST: 3, FIELD: 4, RIVER: 5 };
-const BIOME_NAME = ["water", "shore", "grass", "forest", "fields", "river"];
+/* the terrain-scouting `where` rules in the asset files need these */
+Object.assign(H, { STEP, PLAIN, SEA, BASE_Z });
 
 let tiles = new Map();
 let tileList = [];
 let entities = [];
-let treeCount = 0;
+let hill = { x: 0, y: 0 };
+
+/* =========================================================================
+   WORLD
+   ========================================================================= */
 
 function buildWorld(seed) {
   rng = d3.randomLcg(seed);
   buildPerm();
-  tiles = new Map(); tileList = []; entities = []; treeCount = 0;
+  tiles = new Map(); tileList = []; entities = [];
 
   const R = HEX_R;
+  const span = SQ3 * R * 0.95;
+
+  /* one hill, parked a little off centre at a random bearing */
+  const hillAng = rng() * Math.PI * 2, hillDist = span * 0.34;
+  hill = { x: Math.cos(hillAng) * hillDist, y: Math.sin(hillAng) * hillDist };
+
   for (let q = -R; q <= R; q++) {
     for (let r = Math.max(-R, -q - R); r <= Math.min(R, -q + R); r++) {
       const c = hexCenter(q, r);
-      const dist = Math.hypot(c.x, c.y) / (SQ3 * R * 0.95);
-      const falloff = 1 - smoothstep(0.55, 0.98, dist);
 
-      /* Snap the height to a quantum. Without this every hex sits at its own
-         height and the whole valley reads as a staircase of little brown
-         cliffs; snapped, you get flat plains that occasionally step. */
-      const base = fbm(c.x * 0.062 + 40.5, c.y * 0.062 + 40.5, 3);
-      const hRaw = base * falloff * 3.2 - 0.20;
-      const h = Math.round(hRaw / STEP) * STEP;
+      const rim = smoothstep(RIM_IN, RIM_OUT, Math.hypot(c.x, c.y) / span);
+      let h = PLAIN * (1 - rim);
 
-      const moist = fbm(c.x * 0.095 + 310.7, c.y * 0.095 + 310.7, 3);
+      const hd = Math.hypot(c.x - hill.x, c.y - hill.y) / HILL_R;
+      if (hd < 1) h += HILL_H * (1 - smoothstep(0.55, 1.0, hd));
+
+      h = Math.round(h / STEP) * STEP;
+
+      const moist = fbm(c.x * 0.075 + 310.7, c.y * 0.075 + 310.7, 3);
       const season = fbm(c.x * 0.052 + 880.1, c.y * 0.052 + 880.1, 2);
-
-      /* Sand is decided in the second pass — it means "touching water", not
-         "low ground", or the whole lowest terrace turns into one vast beach. */
-      const biome = h <= SEA ? BIOME.WATER : BIOME.GRASS;
 
       const wx = new Array(6), wy = new Array(6);
       for (let i = 0; i < 6; i++) { wx[i] = c.x + CORNER[i].x; wy[i] = c.y + CORNER[i].y; }
 
       const t = {
-        q, r, cx: c.x, cy: c.y, h, biome, moist, season,
-        rz: biome === BIOME.WATER ? SEA : h,
+        q, r, cx: c.x, cy: c.y, h, moist, season,
+        biome: h <= SEA ? BIOME.WATER : BIOME.GRASS,
+        rz: h <= SEA ? SEA : h,
         nb: new Array(6).fill(null),
         wx, wy,
         top: CIDX.grassA, side: CIDX.soil, rows: null,
@@ -424,22 +269,16 @@ function buildWorld(seed) {
     }
   });
 
-  carveRiver();
-
-  // second pass: biome, now that we know who touches water
+  // biome pass — needs neighbours, so it runs after linking
   tileList.forEach(t => {
     if (t.biome === BIOME.WATER) {
-      // open sea reads darker than the shallows, so the coast has some depth
       const shallow = t.nb.some(n => n && n.biome !== BIOME.WATER);
       t.top = shallow ? CIDX.water : CIDX.waterDeep;
       t.side = CIDX.base;
       return;
     }
-    if (t.biome === BIOME.RIVER) {
-      t.top = CIDX.river;
-      t.side = CIDX.soil;
-      return;
-    }
+    if (t.biome === BIOME.RIVER) { t.top = CIDX.river; t.side = CIDX.soil; return; }
+
     const shore = t.nb.some(n => n && (n.biome === BIOME.WATER || n.biome === BIOME.RIVER));
     if (shore) t.biome = BIOME.SAND;
     else if (t.moist > 0.55) t.biome = BIOME.FOREST;
@@ -447,85 +286,14 @@ function buildWorld(seed) {
     else t.biome = BIOME.GRASS;
 
     t.top = topColorFor(t.biome, t);
-    /* Furrow direction comes from a slow noise, not a per-tile hash, so a run
-       of field tiles ploughs the same way instead of hatching against itself. */
     if (t.biome === BIOME.FIELD) {
       const ang = fbm(t.cx * 0.019 + 700.3, t.cy * 0.019 + 700.3, 2) * Math.PI * 1.6;
       t.rows = makeFurrows(t.wx, t.wy, ang);
     }
   });
 
+  carveRiver();
   decorate();
-}
-
-/* A river runs from the highest ground down to the sea. Each tile in the path
-   is dropped to a level that falls as it goes, so the banks read as a valley
-   rather than a canal floating above the fields. */
-function carveRiver() {
-  let src = null, best = -Infinity;
-  for (const t of tileList) {
-    if (t.biome === BIOME.WATER) continue;
-    const mid = t.cx * t.cx + t.cy * t.cy;
-    const score = t.h - mid * 0.004;             // high, and not right on the edge
-    if (score > best) { best = score; src = t; }
-  }
-  if (!src) return;
-
-  const path = [];
-  const seen = new Set();
-  let cur = src, riverH = src.h;
-  for (let step = 0; step < 240; step++) {
-    if (!cur || seen.has(key(cur.q, cur.r))) break;
-    seen.add(key(cur.q, cur.r));
-    path.push(cur);
-    if (cur.biome === BIOME.WATER) break;        // reached the sea
-    riverH = Math.min(riverH - 0.30, cur.h);
-    let nxt = null, nbest = Infinity;
-    for (const d of DIRS) {
-      const n = tiles.get(key(cur.q + d[0], cur.r + d[1]));
-      if (!n || seen.has(key(n.q, n.r))) continue;
-      const score = n.h - Math.hypot(n.cx, n.cy) * 0.05;   // downhill first, outward as a tiebreak
-      if (score < nbest) { nbest = score; nxt = n; }
-    }
-    if (!nxt) break;
-    cur = nxt;
-  }
-  if (path.length < 4) return;
-
-  path.forEach((t, i) => {
-    if (t.biome === BIOME.WATER) return;
-    t.biome = BIOME.RIVER;
-    t.h = i === 0 ? t.h : Math.min(t.h, path[i - 1].h - 0.30);
-    t.rz = t.h;
-  });
-
-  /* Widen it: one hex to alternating sides of the flow, so it reads as a river
-     rather than a canal someone dug in a straight line. */
-  const wide = [];
-  for (let i = 1; i < path.length; i++) {
-    const a = path[i - 1], b = path[i];
-    if (b.biome !== BIOME.RIVER) continue;
-    const ang = Math.atan2(b.cy - a.cy, b.cx - a.cx) + (i % 2 ? Math.PI / 2 : -Math.PI / 2);
-    const w2 = worldToAxial(b.cx + Math.cos(ang) * 1.25, b.cy + Math.sin(ang) * 1.25);
-    const n = tiles.get(key(w2.q, w2.r));
-    if (n && n.biome !== BIOME.WATER && n.biome !== BIOME.RIVER) wide.push([n, b.rz]);
-  }
-  wide.forEach(([n, hz]) => {
-    n.biome = BIOME.RIVER;
-    n.h = Math.min(n.h, hz);
-    n.rz = n.h;
-  });
-
-  /* Bridges, or the river can cut the island in half and strand the player.
-     Rotated square across the flow. */
-  const crossable = path.filter(t => t.biome === BIOME.RIVER);
-  for (let n = 0; n < 2 && crossable.length > 4; n++) {
-    const t = crossable[Math.floor(crossable.length * (n + 1) / 3)];
-    const i = path.indexOf(t);
-    const a = path[Math.max(0, i - 1)], b = path[Math.min(path.length - 1, i + 1)];
-    t.bridge = true;
-    t.bridgeRot = Math.atan2(b.cy - a.cy, b.cx - a.cx) + Math.PI / 2;
-  }
 }
 
 function topColorFor(biome, t) {
@@ -538,9 +306,8 @@ function topColorFor(biome, t) {
   return p < 0.28 ? CIDX.grassA : p < 0.56 ? CIDX.grassB : p < 0.81 ? CIDX.grassC : CIDX.grassD;
 }
 
-/* Furrows: clip the hex against a slab running across it. Doing this in world
-   space (rather than in screen space) keeps them stuck to the ground as the
-   camera turns. */
+/* Furrows: clip the hex against a slab running across it. Done in world space
+   rather than screen space so they stay stuck to the ground as the camera turns. */
 function makeFurrows(wx, wy, ang) {
   const nx = Math.cos(ang), ny = Math.sin(ang);
   let mn = Infinity, mx = -Infinity;
@@ -577,509 +344,198 @@ function clipHalf(poly, nx, ny, c) {
   return out;
 }
 
-/* ---- trees, rocks, houses ---- */
+/* =========================================================================
+   RIVER AND WATERFALL
+   =========================================================================
+   The river leaves the hill's shoulder, falls the whole remaining height of
+   the hill in a single tile boundary — that drop IS the waterfall — and then
+   eases across the plain to the sea.
 
-function tileSpot(t, spread) {
-  const ang = rng() * Math.PI * 2;
-  const rad = spread * Math.sqrt(rng());
-  const x = t.cx + Math.cos(ang) * rad, y = t.cy + Math.sin(ang) * rad;
-  const w = worldToAxial(x, y);
-  return { x, y, owner: tiles.get(key(w.q, w.r)) || t };
-}
+   The fall is not drawn specially. A river tile whose neighbour is much lower
+   gets a foam-coloured cliff face like any other, which happens to be exactly
+   what falling water looks like from here.
+   ========================================================================= */
 
-function addTree(t, forest) {
-  const spot = tileSpot(t, forest ? 0.74 : 0.40);
-  if (!dryLand(spot.owner)) return;
-  const autumn = t.season > 0.66;
-  const e = {
-    kind: autumn ? "autumn" : (rng() < 0.62 ? "pine" : "leaf"),
-    x: spot.x, y: spot.y, z: spot.owner.rz, owner: spot.owner,
-    s: rr(0.72, 1.18), rot: rng() * Math.PI * 2, birth: -1, faces: null, simple: null
-  };
-  makeTreeFaces(e);
-  entities.push(e);
-  treeCount++;
-}
-
-function makeTreeFaces(e) {
-  const f = [], g = [];
-  const s = e.s, r = e.rot;
-  prism(f, 0, 0, 0, 0.30 * s, 0.072 * s, 5, r, CIDX.trunk);
-
-  if (e.kind === "autumn" || e.kind === "leaf") {
-    const pal = e.kind === "autumn"
-      ? [CIDX.autumnA, CIDX.autumnB, CIDX.autumnC]
-      : [CIDX.leafA, CIDX.leafB, CIDX.leafC];
-    const c = pal[Math.floor(rng() * 3)];
-    blob(f, 0, 0, 0.72 * s, 0.40 * s, 0.64 * s, 6, r + 0.3, c);
-    blob(g, 0, 0, 0.74 * s, 0.38 * s, 0.58 * s, 5, r, c);
-  } else {
-    const c = [CIDX.pineA, CIDX.pineB, CIDX.pineC][Math.floor(rng() * 3)];
-    cone(f, 0, 0, 0.14 * s, 0.35 * s, 0.72 * s, 6, r, c);
-    cone(f, 0, 0, 0.58 * s, 0.24 * s, 0.62 * s, 6, r + 0.5, c);
-    cone(g, 0, 0, 0.18 * s, 0.34 * s, 1.02 * s, 5, r, c);
+function carveRiver() {
+  let src = null, best = -Infinity;
+  for (const t of tileList) {
+    if (t.h <= SEA) continue;
+    const score = t.h - Math.hypot(t.cx - hill.x, t.cy - hill.y) * 0.4;
+    if (score > best) { best = score; src = t; }
   }
-  e.faces = f;
-  e.simple = g;
-}
+  if (!src) return;
 
-/* hay bales, so the fields look worked */
-function addHaystack(t) {
-  const spot = tileSpot(t, 0.55);
-  if (!dryLand(spot.owner)) return;
-  const s = rr(0.8, 1.1);
-  const f = [];
-  cone(f, 0, 0, 0, 0.15 * s, 0.26 * s, 6, rng() * 6, CIDX.cropA);
-  cone(f, 0, 0, 0.13 * s, 0.19 * s, 0.09 * s, 6, rng() * 6, CIDX.cropB);
-  add("hay", spot.owner, f, { s, x: spot.x, y: spot.y, tiny: TINY_HAY });
-}
-
-function addFlowers(t) {
-  const spot = tileSpot(t, 0.62);
-  if (!dryLand(spot.owner)) return;
-  const s = rr(0.7, 1.2);
-  const f = [];
-  const ci = [CIDX.comb, CIDX.gold, CIDX.churchWall, CIDX.churchRoof][Math.floor(rng() * 4)];
-  for (let i = 0; i < 3; i++) {
-    const [ox, oy] = off(rng() * 6.28, rr(-0.22, 0.22) * s, rr(-0.22, 0.22) * s);
-    box(f, ox, oy, 0, 0.035 * s, 0.035 * s, 0.075 * s, 0, ci);
+  const path = [];
+  const seen = new Set();
+  let cur = src;
+  for (let step = 0; step < 260; step++) {
+    if (!cur || seen.has(key(cur.q, cur.r))) break;
+    seen.add(key(cur.q, cur.r));
+    path.push(cur);
+    if (cur.biome === BIOME.WATER) break;
+    let nxt = null, nbest = Infinity;
+    for (const d of DIRS) {
+      const n = tiles.get(key(cur.q + d[0], cur.r + d[1]));
+      if (!n || seen.has(key(n.q, n.r))) continue;
+      const score = n.h - Math.hypot(n.cx, n.cy) * 0.05;   // downhill first, outward as tiebreak
+      if (score < nbest) { nbest = score; nxt = n; }
+    }
+    if (!nxt) break;
+    cur = nxt;
   }
-  add("flowers", spot.owner, f, { s, x: spot.x, y: spot.y, tiny: TINY_FLOWER });
-}
+  if (path.length < 6) return;
 
-function dryLand(t) { return t && t.biome !== BIOME.WATER && t.biome !== BIOME.RIVER; }
+  let prev = null, prevTile = null;
+  for (let i = 0; i < path.length; i++) {
+    const t = path[i];
+    if (t.biome === BIOME.WATER) break;
 
-function addBush(t) {
-  const spot = tileSpot(t, 0.6);
-  if (!dryLand(spot.owner)) return;
-  const s = rr(0.6, 1.1);
-  const f = [];
-  blob(f, 0, 0, 0.20 * s, 0.26 * s, 0.30 * s, 5, rng() * 6,
-    rng() < 0.5 ? CIDX.leafB : CIDX.leafC);
-  entities.push({
-    kind: "bush", x: spot.x, y: spot.y, z: spot.owner.rz, owner: spot.owner,
-    s, rot: 0, birth: -1, faces: f, simple: null
+    /* Sit just under the ground, and never higher than the tile upstream.
+       Across the flat plain that is a constant height, so the water runs
+       level; over the hill's shoulder it steps down, and those steps are the
+       waterfalls. */
+    let rz = t.h - 0.10;
+    if (prev !== null) rz = Math.min(rz, prev);   // prev holds a height, not a tile
+    rz = Math.max(rz, SEA);
+
+    if (prevTile && (prevTile.rz - rz) > STEP * 1.2) {
+      t.fall = true;
+      prevTile.fall = true;                  // both ends of the drop
+    }
+
+    t.biome = BIOME.RIVER;
+    t.h = rz; t.rz = rz; t.top = CIDX.river; t.side = CIDX.soil; t.rows = null;
+    prev = rz; prevTile = t;
+  }
+
+  /* Widen it: one hex to alternating sides of the flow, so it reads as a river
+     rather than a canal someone dug in a straight line. Never widen across the
+     fall, or the waterfall becomes a very wide waterfall. */
+  const wide = [];
+  for (let i = 1; i < path.length; i++) {
+    const a = path[i - 1], b = path[i];
+    if (b.biome !== BIOME.RIVER || b.fall || a.fall) continue;
+    const ang = Math.atan2(b.cy - a.cy, b.cx - a.cx) + (i % 2 ? Math.PI / 2 : -Math.PI / 2);
+    const wx = worldToAxial(b.cx + Math.cos(ang) * 1.25, b.cy + Math.sin(ang) * 1.25);
+    const n = tiles.get(key(wx.q, wx.r));
+    if (n && n.biome !== BIOME.WATER && n.biome !== BIOME.RIVER) wide.push([n, b.rz]);
+  }
+  wide.forEach(([n, hz]) => {
+    n.biome = BIOME.RIVER;
+    n.h = Math.min(n.h, hz); n.rz = n.h;
+    n.top = CIDX.river; n.side = CIDX.soil; n.rows = null;
   });
-}
 
-function addRock(t) {
-  const spot = tileSpot(t, 0.6);
-  if (!dryLand(spot.owner)) return;
-  const s = rr(0.5, 1.0);
-  const f = [];
-  blob(f, 0, 0, 0.15 * s, 0.30 * s, 0.34 * s, 6, rng() * 6, CIDX.rock);
-  entities.push({
-    kind: "rock", x: spot.x, y: spot.y, z: spot.owner.rz, owner: spot.owner,
-    s, rot: 0, birth: -1, faces: f, simple: null
-  });
+  /* Two bridges, or the river can cut the island in half and strand you. */
+  const crossable = path.filter(t => t.biome === BIOME.RIVER && !t.fall);
+  for (let n = 0; n < 2 && crossable.length > 5; n++) {
+    const t = crossable[Math.floor(crossable.length * (n + 1) / 3)];
+    const i = path.indexOf(t);
+    const a = path[Math.max(0, i - 1)], b = path[Math.min(path.length - 1, i + 1)];
+    t.bridge = true;
+    t.bridgeRot = Math.atan2(b.cy - a.cy, b.cx - a.cx) + Math.PI / 2;
+  }
 }
 
 /* =========================================================================
-   5b.  BUILDINGS AND CREATURES
+   PLACEMENT — driven entirely by the spawn rules in the asset files
    ========================================================================= */
 
-function add(kind, t, faces, opts) {
-  const e = Object.assign({
-    kind, x: t.cx, y: t.cy, z: t.rz, owner: t,
-    s: 1, rot: 0, birth: -1, faces: faces || [], dyn: null
-  }, opts || {});
-  entities.push(e);
-  return e;
-}
-
-/* ---- windmill: a tapered tower, plus sails rebuilt every frame ---- */
-function makeWindmill(t) {
-  const f = [];
-  const s = rr(0.9, 1.15);
-  const r = rng() * Math.PI * 2;
-  prism(f, 0, 0, 0.00 * s, 0.30 * s, 0.35 * s, 8, r, CIDX.millWall);
-  prism(f, 0, 0, 0.30 * s, 0.60 * s, 0.30 * s, 8, r, CIDX.millWall);
-  prism(f, 0, 0, 0.60 * s, 0.86 * s, 0.25 * s, 8, r, CIDX.millWall);
-  cone(f, 0, 0, 0.86 * s, 0.27 * s, 0.26 * s, 8, r, CIDX.roofA);
-  const [dx, dy] = off(r, 0, 0);
-  box(f, dx + Math.cos(r) * 0.34 * s, dy + Math.sin(r) * 0.34 * s, 0.02,
-    0.02 * s, 0.06 * s, 0.17 * s, r, CIDX.timber);
-  return add("windmill", t, f, {
-    s, rot: r, spin: rng() * 6.28, spinRate: rr(0.6, 1.1),
-    sailCi: CIDX.timber, hubZ: 0.72 * s, hubR: 0.38 * s, dyn: []
-  });
-}
-
-function windmillSails(e) {
-  const f = [], s = e.s, r = e.rot;
-  const px = -Math.sin(r), py = Math.cos(r);          // in the sail plane, horizontal
-  const hx = Math.cos(r) * e.hubR, hy = Math.sin(r) * e.hubR, hz = e.hubZ;
-  for (let k = 0; k < 4; k++) {
-    const a = e.spin + k * Math.PI / 2;
-    const ca = Math.cos(a), sa = Math.sin(a);
-    const dx = ca * px, dy = ca * py, dz = sa;
-    const tx = -sa * px, ty = -sa * py, tz = ca;
-    const P = (rr_, ww) => [hx + dx * rr_ + tx * ww, hy + dy * rr_ + ty * ww, hz + dz * rr_ + tz * ww];
-    const r0 = 0.10 * s, r1 = 0.62 * s, w = 0.088 * s;
-    slab(f, P(r0, -w), P(r1, -w), P(r1, w), P(r0, w), e.sailCi);
-  }
-  return f;
-}
-
-/* ---- church: nave with a gable roof, tower and spire ---- */
-function makeChurch(t) {
-  const f = [];
-  const s = rr(1.0, 1.2);
-  const r = Math.round(rng() * 4) * Math.PI / 2;
-  box(f, 0, 0, 0, 0.34 * s, 0.20 * s, 0.26 * s, r, CIDX.churchWall);
-  gableRoof(f, 0, 0, 0.26 * s, 0.35 * s, 0.21 * s, 0.22 * s, r, CIDX.churchRoof);
-  const [tx, ty] = off(r, 0.38 * s, 0);
-  box(f, tx, ty, 0, 0.12 * s, 0.12 * s, 0.64 * s, r, CIDX.churchWall);
-  cone(f, tx, ty, 0.64 * s, 0.14 * s, 0.36 * s, 4, r + Math.PI / 4, CIDX.churchRoof);
-  box(f, tx, ty, 1.00 * s, 0.011 * s, 0.011 * s, 0.09 * s, r, CIDX.gold);
-  box(f, tx, ty, 1.05 * s, 0.033 * s, 0.009 * s, 0.011 * s, r, CIDX.gold);
-  return add("church", t, f, { s, rot: r });
-}
-
-/* ---- farmhouse barn, with the big doors ---- */
-function makeBarn(t) {
-  const f = [];
-  const s = rr(0.95, 1.15);
-  const r = Math.round(rng() * 4) * Math.PI / 2;
-  box(f, 0, 0, 0, 0.36 * s, 0.22 * s, 0.26 * s, r, CIDX.barnWall);
-  gableRoof(f, 0, 0, 0.26 * s, 0.37 * s, 0.23 * s, 0.24 * s, r, CIDX.barnRoof);
-  const [dx, dy] = off(r, 0, 0.225 * s);
-  box(f, dx, dy, 0, 0.11 * s, 0.02 * s, 0.17 * s, r, CIDX.timber);
-  return add("barn", t, f, { s, rot: r });
-}
-
-function makeWell(t) {
-  const f = [];
-  const s = rr(0.85, 1.05), r = rng() * 6.28;
-  prism(f, 0, 0, 0, 0.16 * s, 0.13 * s, 6, r, CIDX.stone);
-  const [ax, ay] = off(r, 0.10 * s, 0);
-  const [bx, by] = off(r, -0.10 * s, 0);
-  box(f, ax, ay, 0.16 * s, 0.018 * s, 0.018 * s, 0.15 * s, r, CIDX.timber);
-  box(f, bx, by, 0.16 * s, 0.018 * s, 0.018 * s, 0.15 * s, r, CIDX.timber);
-  gableRoof(f, 0, 0, 0.31 * s, 0.14 * s, 0.11 * s, 0.09 * s, r, CIDX.roofB);
-  return add("well", t, f, { s, rot: r });
-}
-
-function makeKeep(t) {
-  const f = [];
-  const s = rr(0.95, 1.25), r = rng() * 6.28;
-  prism(f, 0, 0, 0, 0.62 * s, 0.21 * s, 6, r, CIDX.stone);
-  prism(f, 0, 0, 0.42 * s, 0.47 * s, 0.235 * s, 6, r, CIDX.rockDark);
-  cone(f, 0, 0, 0.62 * s, 0.24 * s, 0.30 * s, 6, r, CIDX.roofC);
-  return add("keep", t, f, { s, rot: r });
-}
-
-function makeLighthouse(t) {
-  const f = [];
-  const s = rr(0.95, 1.15), r = rng() * 6.28;
-  prism(f, 0, 0, 0.00 * s, 0.26 * s, 0.19 * s, 8, r, CIDX.churchWall);
-  prism(f, 0, 0, 0.26 * s, 0.56 * s, 0.155 * s, 8, r, CIDX.churchWall);
-  prism(f, 0, 0, 0.56 * s, 0.63 * s, 0.185 * s, 8, r, CIDX.trim);
-  prism(f, 0, 0, 0.63 * s, 0.79 * s, 0.135 * s, 8, r, CIDX.lamp);
-  prism(f, 0, 0, 0.79 * s, 0.85 * s, 0.18 * s, 8, r, CIDX.trim);
-  cone(f, 0, 0, 0.85 * s, 0.18 * s, 0.20 * s, 8, r, CIDX.roofB);
-  return add("lighthouse", t, f, { s, rot: r });
-}
-
-function boatFaces(s, r) {
-  const f = [];
-  const HULL = [[0.30, 0], [0.10, 0.13], [-0.22, 0.13], [-0.27, 0], [-0.22, -0.13], [0.10, -0.13]];
-  const pts = HULL.map(([x, y]) => off(r, x * s, y * s));
-  const h = 0.11 * s;
-  for (let i = 0; i < 6; i++) {
-    const j = (i + 1) % 6;
-    push(f, [[pts[i][0], pts[i][1], 0], [pts[j][0], pts[j][1], 0],
-             [pts[j][0], pts[j][1], h], [pts[i][0], pts[i][1], h]], CIDX.hull);
-  }
-  push(f, pts.map(p => [p[0], p[1], h]), CIDX.plank);
-  prism(f, 0, 0, h, h + 0.36 * s, 0.014 * s, 4, r, CIDX.timber);
-  const [px, py] = off(r, 1, 0);
-  slab(f,
-    [0, 0, h + 0.34 * s],
-    [px * 0.24 * s, py * 0.24 * s, h + 0.32 * s],
-    [px * 0.24 * s, py * 0.24 * s, h + 0.04 * s],
-    [0, 0, h + 0.04 * s], CIDX.trim);
-  return f;
-}
-
-function makeBoat(t) {
-  const s = rr(0.85, 1.25), r = rng() * 6.28;
-  const e = add("boat", t, boatFaces(s, r), {
-    s, rot: r, mobile: true, bob: rng() * 6.28, driftA: rng() * 6.28,
-    homeX: t.cx, homeY: t.cy, drift: rr(0.10, 0.22), driftR: rr(0.10, 0.22)
-  });
-  e.z = t.rz + 0.03;
-  return e;
-}
-
-function makeBoatFaces(e) { return boatFaces(e.s, e.rot); }
-
-function makeBridge(t) {
-  const f = [];
-  const r = t.bridgeRot, s = 1.0;
-  box(f, 0, 0, 0, 0.90, 0.17, 0.06, r, CIDX.plank);
-  [-0.15, 0.15].forEach(side => {
-    const [rx, ry] = off(r, 0, side);
-    box(f, rx, ry, 0.06, 0.90, 0.02, 0.035, r, CIDX.timber);
-    [-0.62, 0, 0.62].forEach(u => {
-      const [ux, uy] = off(r, u, side);
-      box(f, ux, uy, 0.06, 0.022, 0.022, 0.10, r, CIDX.timber);
-    });
-  });
-  return add("bridge", t, f, { s, rot: r });
-}
-
-/* ---- animals ---- */
-
-const SPECIES = {
-  sheep: { bodyLen: 0.34, bodyWid: 0.24, bodyH: 0.26, legH: 0.15, headR: 0.082, gait: 6.5,
-           bodyCi: "sheep", headCi: "cowPatch", legCi: "cowPatch", speed: 0.55 },
-  cow:   { bodyLen: 0.46, bodyWid: 0.26, bodyH: 0.30, legH: 0.24, headR: 0.098, gait: 5.0,
-           bodyCi: "cow", headCi: "cow", legCi: "cowPatch", speed: 0.40, patches: true },
-  deer:  { bodyLen: 0.40, bodyWid: 0.20, bodyH: 0.23, legH: 0.28, headR: 0.072, gait: 8.0,
-           bodyCi: "deer", headCi: "deer", legCi: "deerLight", speed: 0.95, antlers: true },
-  goat:  { bodyLen: 0.28, bodyWid: 0.18, bodyH: 0.20, legH: 0.15, headR: 0.066, gait: 7.5,
-           bodyCi: "goat", headCi: "goat", legCi: "goatHorn", speed: 0.70, horns: true },
-  hen:   { bodyLen: 0.15, bodyWid: 0.12, bodyH: 0.13, legH: 0.065, headR: 0.048, gait: 12,
-           bodyCi: "hen", headCi: "hen", legCi: "gold", speed: 0.40, comb: true }
-};
-
-function animalFaces(e) {
-  const f = [], sp = e.sp, s = e.s, r = e.facing;
-  const swing = Math.sin(e.phase) * e.moving;
-  const bob = Math.abs(Math.cos(e.phase)) * 0.012 * e.moving * s;
-  const bl = sp.bodyLen * s, bw = sp.bodyWid * s, bh = sp.bodyH * s, lh = sp.legH * s;
-  const legCi = CIDX[sp.legCi], bodyCi = CIDX[sp.bodyCi], headCi = CIDX[sp.headCi];
-
-  const LX = 0.28 * bl, LY = 0.32 * bw;
-  for (let i = 0; i < 4; i++) {
-    const ph = (i === 0 || i === 3) ? 1 : -1;
-    const [px, py] = off(r, (i < 2 ? LX : -LX) + ph * swing * 0.05 * s, i % 2 ? LY : -LY);
-    prism(f, px, py, 0, lh, 0.024 * s, 3, r, legCi);
-  }
-  blob(f, 0, 0, lh + bh * 0.44 + bob, bl * 0.5, bh, 7, r, bodyCi);
-  if (sp.patches) {
-    const [qx, qy] = off(r, bl * 0.18, bw * 0.26);
-    blob(f, qx, qy, lh + bh * 0.58 + bob, bl * 0.20, bh * 0.55, 5, r + 0.6, CIDX.cowPatch);
-  }
-  const [hx, hy] = off(r, bl * 0.60, 0);
-  blob(f, hx, hy, lh + bh * 0.64 + bob, sp.headR * s, sp.headR * 1.9 * s, 6, r, headCi);
-  if (sp.antlers || sp.horns) {
-    const ci = sp.antlers ? CIDX.deerLight : CIDX.goatHorn;
-    const hh = (sp.antlers ? 0.07 : 0.05) * s;
-    [0.7, -0.7].forEach(k => {
-      const [ax, ay] = off(r, bl * 0.62, sp.headR * k * s);
-      box(f, ax, ay, lh + bh * 0.80 + bob, 0.008 * s, 0.008 * s, hh, r, ci);
-    });
-  }
-  if (sp.comb) {
-    const [cx2, cy2] = off(r, bl * 0.58, 0);
-    box(f, cx2, cy2, lh + bh * 0.88 + bob, 0.011 * s, 0.011 * s, 0.032 * s, r, CIDX.comb);
-  }
-  return f;
-}
-
-function makeAnimal(t, kind) {
-  const e = {
-    kind: "animal", species: kind, sp: SPECIES[kind],
-    x: t.cx, y: t.cy, z: t.rz, owner: t, s: rr(0.9, 1.15),
-    facing: rng() * 6.28, phase: rng() * 6.28, moving: 0, wait: rr(0, 2),
-    homeX: t.cx, homeY: t.cy, tx: t.cx, ty: t.cy,
-    mobile: true, birth: -1, faces: [], dyn: []
-  };
-  entities.push(e);
-  return e;
-}
-
-function pickAnimalTarget(e) {
-  for (let tries = 0; tries < 8; tries++) {
-    const a = rng() * Math.PI * 2, d = rr(1.0, 4.0);
-    const tx = e.homeX + Math.cos(a) * d, ty = e.homeY + Math.sin(a) * d;
-    const t = tileAt(tx, ty);
-    if (t && walkable(t)) { e.tx = tx; e.ty = ty; return; }
-  }
-  e.tx = e.homeX; e.ty = e.homeY;
-}
-
-function updateAnimal(e, dt) {
-  if (e.wait > 0) {
-    e.wait -= dt;
-    e.moving += (0 - e.moving) * Math.min(1, dt * 5);
-    return;
-  }
-  const dx = e.tx - e.x, dy = e.ty - e.y;
-  const d = Math.hypot(dx, dy);
-  if (d < 0.10) { e.wait = rr(0.7, 3.4); pickAnimalTarget(e); return; }
-
-  const step = e.sp.speed * dt;
-  const nx = e.x + dx / d * step, ny = e.y + dy / d * step;
-  const t = tileAt(nx, ny);
-  if (!t || !walkable(t)) { pickAnimalTarget(e); return; }
-  e.x = nx; e.y = ny; e.owner = t;
-  e.z += (t.rz - e.z) * Math.min(1, dt * 8);
-  const want = Math.atan2(dy, dx);
-  const diff = ((want - e.facing + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
-  e.facing += diff * Math.min(1, dt * 6);
-  e.moving = Math.min(1, e.moving + dt * 4);
-  e.phase += dt * e.sp.gait;
-}
+const clampI = (v, a, b) => v < a ? a : v > b ? b : v;
+const countFor = (spec, t) => typeof spec === "function" ? spec(t, H)
+                       : Array.isArray(spec) ? (spec[0] + Math.floor(rnd() * (spec[1] - spec[0] + 1)))
+                       : 1;
 
 function decorate() {
-  const flatGrass = [];
-  tileList.forEach(t => {
-    if (t.biome === BIOME.WATER || t.biome === BIOME.RIVER) return;
-    if (t.biome === BIOME.FOREST) {
-      const n = ri(2, 4);
-      for (let i = 0; i < n; i++) addTree(t, true);
-      if (rng() < 0.10) addBush(t);
-    } else if (t.biome === BIOME.FIELD) {
-      if (rng() < 0.05) addRock(t);
-      if (rng() < 0.04) addBush(t);
-      if (rng() < 0.02) addHaystack(t);
-    } else if (t.biome === BIOME.GRASS) {
-      const n = rng() < 0.30 ? ri(1, 3) : 0;
-      for (let i = 0; i < n; i++) addTree(t, false);
-      if (rng() < 0.05) addRock(t);
-      if (rng() < 0.12) addBush(t);
-      if (rng() < 0.13) addFlowers(t);
-      if (t.h > SEA && t.h <= STEP * 3) flatGrass.push(t);
-    } else {
-      if (rng() < 0.12) addBush(t);
-      if (rng() < 0.08) addFlowers(t);
+  for (const def of DEFS) {
+    if (!def.spawn) continue;
+    const rules = Array.isArray(def.spawn) ? def.spawn : [def.spawn];
+    for (const rule of rules) {
+      if (rule.kind) continue;                    // village / water kinds spawn elsewhere
+      if (rule.mode === "perTile") spawnPerTile(def, rule);
+      else if (rule.mode === "scatter") spawnScatter(def, rule);
     }
-  });
+  }
+  placeVillages();
+  placeBoats();
+  tileList.forEach(t => { if (t.bridge) spawnEntity("bridge", t); });
+}
 
-  shuffleSeeded(flatGrass);
+function spawnPerTile(def, rule) {
+  for (const t of tileList) {
+    if (rule.biomes.indexOf(t.biome) < 0) continue;
+    if (rule.where && !rule.where(t, H)) continue;
+    const chance = typeof rule.chance === "function" ? rule.chance(t, H)
+                 : rule.chance === undefined ? 1 : rule.chance;
+    if (chance <= 0 || rnd() >= chance) continue;
+    const n = rule.count ? countFor(rule.count, t) : 1;
+    for (let i = 0; i < n; i++) spawnEntity(def.key, t);
+  }
+}
+
+function spawnScatter(def, rule) {
+  const pool = tileList.filter(t =>
+    rule.biomes.indexOf(t.biome) >= 0 && (!rule.where || rule.where(t, H)));
+  shuffleSeeded(pool);
+  const want = clampI(Math.round(pool.length * (rule.density || 0.02)), rule.min || 0, rule.max || 999);
+  const taken = [];
+  let placed = 0;
+  for (const t of pool) {
+    if (placed >= want) break;
+    if (rule.gap && taken.some(s => Math.hypot(s.cx - t.cx, s.cy - t.cy) < rule.gap)) continue;
+    if (spawnEntity(def.key, t)) { taken.push(t); placed++; }
+  }
+}
+
+/* Villages: a well in the middle, houses on the flat ring around it. */
+function placeVillages() {
+  const flat = tileList.filter(t =>
+    t.biome === BIOME.GRASS && t.h > SEA && t.h <= PLAIN + STEP);
+  shuffleSeeded(flat);
   const sites = [];
-  for (const t of flatGrass) {
+  for (const t of flat) {
     if (sites.length >= 10) break;
     if (sites.every(s => Math.hypot(s.cx - t.cx, s.cy - t.cy) > 4.6)) {
       sites.push(t);
-      placeVillage(t);
+      makeVillage(t);
     }
   }
-
-  placeLandmarks();
-  placeBoats();
-  placeBridges();
-  placeAnimals(sites);
 }
 
-function placeVillage(center) {
-  const homes = [center];
-  for (let i = 0; i < 6; i++) {
-    const d = DIRS[i];
-    const n = tiles.get(key(center.q + d[0], center.r + d[1]));
-    if (n && n.biome === BIOME.GRASS && rng() < 0.60) homes.push(n);
+function makeVillage(centre) {
+  spawnEntity("well", centre);
+  const homes = [centre];
+  for (const d of DIRS) {
+    const n = tiles.get(key(centre.q + d[0], centre.r + d[1]));
+    if (n && n.biome === BIOME.GRASS && rnd() < 0.6) homes.push(n);
   }
   homes.forEach((t, i) => {
-    if (i > 0 && rng() < 0.22) return;
+    if (i > 0 && rnd() < 0.22) return;
     const spot = tileSpot(t, i === 0 ? 0.18 : 0.48);
     if (spot.owner.biome !== BIOME.GRASS) return;
-    if (i === 0) { makeWell(spot.owner); return; }     // village well at the middle
-    const s = rr(0.86, 1.12);
-    const rot = Math.round(rng() * 4) * Math.PI / 2 + (rng() < 0.3 ? Math.PI / 4 : 0);
-    const f = [];
-    const hx = 0.30 * s, hy = 0.24 * s, hh = 0.36 * s;
-    box(f, 0, 0, 0, hx, hy, hh, rot, rng() < 0.5 ? CIDX.wallA : CIDX.wallB);
-    if (rng() < 0.55) {
-      gableRoof(f, 0, 0, hh, hx * 1.06, hy * 1.1, 0.30 * s, rot,
-        [CIDX.roofA, CIDX.roofB, CIDX.roofC, CIDX.roofD][Math.floor(rng() * 4)]);
-    } else {
-      cone(f, 0, 0, hh, Math.max(hx, hy) * 1.34, 0.30 * s, 4, rot + Math.PI / 4,
-        [CIDX.roofA, CIDX.roofB, CIDX.roofC, CIDX.roofD][Math.floor(rng() * 4)]);
-    }
-    if (rng() < 0.5) {
-      // chimney, offset in the house's own frame so it stays on the roof when rotated
-      const [cx2, cy2] = off(rot, 0.15 * s, 0.11 * s);
-      box(f, cx2, cy2, hh + 0.12 * s, 0.045 * s, 0.045 * s, 0.22 * s, rot, CIDX.rockDark);
-    }
-    add("house", spot.owner, f, { s, rot, x: spot.x, y: spot.y });
+    const e = spawnEntity("house", spot.owner);
+    if (e) { e.x = spot.x; e.y = spot.y; }
   });
-}
-
-/* Landmarks want specific ground: churches and keeps get the high spots,
-   windmills and barns the open flats, lighthouses the coast. */
-function placeLandmarks() {
-  const open = [], high = [], coast = [];
-  tileList.forEach(t => {
-    if (t.biome === BIOME.GRASS || t.biome === BIOME.FIELD) {
-      if (t.h > SEA && t.h <= STEP * 2) open.push(t);
-      if (t.h >= STEP * 3) high.push(t);
-    }
-    if (t.biome === BIOME.SAND && t.nb.some(n => n && n.biome === BIOME.WATER)) coast.push(t);
-  });
-  shuffleSeeded(open); shuffleSeeded(high); shuffleSeeded(coast);
-
-  const taken = [];
-  const grab = (pool, minGap, budget) => {
-    const out = [];
-    for (const t of pool) {
-      if (out.length >= budget) break;
-      if (taken.every(s => Math.hypot(s.cx - t.cx, s.cy - t.cy) > minGap)) {
-        taken.push(t); out.push(t);
-      }
-    }
-    return out;
-  };
-
-  grab(high, 9, 2).forEach(makeChurch);
-  grab(open, 11, ri(3, 5)).forEach(makeWindmill);
-  grab(open, 7, ri(3, 5)).forEach(makeBarn);
-  grab(high, 12, ri(1, 3)).forEach(makeKeep);
-  grab(coast, 14, ri(2, 3)).forEach(makeLighthouse);
-}
-
-function placeBridges() {
-  tileList.forEach(t => { if (t.bridge) makeBridge(t); });
 }
 
 function placeBoats() {
   const water = tileList.filter(t =>
     t.biome === BIOME.WATER && t.nb.some(n => n && n.biome !== BIOME.WATER));
   shuffleSeeded(water);
-  water.slice(0, Math.min(18, Math.max(6, Math.floor(water.length * 0.10)))).forEach(makeBoat);
+  const n = clampI(Math.round(water.length * 0.06), 6, 18);
+  water.slice(0, n).forEach(t => spawnEntity("boat", t));
 }
-
-function placeAnimals(sites) {
-  const graze = [], wood = [], yards = [];
-  tileList.forEach(t => {
-    if (t.biome === BIOME.GRASS || t.biome === BIOME.FIELD) graze.push(t);
-    else if (t.biome === BIOME.FOREST && rng() < 0.45) wood.push(t);
-  });
-  sites.forEach(s => {
-    for (let i = 0; i < 6; i++) {
-      const d = DIRS[i];
-      const n = tiles.get(key(s.q + d[0], s.r + d[1]));
-      if (n && n.biome === BIOME.GRASS) yards.push(n);
-    }
-  });
-
-  const put = (pool, kind, n) => {
-    shuffleSeeded(pool);
-    pool.slice(0, n).forEach(t => makeAnimal(t, kind));
-  };
-  put(graze, "sheep", clampI(Math.round(graze.length * 0.075), 14, 46));
-  put(graze, "cow", clampI(Math.round(graze.length * 0.035), 6, 22));
-  put(wood, "deer", clampI(Math.round(wood.length * 0.16), 8, 30));
-  put(wood, "goat", clampI(Math.round(wood.length * 0.05), 3, 12));
-  put(yards, "hen", clampI(yards.length * 2, 6, 30));
-}
-
-function clampI(v, a, b) { return v < a ? a : v > b ? b : v; }
 
 /* =========================================================================
-   6.  PLAYER
+   PLAYER
    ========================================================================= */
 
 const player = { x: 0, y: 0, z: 0, facing: 0, walk: 0, moving: 0, run: 0, faces: [] };
 
 function spawnPlayer() {
-  /* start in the middle of the valley, not at whichever tile happens to come
-     first out of the generator — otherwise you spawn on the coast */
   let home = null, best = Infinity;
   for (const t of tileList) {
-    if (t.biome !== BIOME.GRASS || t.h <= SEA || t.h > STEP * 2) continue;
+    if (t.biome !== BIOME.GRASS || t.h <= SEA || t.h > PLAIN) continue;
     const d = t.cx * t.cx + t.cy * t.cy;
     if (d < best) { best = d; home = t; }
   }
@@ -1097,7 +553,6 @@ function buildPlayer() {
   const c = Math.cos(player.facing), sn = Math.sin(player.facing);
   const fwd = (dx, dy) => [dx * c - dy * sn, dx * sn + dy * c];
 
-  // legs swing along the character's own forward axis
   [-1, 1].forEach(side => {
     const kick = side * swing * 0.10 * s;
     const [lx, ly] = fwd(0.105 * s + kick, 0);
@@ -1121,7 +576,7 @@ function buildPlayer() {
 }
 
 /* =========================================================================
-   7.  CAMERA + PROJECTION
+   CAMERA + PROJECTION
    ========================================================================= */
 
 const PITCH = 0.60;
@@ -1149,7 +604,6 @@ function updateLight() {
   LWy = -LV[0] * cam.s + LV[1] * cam.c;
   LWz = LV[2];
 }
-
 function bandOf(n) {
   const d = n[0] * LWx + n[1] * LWy + n[2] * LWz;
   let i = Math.round((d * 0.72 + 0.36) * (BAND_K.length - 1));
@@ -1158,13 +612,28 @@ function bandOf(n) {
 }
 
 /* =========================================================================
-   8.  RENDER
+   RENDER
    ========================================================================= */
 
 const canvas = document.getElementById("view");
 const ctx = canvas.getContext("2d");
 const PBUF = d3.range(8).map(() => ({ x: 0, y: 0 }));
+
+/* Draw list. DRAW holds references into POOL, which grows to a high-water mark
+   and is never thrown away — so a frame allocates no objects at all once it has
+   warmed up. Building {d,k,r} literals every frame was ~460 objects a frame,
+   which is ~28k a second of pure garbage for the collector to sweep. */
+const POOL = [];
 const DRAW = [];
+let drawN = 0;
+
+function drawPush(d, k, r) {
+  let it = POOL[drawN];
+  if (it === undefined) it = POOL[drawN] = { d: 0, k: 0, r: null };
+  it.d = d; it.k = k; it.r = r;
+  DRAW.push(it);
+  drawN++;
+}
 let playerDepth = 0;
 let skyGrad = null;
 
@@ -1183,9 +652,6 @@ function resize() {
   skyGrad = g;
 }
 
-/* Straight to the context: this runs a few thousand times a frame, and
-   d3.path() builds a string, so it would be the wrong tool in this loop.
-   d3 carries the world generation, the colour system and the grid maths. */
 function fillBuf(n, ci, normal, alpha, seam) {
   const col = SHADES[ci][bandOf(normal)];
   ctx.beginPath();
@@ -1196,19 +662,17 @@ function fillBuf(n, ci, normal, alpha, seam) {
   if (alpha !== undefined) ctx.globalAlpha = alpha;
   ctx.fill();
   if (alpha !== undefined) ctx.globalAlpha = 1;
-  /* Anti-aliasing leaves a hairline between two tiles that share an edge at
-     the same height, which reads as a grid drawn over the grass. Stroking the
-     big flat faces with their own colour closes it. Only worth it on tops. */
-  if (seam) {
-    ctx.strokeStyle = col;
-    ctx.lineWidth = 1;
-    ctx.stroke();
-  }
+  /* Anti-aliasing leaves a hairline between two tiles sharing an edge at the
+     same height, which reads as a grid drawn over the grass. Stroking the big
+     flat faces with their own colour closes it. Only worth it on tile tops. */
+  if (seam) { ctx.strokeStyle = col; ctx.lineWidth = 1; ctx.stroke(); }
 }
 
 /* Every solid here is convex, so anything facing away is hidden behind its own
    front. Dropping those roughly halves the fills. */
 function facing(n) { return n[0] * cam.s + n[1] * cam.c < 0.02; }
+
+const NRM = [0, 0, 0];       // scratch face normal, reused — see the note on PBUF
 
 function drawTile(t) {
   const zt = t.rz;
@@ -1220,13 +684,19 @@ function drawTile(t) {
     if (zb >= zt - 0.004) continue;
     const ex = (t.wx[i] + t.wx[j]) / 2 - t.cx, ey = (t.wy[i] + t.wy[j]) / 2 - t.cy;
     const L = Math.hypot(ex, ey) || 1;
-    const nrm = [ex / L, ey / L, 0];
-    if (!facing(nrm)) continue;
+    NRM[0] = ex / L; NRM[1] = ey / L; NRM[2] = 0;
+    if (!facing(NRM)) continue;
+
+    /* a river dropping a long way is a waterfall; nothing else needs painting */
+    const river = t.biome === BIOME.RIVER || (nb && nb.biome === BIOME.RIVER);
+    const ci = river && (zt - zb) > STEP * 1.4 ? CIDX.foam
+             : nb ? t.side : CIDX.base;
+
     project(t.wx[i], t.wy[i], zt, PBUF[0]);
     project(t.wx[j], t.wy[j], zt, PBUF[1]);
     project(t.wx[j], t.wy[j], zb, PBUF[2]);
     project(t.wx[i], t.wy[i], zb, PBUF[3]);
-    fillBuf(4, nb ? t.side : CIDX.base, nrm);
+    fillBuf(4, ci, NRM);
   }
 
   for (let i = 0; i < 6; i++) project(t.wx[i], t.wy[i], zt, PBUF[i]);
@@ -1243,9 +713,9 @@ function drawTile(t) {
   }
 }
 
-/* Faces of one solid that share a fill colour can go into a single canvas path,
-   and one fill draws the lot. A pine's three cones are the same green, so this
-   turns ~18 fills into about four. Buckets are keyed by colour AND light band,
+/* Faces of one solid sharing a fill colour go into a single canvas path, and
+   one fill draws the lot. A pine's two cones are the same green, so this turns
+   a dozen fills into about three. Buckets are keyed by colour AND light band,
    because the band is what actually picks the drawn colour. */
 const MAXF = 512;
 const NKEYS = CNAMES.length * 8;
@@ -1269,20 +739,21 @@ function drawFaces(faces, ox, oy, oz, scale, alpha) {
     const f = faces[fi], p = f.p, n = p.length;
     if (!facing(f.n)) continue;
     if (nf >= MAXF) break;
-    /* projection inlined: this loop runs tens of thousands of times a frame,
-       and going through a scratch object for every vertex showed up in the profile */
+    /* projection inlined: this loop runs tens of thousands of times a frame */
     for (let i = 0; i < n; i++) {
       const v = p[i];
-      const dx = ox + v[0] * scale - camX, dy = oy + v[1] * scale - camY, dz = oz + v[2] * scale - camZ;
+      const dx = ox + v[0] * scale - camX;
+      const dy = oy + v[1] * scale - camY;
+      const dz = oz + v[2] * scale - camZ;
       const rx = dx * cc - dy * cs;
       const ry = dx * cs + dy * cc;
       const o = (nf * 4 + i) * 2;
       FBUF[o] = halfW + rx * z;
       FBUF[o + 1] = baseY + (-ry * SINP - dz * COSP) * z;
     }
-    const key = f.c * 8 + bandOf(f.n);
-    FCNT[nf] = n; FKEY[nf] = key;
-    if (!BCOUNT[key]++) { BUSED[key] = 1; BUSED_LIST[nused++] = key; }
+    const k = f.c * 8 + bandOf(f.n);
+    FCNT[nf] = n; FKEY[nf] = k;
+    if (!BCOUNT[k]++) { BUSED[k] = 1; BUSED_LIST[nused++] = k; }
     nf++;
   }
 
@@ -1308,75 +779,60 @@ function drawFaces(faces, ox, oy, oz, scale, alpha) {
     }
     ctx.fillStyle = SHADES[k >> 3][k & 7];
     ctx.fill();
-    /* BCOUNT doubled as the write cursor during placement, so it has to go back
-       to zero — leave it dirty and the next call thinks every bucket is used,
-       marks nothing, and silently draws nothing at all. */
+    /* BCOUNT doubled as the write cursor, so it has to go back to zero —
+       leave it dirty and the next call marks nothing used and draws nothing */
     BUSED[k] = 0;
     BCOUNT[k] = 0;
   }
   if (alpha !== undefined) ctx.globalAlpha = 1;
 }
 
-const TREE_KINDS = { pine: 1, leaf: 1, autumn: 1 };
+/* A tree two hundred metres away covers a dozen pixels, so it doesn't need two
+   cones and a canopy. Distance LOD is most of the frame budget here. */
+const LOD_R2 = 9.5 * 9.5;
+const ANIM_R2 = 28 * 28;
+const TREE_KEYS = { pine: 1, leaf: 1, autumn: 1 };
 const FADE_R2 = 2.6 * 2.6;
 
 /* Walking into a wood swallows the character completely, so anything standing
    between the camera and the player drops back to a ghost. */
 function occluderAlpha(e) {
-  if (!TREE_KINDS[e.kind]) return undefined;
-  if (e.owner._d >= playerDepth) return undefined;      // behind the player, leave it
+  if (!TREE_KEYS[e.key]) return undefined;
+  if (e.owner._d >= playerDepth) return undefined;
   const dx = e.x - player.x, dy = e.y - player.y;
   return dx * dx + dy * dy < FADE_R2 ? 0.20 : undefined;
 }
 
-/* A tree two hundred metres away covers a dozen pixels, so it doesn't need
-   three cones and two canopies. Distance LOD is most of the frame budget here:
-   a thousand trees at full detail is ~25k faces. */
-const LOD_R2 = 9.5 * 9.5;
-const TINY_FLOWER = 34, TINY_HAY = 26;   // zoom below which these are specks
-
 function drawEntity(e) {
   const lod = (cam.zoom < 44 || !e._near) && e.simple && e.simple.length;
   const grow = e.birth >= 0 ? Math.min(1, (now - e.birth) / 0.35) : 1;
-  const s = e.s * (0.45 + 0.55 * grow) * (1 + (1 - grow) * 0.3);
+  const s = e.s * e.sizeMul * (0.45 + 0.55 * grow) * (1 + (1 - grow) * 0.3);
   const alpha = occluderAlpha(e);
   if (!lod && e.dyn && e.dyn.length) drawFaces(e.dyn, e.x, e.y, e.z, s, alpha);
   drawFaces(lod ? e.simple : e.faces, e.x, e.y, e.z, s, alpha);
 }
 
-/* Only animate what's near enough to see move. Everything else holds its pose,
-   which keeps a valley full of livestock cheap. */
-const ANIM_R2 = 28 * 28;
+/* Animated entities are rebuilt from scratch every time they tick — a walking
+   sheep is a few hundred small arrays. Ticking them all every frame was the
+   single biggest source of garbage in the scene, and a sheep at 20fps looks
+   exactly like a sheep at 60. So each one ticks on a rotating third of frames,
+   and gets handed the time it actually missed. */
+const ANIM_SLICES = 3;
+let frameNo = 0;
 
 function updateEntities(dt) {
+  frameNo++;
   for (let i = 0; i < entities.length; i++) {
     const e = entities[i];
     const dx = e.x - player.x, dy = e.y - player.y;
     const d2 = dx * dx + dy * dy;
-    const near = d2 < ANIM_R2;
-    e._near = d2 < LOD_R2;                  // distance LOD, read by drawEntity
-
-    if (e.kind === "windmill") {
-      if (near) {
-        e.spin += dt * e.spinRate;
-        e.dyn = windmillSails(e);
-      }
-    } else if (e.kind === "animal") {
-      if (near) {
-        updateAnimal(e, dt);
-        e.dyn = animalFaces(e);
-      }
-    } else if (e.kind === "boat") {
-      if (near) {
-        e.bob += dt * 1.3;
-        e.driftA = (e.driftA || 0) + dt * e.drift;
-        e.x = e.homeX + Math.cos(e.driftA) * e.driftR;
-        e.y = e.homeY + Math.sin(e.driftA) * e.driftR;
-        e.z = e.owner.rz + 0.03 + Math.sin(e.bob) * 0.022;
-        e.rot = e.driftA + Math.PI / 2;
-        e.faces = makeBoatFaces(e);
-      }
-    }
+    e._near = d2 < LOD_R2;
+    if (!e.def.anim || d2 > ANIM_R2) continue;
+    e.acc = (e.acc || 0) + dt;
+    if (e.tick === undefined) e.tick = i % ANIM_SLICES;
+    if ((frameNo + e.tick) % ANIM_SLICES !== 0) continue;
+    e.def.anim(e, e.acc, H);
+    e.acc = 0;
   }
 }
 
@@ -1397,8 +853,8 @@ function render() {
   ctx.fillRect(0, 0, view.w, view.h);
 
   updateLight();
-
   DRAW.length = 0;
+  drawN = 0;
   const margin = 1.5 * cam.zoom;
 
   for (let i = 0; i < tileList.length; i++) {
@@ -1408,24 +864,23 @@ function render() {
         PBUF[0].y < -margin || PBUF[0].y > view.h + margin) { t._vis = false; continue; }
     t._vis = true;
     t._d = PBUF[0].d - 0.01;                 // entities on it draw just after it
-    DRAW.push({ d: PBUF[0].d, k: 0, r: t });
+    drawPush(PBUF[0].d, 0, t);
   }
 
   for (let i = 0; i < entities.length; i++) {
     const e = entities[i];
-    /* a creature that has wandered is no longer where its tile says it is, so it
-       sorts on its own depth; static things sort with the tile they stand on */
+    /* a creature that has wandered is no longer where its tile says it is, so
+       it sorts on its own depth; static things sort with the tile they're on */
     const mobile = e.mobile;
-    if (e.tiny !== undefined && cam.zoom < e.tiny) continue;
     if (!mobile && !e.owner._vis) continue;
     project(e.x, e.y, e.z, PBUF[0]);
     if (PBUF[0].x < -margin || PBUF[0].x > view.w + margin ||
         PBUF[0].y < -margin || PBUF[0].y > view.h + margin) continue;
-    DRAW.push({ d: mobile ? PBUF[0].d - 0.02 : e.owner._d, k: 1, r: e });
+    drawPush(mobile ? PBUF[0].d - 0.02 : e.owner._d, 1, e);
   }
 
   playerDepth = project(player.x, player.y, player.z, PBUF[0]).d - 0.02;
-  DRAW.push({ d: playerDepth, k: 2, r: null });
+  drawPush(playerDepth, 2, null);
 
   DRAW.sort((p, q) => q.d - p.d);
 
@@ -1438,7 +893,7 @@ function render() {
 }
 
 /* =========================================================================
-   9.  INPUT
+   INPUT
    ========================================================================= */
 
 const keys = Object.create(null);
@@ -1449,6 +904,7 @@ window.addEventListener("keydown", ev => {
   keys[ev.code] = true;
   if (ev.code === "Space" && !ev.repeat) plantTree();
   if (ev.key === "r" || ev.key === "R") newValley();
+  if (ev.key === "h" || ev.key === "H") toggleUI();
 });
 window.addEventListener("keyup", ev => { keys[ev.key.toLowerCase()] = false; keys[ev.code] = false; });
 window.addEventListener("blur", () => { for (const k in keys) keys[k] = false; });
@@ -1457,6 +913,16 @@ canvas.addEventListener("wheel", ev => {
   ev.preventDefault();
   cam.target = Math.max(16, Math.min(90, cam.target * (ev.deltaY > 0 ? 0.9 : 1.11)));
 }, { passive: false });
+
+const uiToggle = document.getElementById("uiToggle");
+function toggleUI(force) {
+  const off = force === undefined
+    ? !document.body.classList.contains("ui-off")
+    : force;
+  document.body.classList.toggle("ui-off", off);
+  uiToggle.title = (off ? "Show" : "Hide") + " the panel (H)";
+}
+uiToggle.addEventListener("click", () => toggleUI());
 
 const hint = document.getElementById("hint");
 let hintTimer = null;
@@ -1471,49 +937,30 @@ let planted = 0;
 function plantTree() {
   const px = player.x + Math.cos(player.facing) * 0.95;
   const py = player.y + Math.sin(player.facing) * 0.95;
-  const w = worldToAxial(px, py);
-  const owner = tiles.get(key(w.q, w.r));
-  if (!owner || owner.biome === BIOME.WATER) { showHint("Not in the water, thanks."); return; }
-
-  const e = {
-    kind: rng() < 0.6 ? "pine" : "leaf",
-    x: px, y: py, z: owner.rz, owner,
-    s: rr(0.8, 1.15), rot: rng() * Math.PI * 2, birth: now, faces: null, simple: null
-  };
-  makeTreeFaces(e);
-  entities.push(e);
-  treeCount++; planted++;
+  const t = tileAtWorld(px, py);
+  if (!t || !dryLand(t)) { showHint("Not in the water, thanks."); return; }
+  const e = spawnEntity(rnd() < 0.6 ? "pine" : "leaf", t);
+  if (!e) return;
+  e.x = px; e.y = py; e.birth = now;
+  planted++;
   if (planted === 1) showHint("Nice. <b>Space</b> plants another.");
   else if (planted === 10) showHint("Ten trees. You're basically a forester now.");
 }
 
 /* =========================================================================
-   10.  MOVEMENT
+   MOVEMENT
    ========================================================================= */
 
-function tileAt(x, y) {
-  const w = worldToAxial(x, y);
-  return tiles.get(key(w.q, w.r));
-}
-
-/* Bridges are the only way over a river, which is the whole point of them. */
-function walkable(t) {
-  if (!t) return false;
-  if (t.biome === BIOME.WATER) return false;
-  if (t.biome === BIOME.RIVER && !t.bridge) return false;
-  return true;
-}
-
 function tryMove(nx, ny) {
-  const t = tileAt(nx, ny);
+  const t = tileAtWorld(nx, ny);
   if (!walkable(t)) return false;
-  if (Math.abs(t.rz - player.z) > 0.85) return false;      // no scaling cliffs
+  if (Math.abs(t.rz - player.z) > 2.2) return false;       // no scaling sheer cliffs
   player.x = nx; player.y = ny;
   return true;
 }
 
 function update(dt) {
-  const turn = (keys["q"] || keys["Q"] ? 1 : 0) - (keys["e"] || keys["E"] ? 1 : 0);
+  const turn = (keys["q"] ? 1 : 0) - (keys["e"] ? 1 : 0);
   if (turn) cam.yaw += turn * dt * 1.9;
   cam.c = Math.cos(cam.yaw); cam.s = Math.sin(cam.yaw);
 
@@ -1528,8 +975,7 @@ function update(dt) {
 
   if (ix || iy) {
     /* Screen intent -> world. Screen-up is "away from the camera", which is
-       +ry, so W has to come through as +iy. It was negated here before, which
-       walked you towards the viewer. */
+       +ry, so W has to come through as +iy. */
     let dx = ix * cam.c + iy * cam.s;
     let dy = -ix * cam.s + iy * cam.c;
     const L = Math.hypot(dx, dy);
@@ -1553,7 +999,7 @@ function update(dt) {
     player.moving += (0 - player.moving) * Math.min(1, dt * 12);
   }
 
-  const t = tileAt(player.x, player.y);
+  const t = tileAtWorld(player.x, player.y);
   if (t) player.z += (t.rz - player.z) * Math.min(1, dt * 12);
 
   buildPlayer();
@@ -1565,13 +1011,15 @@ function update(dt) {
 }
 
 /* =========================================================================
-   11.  BOOT
+   BOOT
    ========================================================================= */
 
 let now = 0, last = 0, fpsAcc = 0, fpsN = 0;
 const sFps = document.getElementById("sFps");
 const sTiles = document.getElementById("sTiles");
 const sTrees = document.getElementById("sTrees");
+const sBeasts = document.getElementById("sBeasts");
+const sBuilds = document.getElementById("sBuilds");
 const sWhere = document.getElementById("sWhere");
 const seedInput = document.getElementById("seed");
 
@@ -1583,10 +1031,15 @@ function newValley() {
   spawnPlayer();
   planted = 0;
   sTiles.textContent = tileList.length;
-  sTrees.textContent = treeCount;
-  let beasts = 0;
-  for (const e of entities) if (e.kind === "animal" || e.kind === "boat") beasts++;
-  document.getElementById("sFolk").textContent = beasts;
+  let trees = 0, beasts = 0, builds = 0;
+  for (const e of entities) {
+    if (e.group === "nature" && TREE_KEYS[e.key]) trees++;
+    else if (e.group === "animal" || e.group === "vehicle") beasts++;
+    else builds++;
+  }
+  sTrees.textContent = trees;
+  sBeasts.textContent = beasts;
+  sBuilds.textContent = builds;
 }
 
 document.getElementById("regen").addEventListener("click", () => {
@@ -1615,7 +1068,7 @@ function frame(ts) {
   if (fpsAcc > 0.5) {
     sFps.textContent = Math.round(fpsN / fpsAcc);
     fpsAcc = 0; fpsN = 0;
-    const t = tileAt(player.x, player.y);
+    const t = tileAtWorld(player.x, player.y);
     sWhere.textContent = t ? BIOME_NAME[t.biome] : "–";
   }
 }
