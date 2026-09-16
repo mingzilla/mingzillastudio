@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>What's The Actual Problem? — a Kenny game</title>
+<style>
+  :root{
+    --bg:#12161c;
+    --bg2:#1a202a;
+    --line:#2c3542;
+    --ink:#eef2f7;
+    --dim:#93a1b3;
+    --waffle:#7c5cff;
+    --problem:#26c281;
+    --bad:#ff5d5d;
+    --warn:#ffb020;
+    --card:#f4f6fa;
+    --cardink:#151a21;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    background:radial-gradient(120% 90% at 50% 0%, #1b2330 0%, var(--bg) 60%);
+    color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    letter-spacing:.01em;
+    overflow:hidden;
+    -webkit-tap-highlight-color:transparent;
+    user-select:none;
+  }
+  button{font:inherit;color:inherit}
+
+  /* ---------- shell ---------- */
+  #app{position:fixed;inset:0;display:flex;flex-direction:column}
+
+  header{
+    display:flex;align-items:center;gap:14px;
+    padding:10px 16px;border-bottom:1px solid var(--line);
+    background:rgba(18,22,28,.75);backdrop-filter:blur(6px);
+    flex:0 0 auto;z-index:20;
+  }
+  .brand{font-weight:800;font-size:15px;white-space:nowrap}
+  .brand small{display:block;font-weight:500;font-size:11px;color:var(--dim);letter-spacing:.06em;text-transform:uppercase}
+
+  .stat{display:flex;flex-direction:column;gap:2px;min-width:64px}
+  .stat b{font-size:17px;font-variant-numeric:tabular-nums;line-height:1}
+  .stat span{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+
+  .pat{flex:1 1 auto;min-width:110px;max-width:340px}
+  .pat .track{height:12px;border-radius:999px;background:#232c38;border:1px solid var(--line);overflow:hidden}
+  .pat .fill{height:100%;width:100%;border-radius:999px;background:linear-gradient(90deg,#26c281,#8fd14f);transition:width .18s ease, background .3s ease}
+  .pat.low .fill{background:linear-gradient(90deg,#ffb020,#ff8a3d)}
+  .pat.crit .fill{background:linear-gradient(90deg,#ff5d5d,#ff2d55)}
+
+  .iconbtn{
+    background:#232c38;border:1px solid var(--line);border-radius:10px;
+    padding:7px 10px;font-size:12px;cursor:pointer;
+  }
+  .iconbtn:hover{background:#2b3644}
+
+  /* ---------- stage ---------- */
+  #stage{position:relative;flex:1 1 auto;overflow:hidden}
+
+  #desk{
+    position:absolute;left:0;right:0;bottom:0;height:34px;
+    background:
+      repeating-linear-gradient(90deg,#232c38 0 2px,transparent 2px 26px),
+      linear-gradient(180deg,#1e2733,#151b24);
+    border-top:2px solid #2f3a49;
+  }
+  #deskline{position:absolute;left:0;right:0;border-top:2px dashed rgba(147,161,179,.25)}
+
+  #mug{
+    position:absolute;right:26px;bottom:30px;width:46px;height:auto;opacity:.9;
+  }
+
+  /* ---------- cards ---------- */
+  /* outer .card carries the fall position; inner .cardFace carries the juice.
+     Keeps the death animations from fighting the transform we move the card with. */
+  .card{position:absolute;top:0;left:0;cursor:pointer;will-change:transform}
+  .cardFace{
+    position:relative;
+    padding:14px 15px;
+    background:var(--card);color:var(--cardink);
+    border-radius:14px;
+    box-shadow:0 10px 24px rgba(0,0,0,.45), inset 0 -3px 0 rgba(0,0,0,.08);
+    font-size:18px;line-height:1.32;font-weight:650;
+    text-wrap:balance;
+  }
+  .cardFace .tag{
+    display:block;font-size:10px;font-weight:800;letter-spacing:.1em;
+    text-transform:uppercase;color:#9aa7b6;margin-bottom:6px;white-space:nowrap;
+  }
+  .card.killed,.card.ok,.card.shot{pointer-events:none}
+  .card.killed .cardFace{animation:kill .28s ease forwards}
+  .card.ok .cardFace{animation:ok .5s ease forwards}
+  .card.shot .cardFace{animation:shot .45s ease forwards}
+  @keyframes kill{
+    0%{filter:brightness(1)}
+    35%{filter:brightness(2.2);box-shadow:0 0 0 4px rgba(124,92,255,.5),0 0 40px rgba(124,92,255,.7)}
+    100%{opacity:0;transform:scale(.68)}
+  }
+  @keyframes ok{
+    0%{box-shadow:0 0 0 4px rgba(38,194,129,.55),0 0 34px rgba(38,194,129,.55)}
+    100%{opacity:0;transform:translateY(16px) scale(.94)}
+  }
+  @keyframes shot{
+    0%{background:#fff;box-shadow:0 0 0 5px rgba(255,93,93,.6),0 0 44px rgba(255,93,93,.7)}
+    100%{opacity:0;transform:scale(1.12) rotate(3deg)}
+  }
+  .stamp{
+    position:absolute;inset:auto 8px 8px auto;
+    font-size:11px;font-weight:900;letter-spacing:.12em;
+    padding:4px 8px;border-radius:6px;
+  }
+  .stamp.real{color:#0d3d27;background:#8ff0c0}
+  .stamp.wa{color:#2b1c66;background:#cfc2ff}
+
+  /* ---------- floaters ---------- */
+  .pop{
+    position:absolute;pointer-events:none;font-weight:900;font-size:20px;
+    font-variant-numeric:tabular-nums;text-shadow:0 2px 10px rgba(0,0,0,.7);
+    animation:float 1s ease-out forwards;white-space:nowrap;
+  }
+  .pop.good{color:#6ef2b0}
+  .pop.bad{color:#ff7b7b}
+  @keyframes float{
+    0%{opacity:0;transform:translate(-50%,0) scale(.8)}
+    15%{opacity:1;transform:translate(-50%,-8px) scale(1.08)}
+    100%{opacity:0;transform:translate(-50%,-64px) scale(1)}
+  }
+  .spark{
+    position:absolute;width:7px;height:7px;border-radius:2px;pointer-events:none;
+    animation:spark .6s ease-out forwards;
+  }
+  @keyframes spark{
+    0%{opacity:1;transform:translate(0,0) scale(1)}
+    100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.2)}
+  }
+  #flash{position:absolute;inset:0;pointer-events:none;background:#fff;opacity:0}
+  #flash.on{animation:flash .4s ease-out}
+  @keyframes flash{0%{opacity:.3}100%{opacity:0}}
+  @media (prefers-reduced-motion: reduce){
+    #flash,.shake,.spark{animation:none!important;display:none}
+    .card.killed .cardFace,.card.ok .cardFace,.card.shot .cardFace{animation-duration:.01ms}
+    #banner.on{animation-duration:.01ms;opacity:1}
+  }
+
+  .shake{animation:shake .3s}
+  @keyframes shake{
+    0%,100%{transform:translate(0,0)}
+    20%{transform:translate(-7px,3px)}
+    40%{transform:translate(6px,-4px)}
+    60%{transform:translate(-4px,-2px)}
+    80%{transform:translate(3px,3px)}
+  }
+
+  /* ---------- kenny ---------- */
+  #kenny{
+    position:absolute;left:16px;bottom:22px;width:96px;height:96px;pointer-events:none;
+    transition:transform .18s ease;
+  }
+  #kenny.pleased{transform:translateY(-6px) rotate(-3deg)}
+  #kenny.cross{transform:translateY(4px) rotate(3deg)}
+  #kenny .brow{transition:transform .15s ease, d .15s}
+  #kenny .mouth{transition:d .15s}
+  #kenny .eye{transition:transform .15s}
+
+  /* ---------- footer ---------- */
+  footer{
+    flex:0 0 auto;display:flex;align-items:center;gap:14px;
+    padding:10px 16px;border-top:1px solid var(--line);
+    background:rgba(18,22,28,.85);backdrop-filter:blur(6px);z-index:20;
+  }
+  #say{
+    flex:1 1 auto;min-height:24px;font-size:16px;font-weight:600;
+    display:flex;align-items:center;gap:10px;
+  }
+  #say .q{color:var(--dim);font-size:20px;font-weight:800;line-height:1}
+  #say.good{color:#8ff0c0}
+  #say.bad{color:#ff9b9b}
+  #say.wa{color:#c6b6ff}
+
+  #power{
+    position:relative;overflow:hidden;
+    background:#232c38;border:1px solid var(--line);border-radius:12px;
+    padding:10px 14px;font-weight:800;font-size:13px;cursor:pointer;white-space:nowrap;
+    transition:background .2s;
+  }
+  #power:disabled{opacity:.45;cursor:not-allowed}
+  #power.ready{background:linear-gradient(180deg,#3a2f7a,#2b2359);border-color:#5a48c8;box-shadow:0 0 22px rgba(124,92,255,.4)}
+  #power .c{position:absolute;left:0;bottom:0;height:3px;background:var(--waffle);width:0%;transition:width .2s}
+
+  /* ---------- overlays ---------- */
+  .overlay{
+    position:absolute;inset:0;z-index:30;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(10,13,17,.82);backdrop-filter:blur(4px);
+    padding:20px;text-align:center;
+  }
+  .overlay[hidden]{display:none}
+  .panel{max-width:640px;width:100%}
+  .panel h1{font-size:clamp(26px,5.2vw,44px);line-height:1.1;margin:0 0 6px}
+  .panel h2{font-size:clamp(20px,4vw,30px);margin:0 0 10px}
+  .panel .sub{color:var(--dim);margin:0 0 20px;font-size:15px}
+  .rules{
+    text-align:left;display:grid;gap:10px;margin:0 auto 22px;max-width:470px;
+  }
+  .rule{display:flex;gap:12px;align-items:flex-start;background:#1b222c;border:1px solid var(--line);border-radius:12px;padding:11px 13px}
+  .rule .k{font-weight:800;flex:0 0 auto;font-size:15px}
+  .rule .k.on{color:#8ff0c0}
+  .rule .k.off{color:#ff7b7b}
+  .rule .k.wa{color:#c6b6ff}
+  .rule p{margin:0;font-size:14px;color:#c3cdda;line-height:1.35}
+  .kv{display:flex;gap:22px;justify-content:center;margin:0 0 22px;flex-wrap:wrap}
+  .kv div{min-width:88px}
+  .kv b{display:block;font-size:28px;font-variant-numeric:tabular-nums}
+  .kv span{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+  .btn{
+    background:linear-gradient(180deg,#3a2f7a,#2b2359);border:1px solid #5a48c8;
+    color:#fff;font-weight:800;font-size:16px;padding:13px 26px;border-radius:12px;cursor:pointer;
+    box-shadow:0 0 26px rgba(124,92,255,.32);
+  }
+  .btn:hover{background:linear-gradient(180deg,#463a90,#332a66)}
+  .btn.ghost{background:#232c38;border-color:var(--line);box-shadow:none;font-size:14px;padding:11px 18px}
+  .opts{display:flex;gap:16px;justify-content:center;margin:18px 0 0;flex-wrap:wrap;font-size:13px;color:var(--dim)}
+  .opts label{display:flex;gap:7px;align-items:center;cursor:pointer}
+  .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#232c38;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:12px}
+
+  #banner{
+    position:absolute;left:50%;top:14%;transform:translateX(-50%);
+    z-index:40;pointer-events:none;text-align:center;opacity:0;
+  }
+  #banner.on{animation:ban 2.4s ease-out}
+  #banner .lv{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#c6b6ff;font-weight:800}
+  #banner .nm{font-size:clamp(22px,4.5vw,36px);font-weight:900;margin:2px 0 6px}
+  #banner .ln{font-size:15px;color:#c3cdda;max-width:520px}
+  @keyframes ban{
+    0%{opacity:0;transform:translate(-50%,16px)}
+    12%{opacity:1;transform:translate(-50%,0)}
+    82%{opacity:1;transform:translate(-50%,0)}
+    100%{opacity:0;transform:translate(-50%,-14px)}
+  }
+
+  @media (max-width:640px){
+    .brand small{display:none}
+    .stat{min-width:52px}
+    #kenny{width:64px;height:64px;bottom:16px;left:10px}
+    #mug{width:34px;right:14px}
+    #say{font-size:14px}
+    .card{font-size:16px;padding:12px 13px}
+  }
+
+  /* Narrow: header wraps so the patience bar gets its own row, and the power-up
+     becomes a full-width thumb target instead of being squeezed off the edge. */
+  @media (max-width:560px){
+    header{padding:8px 10px;gap:8px;flex-wrap:wrap;row-gap:7px}
+    .brand{font-size:12px;order:0}
+    .stat{order:1;min-width:0}
+    .stat b{font-size:15px}
+    #btnMute{order:2;margin-left:auto}
+    #btnPause{order:3}
+    .pat{order:4;flex:1 1 100%;max-width:none;min-width:0}
+    footer{padding:8px 10px;gap:8px;flex-wrap:wrap;row-gap:7px}
+    #say{order:0;flex:1 1 100%;min-height:0}
+    #power{order:1;flex:1 1 100%;padding:12px;font-size:13px}
+    .panel h1{font-size:26px}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header>
+    <div class="brand">WHAT'S THE ACTUAL<br>PROBLEM?<small>a Kenny game</small></div>
+    <div class="stat"><b id="hLevel">1</b><span>Level</span></div>
+    <div class="stat"><b id="hScore">0</b><span>Score</span></div>
+    <div class="stat"><b id="hCombo">x1</b><span>Combo</span></div>
+    <div class="pat" id="patWrap">
+      <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+        <span style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)">Patience</span>
+        <span style="font-size:10px;color:var(--dim)" id="hPat">100%</span>
+      </div>
+      <div class="track"><div class="fill" id="patFill"></div></div>
+    </div>
+    <button class="iconbtn" id="btnMute" title="Sound on/off">🔊</button>
+    <button class="iconbtn" id="btnPause" title="Pause (Esc)">⏸</button>
+  </header>
+
+  <div id="stage">
+    <div id="deskline"></div>
+    <div id="desk"></div>
+    <svg id="mug" viewBox="0 0 48 46" aria-hidden="true">
+      <rect x="6" y="8" width="30" height="32" rx="5" fill="#f4f6fa"/>
+      <path d="M36 16h4a7 7 0 0 1 0 14h-4" fill="none" stroke="#f4f6fa" stroke-width="4"/>
+      <rect x="6" y="8" width="30" height="9" rx="4" fill="#8a7bff"/>
+      <rect x="10" y="2" width="3" height="8" rx="1.5" fill="#cfc2ff" opacity=".7"/>
+      <rect x="18" y="0" width="3" height="10" rx="1.5" fill="#cfc2ff" opacity=".55"/>
+      <rect x="26" y="3" width="3" height="7" rx="1.5" fill="#cfc2ff" opacity=".4"/>
+    </svg>
+
+    <svg id="kenny" viewBox="0 0 100 100" aria-hidden="true">
+      <circle cx="50" cy="50" r="34" fill="#f6d7b8"/>
+      <path d="M16 42c0-20 15-30 34-30s34 10 34 30c-6-8-18-11-34-11S22 34 16 42z" fill="#4a4038"/>
+      <g class="brow" id="brL"><rect x="28" y="40" width="14" height="4" rx="2" fill="#4a4038"/></g>
+      <g class="brow" id="brR"><rect x="58" y="40" width="14" height="4" rx="2" fill="#4a4038"/></g>
+      <g class="eye" id="eyL"><circle cx="35" cy="52" r="4" fill="#26303c"/></g>
+      <g class="eye" id="eyR"><circle cx="65" cy="52" r="4" fill="#26303c"/></g>
+      <path class="mouth" id="mouth" d="M38 68q12 6 24 0" stroke="#26303c" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+    </svg>
+
+    <div id="flash"></div>
+    <div id="banner">
+      <div class="lv" id="banLv">Level 2</div>
+      <div class="nm" id="banNm">The Workshop</div>
+      <div class="ln" id="banLn"></div>
+    </div>
+
+    <!-- title -->
+    <div class="overlay" id="ovTitle">
+      <div class="panel">
+        <h1>What's The<br>Actual Problem?</h1>
+        <p class="sub">Everything's coming at you at once. Most of it is waffle.<br>Somewhere in there is a real problem.</p>
+        <div class="rules">
+          <div class="rule"><span class="k wa">TAP IT</span><p>Waffle. Jargon, jargon, "let's leverage the synergy". Kill it before it lands — if it lands, it's in the spec for ever.</p></div>
+          <div class="rule"><span class="k off">DON'T TAP</span><p>A real problem. A member who can't log in. A duplicate payment. Let it land. Shooting it costs you dear.</p></div>
+          <div class="rule"><span class="k on">WATCH</span><p>Your Patience. Every miss and every misfire eats it. Run out and the meeting's over.</p></div>
+        </div>
+        <button class="btn" id="btnStart">Right. Let's go.</button>
+        <div class="opts">
+          <label><input type="checkbox" id="optSlow"> Slower cards — easier to read</label>
+          <label>Keys: <span class="kbd">Space</span> power-up · <span class="kbd">Esc</span> pause</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- paused -->
+    <div class="overlay" id="ovPause" hidden>
+      <div class="panel">
+        <h2>Paused</h2>
+        <p class="sub">The meeting's still going. It's just not going anywhere.</p>
+        <button class="btn" id="btnResume">Back in</button>
+      </div>
+    </div>
+
+    <!-- game over -->
+    <div class="overlay" id="ovOver" hidden>
+      <div class="panel">
+        <h2 id="overTitle">Right. That's me out.</h2>
+        <p class="sub" id="overLine" style="max-width:540px;margin:0 auto 18px"></p>
+        <div class="kv">
+          <div><b id="oScore">0</b><span>Score</span></div>
+          <div><b id="oLevel">1</b><span>Level</span></div>
+          <div><b id="oKilled">0</b><span>Waffle binned</span></div>
+          <div><b id="oMissed">0</b><span>Let through</span></div>
+          <div><b id="oShot">0</b><span>Real ones shot</span></div>
+        </div>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+          <button class="btn" id="btnAgain">Again</button>
+          <button class="btn ghost" id="btnHome">Back to the start</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div id="say"><span class="q">&ldquo;</span><span id="sayText">Right. Everyone's talking. Let's see what's actually being said.</span></div>
+    <button id="power" disabled>
+      <span class="c" id="pc"></span>
+      What's the actual problem?
+    </button>
+  </footer>
+</div>
+
+<script>
+"use strict";
+/* =========================================================
+   What's The Actual Problem? — a Kenny game
+   Kill the waffle. Do not shoot the real problem.
+   ========================================================= */
+
+const $ = id => document.getElementById(id);
+
+/* ---------------- content ---------------- */
+
+const WAFFLE_EASY = [
+  "leverage", "synergy", "circle back", "holistic solution", "strategic alignment",
+  "low-hanging fruit", "move the needle", "touch base", "take it offline",
+  "blue-sky thinking", "bandwidth", "value-add", "run it up the flagpole",
+  "let's socialise that", "north star alignment", "let's park that"
+];
+
+const WAFFLE_MED = [
+  "best practice", "digital transformation", "single source of truth",
+  "we should be more agile", "let's double-click on that", "table it for now",
+  "alignment workshop", "AI-first strategy", "let's form a working group",
+  "we need a framework", "let's be more data-driven", "we should have a dashboard",
+  "let's take that offline", "we need a roadmap for the roadmap",
+  "let's align on the vision first"
+];
+
+/* sounds technical. Is scope creep wearing a lanyard. */
+const WAFFLE_HARD = [
+  "while we're in there, let's add a repository layer",
+  "we should rewrite it as microservices",
+  "make it a platform instead",
+  "let's make it configurable",
+  "we'll need a rules engine for that",
+  "let's add a plugin architecture",
+  "while we're in there, let's swap the database",
+  "let's abstract that into its own service",
+  "we should event-source this",
+  "let's make it multi-tenant while we're here",
+  "we'll need a config service",
+  "let's build an internal DSL"
+];
+
+const PROBLEMS_EASY = [
+  "member can't reset their PIN",
+  "duplicate payments last Tuesday",
+  "direct debit bounced with no warning",
+  "can't log in on the new phone",
+  "the statement is wrong by 2p",
+  "password reset email never arrives",
+  "card declined abroad, no reason given",
+  "balance doesn't match the app"
+];
+
+const PROBLEMS_HARD = [
+  "webhook fired twice and we paid twice",
+  "application stuck on 'pending' for 3 days",
+  "nobody can tell who approved it",
+  "two members share the same reference",
+  "we only find out about outages when they ring",
+  "refund went out but the balance is unchanged",
+  "standing order failed on the 29th and never retried",
+  "the same payment hit the ledger twice",
+  "branch staff re-keying every application",
+  "partial failure left the account locked"
+];
+
+/* ---------------- Kenny's lines ---------------- */
+
+const L = {
+  killed: ["Nope.", "Do we actually need that?", "That's the bit I'd question.",
+           "Gone. Good.", "What's the simplest version?", "Complexity must earn its place.",
+           "Who asked for that, exactly?", "That's not a requirement, that's a word.",
+           "Right. Next.", "No.", "Have we made this more complicated than it needs to be?",
+           "That's not a problem, that's a slide."],
+  shot: ["Hang on — that one's a real problem.", "Oi. That's a member, that.",
+         "You've just binned a real person's problem.", "That's the one we're actually here for.",
+         "Careful. That one matters.", "Why would you shoot that? That's the job.",
+         "No. That's the actual problem. Put it down."],
+  missedWaffle: ["And now it's in the spec.", "Right, that's in the backlog for ever.",
+                 "Congrats. That's a workshop next week.", "It landed. Now it's a workstream.",
+                 "That'll turn up in a slide deck now.", "Nice one. That's a Jira ticket."],
+  landedProblem: ["Yep. Left it alone. Good.", "That one lands. That's real.",
+                  "Right. That's the actual problem.", "Good. Let it sit. That matters.",
+                  "See, that's a person. Not a word."],
+  powerup: ["RIGHT. What's the actual problem?", "All of that. Bin it. All of it.",
+            "There. That's the noise gone.", "Now — what's left?", "Simpler already."],
+  lowPatience: ["I'm losing the will here.", "This is what a workshop does to a man.",
+                "Are we nearly done?", "I've got actual work on."]
+};
+
+const LEVELS = [
+  { name:"The Kick-off",             line:"Right. Everyone's talking. Let's see what's actually being said." },
+  { name:"The Workshop",             line:"More words. Same amount of problem." },
+  { name:"Best Practice",            line:"'Best practice' isn't an argument. Ignore the noise." },
+  { name:"The Backlog",              line:"Careful now. Some of these sound technical. They're still waffle." },
+  { name:"Architecture Astronautics", line:"This is the bit I'd question. All of it." },
+  { name:"Payment Failure States",   line:"Now the real ones hurt more. Don't shoot them." },
+  { name:"The Review Meeting",       line:"Everyone's got a view. Nobody's got a problem." },
+  { name:"The Steering Group",       line:"We've gone past waffle and come out the other side." },
+  { name:"The Reorganisation",       line:"They've restructured. It's the same people with new job titles." },
+  { name:"The Discovery Phase",      line:"We're discovering that we should have started with the problem." },
+  { name:"The Second Workshop",      line:"We had a workshop about the last workshop. I'm not joking." },
+  { name:"The Offsite",              line:"Somebody's put 'align' on a flip chart. Bin it." }
+];
+
+/* for anyone still going after that lot */
+const ENDLESS = [
+  { name:"The Long Meeting",     line:"We're past the agenda. We're into the bit where people start drawing boxes." },
+  { name:"The Follow-up",        line:"We've booked a follow-up. To discuss what we didn't decide." },
+  { name:"The Actions Review",   line:"Half the actions are 'investigate'. Nobody said what that means." },
+  { name:"The Breakout Session", line:"We've split into groups. That's twice the waffle, that is." },
+  { name:"The Wrap-up",          line:"Nearly there. Somebody's just said 'just to build on that'." },
+  { name:"The Debrief",          line:"What did we learn? We learned there was no actual problem." }
+];
+
+const COMBO_NAMES = [
+  "", "Right, that's the bit I'd question", "Do we actually need that?",
+  "What's the simplest version?", "Complexity must earn its place",
+  "What's the actual problem?"
+];
+
+/* ---------------- state ---------------- */
+
+const CARD_MIN_W = 128, CARD_MAX_W = 236;
+const PATIENCE_MAX = 100;
+const CHARGE_PER_USE = 12;      // correct actions to charge the power-up
+const CORRECT_PER_LEVEL = 8;
+
+const S = {
+  on:false, paused:false, over:false,
+  score:0, patience:PATIENCE_MAX, level:1, streak:0, best:1,
+  correct:0, charge:0,
+  killed:0, missed:0, shot:0,
+  cards:[], spawnIn:0, lastT:0,
+  nextLevelAt:CORRECT_PER_LEVEL,
+  slow:false, muted:false,
+  lanes:[], cardW:CARD_MAX_W, cardH:86,
+  floor:0
+};
+
+/* ---------------- audio ---------------- */
+
+let AC = null;
+function ac(){
+  if (S.muted) return null;
+  if (!AC) { const C = window.AudioContext || window.webkitAudioContext; if (!C) return null; AC = new C(); }
+  if (AC.state === "suspended") AC.resume();
+  return AC;
+}
+function tone(freq, dur, type, vol, slideTo){
+  const a = ac(); if (!a) return;
+  const o = a.createOscillator(), g = a.createGain();
+  o.type = type || "square";
+  o.frequency.setValueAtTime(freq, a.currentTime);
+  if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, a.currentTime + dur);
+  g.gain.setValueAtTime(0.0001, a.currentTime);
+  g.gain.exponentialRampToValueAtTime(vol || 0.08, a.currentTime + 0.008);
+  g.gain.exponentialRampToValueAtTime(0.0001, a.currentTime + dur);
+  o.connect(g).connect(a.destination);
+  o.start(); o.stop(a.currentTime + dur + 0.02);
+}
+const SFX = {
+  killed(){ tone(880, .09, "square", .07, 240); },
+  shot(){ tone(160, .30, "sawtooth", .10, 60); },
+  landed(){ tone(520, .12, "sine", .07, 780); },
+  miss(){ tone(120, .18, "triangle", .09, 80); },
+  power(){ tone(300, .35, "square", .08, 1400); },
+  level(){ tone(523, .12, "square", .06); setTimeout(()=>tone(784,.16,"square",.06),120); }
+};
+
+/* ---------------- dom ---------------- */
+
+const stage = $("stage");
+const deskline = $("deskline");
+const patFill = $("patFill"), patWrap = $("patWrap"), hPat = $("hPat");
+const hScore = $("hScore"), hLevel = $("hLevel"), hCombo = $("hCombo");
+const sayText = $("sayText"), sayEl = $("say");
+const powerBtn = $("power"), pc = $("pc");
+const banner = $("banner");
+const kenny = $("kenny");
+const flash = $("flash");
+
+/* ---------------- helpers ---------------- */
+
+const rnd = n => Math.floor(Math.random() * n);
+const pick = arr => arr[rnd(arr.length)];
+const clamp = (v,a,b) => v < a ? a : v > b ? b : v;
+
+/* Pick the lane count first, then size the cards to fill it. Doing it the other
+   way round leaves phones with two skinny columns and text wrapping to three
+   lines — and reading the card is the entire game. */
+function measure(){
+  const w = stage.clientWidth, h = stage.clientHeight;
+  const gap = 14, pad = 16;
+  const n = clamp(Math.floor((w - pad) / 210), 2, 6);
+  S.cardW = clamp(Math.floor((w - pad * 2 - gap * (n - 1)) / n), CARD_MIN_W, CARD_MAX_W);
+  const span = n * S.cardW + (n - 1) * gap;
+  const left = Math.max(pad, (w - span) / 2);
+  S.lanes = [];
+  for (let i = 0; i < n; i++) S.lanes.push(left + i * (S.cardW + gap));
+  S.floor = h - 42;                       // where the desk starts
+  deskline.style.bottom = "42px";
+  deskline.style.top = "auto";
+}
+
+function say(text, mood){
+  sayText.textContent = text;
+  sayEl.className = mood || "";
+  sayEl.querySelector(".q").style.opacity = mood ? "1" : ".5";
+  /* setAttribute, not className — className is read-only on SVG elements */
+  kenny.setAttribute("class", mood === "good" ? "pleased" : mood === "bad" ? "cross" : "");
+  if (mood === "bad") {
+    const m = $("mouth"), bl = $("brL"), br = $("brR");
+    m.setAttribute("d", "M38 72q12-6 24 0");
+    bl.style.transform = "translateY(3px) rotate(9deg)"; bl.style.transformOrigin = "35px 42px";
+    br.style.transform = "translateY(3px) rotate(-9deg)"; br.style.transformOrigin = "65px 42px";
+  } else if (mood === "good") {
+    $("mouth").setAttribute("d", "M38 66q12 10 24 0");
+    $("brL").style.transform = "translateY(-3px)"; $("brL").style.transformOrigin = "35px 42px";
+    $("brR").style.transform = "translateY(-3px)"; $("brR").style.transformOrigin = "65px 42px";
+  } else {
+    $("mouth").setAttribute("d", "M38 68q12 6 24 0");
+    $("brL").style.transform = ""; $("brR").style.transform = "";
+  }
+}
+
+function pop(x, y, text, good){
+  const d = document.createElement("div");
+  d.className = "pop " + (good ? "good" : "bad");
+  d.textContent = text;
+  d.style.left = x + "px"; d.style.top = y + "px";
+  stage.appendChild(d);
+  setTimeout(() => d.remove(), 1000);
+}
+
+const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* Juice is opt-in per event. Shaking the screen when someone does the right thing
+   is exactly the sort of noise this game is about. */
+function sparks(x, y, colour, n, opts){
+  opts = opts || {};
+  if (REDUCED) return;
+  for (let i = 0; i < (n || 12); i++){
+    const s = document.createElement("div");
+    s.className = "spark";
+    const a = Math.random() * Math.PI * 2, dist = 40 + Math.random() * 90;
+    s.style.left = x + "px"; s.style.top = y + "px";
+    s.style.background = colour;
+    s.style.setProperty("--dx", Math.cos(a) * dist + "px");
+    s.style.setProperty("--dy", Math.sin(a) * dist + "px");
+    stage.appendChild(s);
+    setTimeout(() => s.remove(), 640);
+  }
+  if (opts.flash){
+    flash.className = ""; void flash.offsetWidth; flash.className = "on";
+  }
+  if (opts.shake){
+    stage.classList.remove("shake"); void stage.offsetWidth; stage.classList.add("shake");
+  }
+}
+
+/* ---------------- levels ---------------- */
+
+function speedFor(lv){
+  // px per second. Readable at the start, brisk later.
+  const base = 56 + (lv - 1) * 11;
+  return S.slow ? base * 0.66 : base;
+}
+function spawnGapFor(lv){
+  const base = Math.max(0.68, 1.9 - (lv - 1) * 0.16);
+  return S.slow ? base * 1.35 : base;
+}
+function maxCardsFor(lv){ return clamp(4 + Math.floor(lv / 2), 4, 9); }
+
+function poolsFor(lv){
+  const waffle = WAFFLE_EASY.slice();
+  const problems = PROBLEMS_EASY.slice();
+  if (lv >= 2) waffle.push(...WAFFLE_MED);
+  if (lv >= 3) waffle.push(...WAFFLE_MED, ...WAFFLE_EASY);
+  if (lv >= 4) waffle.push(...WAFFLE_HARD);
+  if (lv >= 5) waffle.push(...WAFFLE_HARD, ...WAFFLE_HARD);
+  if (lv >= 6) problems.push(...PROBLEMS_HARD);
+  if (lv >= 7) problems.push(...PROBLEMS_HARD, ...PROBLEMS_HARD);
+  return { waffle, problems };
+}
+
+/* Roughly 55/45 against the player early, tipping to harder later. */
+function nextCardType(lv){
+  const problemChance = lv <= 1 ? 0.0 : clamp(0.30 + lv * 0.025, 0, 0.46);
+  return Math.random() < problemChance ? "problem" : "waffle";
+}
+
+function spawn(){
+  const { waffle, problems } = poolsFor(S.level);
+  const type = nextCardType(S.level);
+  const text = type === "waffle" ? pick(waffle) : pick(problems);
+
+  const w = S.cardW;
+  const lane = S.lanes[rnd(S.lanes.length)];
+  const jitter = (Math.random() - 0.5) * 8;
+  const x = clamp(lane + jitter, 6, stage.clientWidth - w - 6);
+
+  const el = document.createElement("div");
+  el.className = "card";
+  el.style.width = w + "px";
+  el.style.left = "0"; el.style.top = "0";
+  /* identical framing for both types, on purpose. You have to read the thing. */
+  const face = document.createElement("div");
+  face.className = "cardFace";
+  const tag = document.createElement("span");
+  tag.className = "tag"; tag.textContent = "on the list";
+  face.appendChild(tag);
+  face.appendChild(document.createTextNode(text));
+  el.appendChild(face);
+  stage.appendChild(el);
+
+  const card = {
+    el, type, text, x, y: -110,
+    vy: speedFor(S.level) * (0.88 + Math.random() * 0.28),
+    vx: (Math.random() - 0.5) * 16,
+    h: el.offsetHeight || S.cardH,
+    dead: false
+  };
+  el.style.transform = "translate3d(" + card.x + "px," + card.y + "px,0)";
+  el.addEventListener("pointerdown", ev => { ev.preventDefault(); hit(card, ev); });
+  S.cards.push(card);
+}
+
+/* ---------------- resolving ---------------- */
+
+function multiplier(){ return clamp(1 + Math.floor(S.streak / 4), 1, 6); }
+
+function addScore(n){ S.score += n; hScore.textContent = S.score; }
+
+function bumpStreak(){
+  S.streak++;
+  const m = multiplier();
+  hCombo.textContent = "x" + m;
+  if (m > 1) hCombo.style.color = "#c6b6ff"; else hCombo.style.color = "";
+  if (m >= 2 && S.streak % 4 === 0) say(COMBO_NAMES[Math.min(m, COMBO_NAMES.length - 1)], "wa");
+  /* a good run buys you a bit of patience back */
+  if (S.streak % 5 === 0) setPatience(S.patience + 4);
+}
+
+function dropStreak(){
+  S.streak = 0;
+  hCombo.textContent = "x1";
+  hCombo.style.color = "";
+}
+
+function charge(n){
+  S.charge = clamp(S.charge + n, 0, CHARGE_PER_USE);
+  pc.style.width = (S.charge / CHARGE_PER_USE * 100) + "%";
+  const ready = S.charge >= CHARGE_PER_USE;
+  powerBtn.disabled = !ready || !S.on || S.over;
+  powerBtn.classList.toggle("ready", ready);
+}
+
+function setPatience(v){
+  S.patience = clamp(v, 0, PATIENCE_MAX);
+  patFill.style.width = S.patience + "%";
+  hPat.textContent = Math.round(S.patience) + "%";
+  patWrap.classList.toggle("low", S.patience <= 45 && S.patience > 22);
+  patWrap.classList.toggle("crit", S.patience <= 22);
+  if (S.patience <= 22 && S.patience > 0 && Math.random() < 0.25) say(pick(L.lowPatience), "bad");
+  if (S.patience <= 0) gameOver();
+}
+
+function hit(card, ev){
+  if (!S.on || S.paused || S.over || card.dead) return;
+  const cx = card.x + S.cardW / 2;
+  const cy = card.y + card.h / 2;
+
+  if (card.type === "waffle"){
+    card.dead = true;
+    S.killed++;
+    const gain = 10 * multiplier();
+    addScore(gain);
+    bumpStreak();
+    charge(1);
+    card.el.classList.add("killed");
+    setTimeout(() => card.el.remove(), 300);
+    pop(cx, cy, "+" + gain, true);
+    sparks(cx, cy, "#8a7bff", 14);
+    SFX.killed();
+    say(pick(L.killed), "good");
+    S.correct++;
+  } else {
+    card.dead = true;
+    S.shot++;
+    dropStreak();
+    setPatience(S.patience - 14);
+    card.el.classList.add("shot");
+    const st = document.createElement("span");
+    st.className = "stamp real"; st.textContent = "REAL";
+    faceOf(card).appendChild(st);
+    setTimeout(() => card.el.remove(), 460);
+    pop(cx, cy, "−14 patience", false);
+    sparks(cx, cy, "#ff5d5d", 16, { shake:true, flash:true });
+    SFX.shot();
+    say(pick(L.shot), "bad");
+  }
+  S.cards = S.cards.filter(c => c !== card);
+  checkLevel();
+}
+
+const faceOf = card => card.el.querySelector(".cardFace") || card.el;
+
+function landed(card){
+  const cx = card.x + S.cardW / 2;
+  if (card.type === "waffle"){
+    S.missed++;
+    dropStreak();
+    setPatience(S.patience - 9);
+    card.el.classList.add("shot");
+    const st = document.createElement("span");
+    st.className = "stamp wa"; st.textContent = "IN THE SPEC";
+    faceOf(card).appendChild(st);
+    setTimeout(() => card.el.remove(), 460);
+    pop(cx, card.y, "−9 patience", false);
+    SFX.miss();
+    say(pick(L.missedWaffle), "bad");
+  } else {
+    addScore(15);
+    bumpStreak();
+    charge(1);
+    S.correct++;
+    card.el.classList.add("ok");
+    const st = document.createElement("span");
+    st.className = "stamp real"; st.textContent = "LANDED";
+    faceOf(card).appendChild(st);
+    setTimeout(() => card.el.remove(), 520);
+    pop(cx, card.y, "+15", true);
+    sparks(cx, card.y + 20, "#26c281", 8);
+    SFX.landed();
+    if (Math.random() < 0.5) say(pick(L.landedProblem), "good");
+  }
+  S.cards = S.cards.filter(c => c !== card);
+  checkLevel();
+}
+
+/* ---------------- level flow ---------------- */
+
+function checkLevel(){
+  if (S.correct >= S.nextLevelAt){
+    /* the bar rises with the level, otherwise the late levels flash past in seconds */
+    S.nextLevelAt += CORRECT_PER_LEVEL + (S.level - 1) * 2;
+    showLevel(S.level + 1);
+  }
+}
+
+function levelInfo(lv){
+  if (lv <= LEVELS.length) return LEVELS[lv - 1];
+  return ENDLESS[(lv - LEVELS.length - 1) % ENDLESS.length];
+}
+
+/* Non-blocking on purpose — a modal every eight cards would be its own kind of waffle. */
+function showLevel(lv){
+  S.level = lv;
+  hLevel.textContent = lv;
+  const info = levelInfo(lv);
+  SFX.level();
+  banner.classList.remove("on"); void banner.offsetWidth;
+  $("banLv").textContent = "Level " + lv;
+  $("banNm").textContent = info.name;
+  $("banLn").textContent = info.line;
+  banner.classList.add("on");
+  say(info.line);
+}
+
+function clearCards(){
+  S.cards.forEach(c => c.el.remove());
+  S.cards = [];
+  /* resolved cards linger briefly for their death animation and are already
+     out of S.cards, so sweep the stage too — otherwise one flashes over a restart */
+  stage.querySelectorAll(".card").forEach(el => el.remove());
+  S.spawnIn = 0.6;
+}
+
+/* ---------------- power-up ---------------- */
+
+function powerUp(){
+  if (powerBtn.disabled || !S.on || S.paused || S.over) return;
+  S.charge = 0; charge(0);
+  const waffle = S.cards.filter(c => c.type === "waffle");
+  let n = 0;
+  waffle.forEach(c => {
+    c.dead = true; n++;
+    S.killed++;
+    const gain = 8 * multiplier();
+    addScore(gain);
+    pop(c.x + S.cardW / 2, c.y + c.h / 2, "+" + gain, true);
+    sparks(c.x + S.cardW / 2, c.y + c.h / 2, "#ffb020", 10);
+    c.el.classList.add("killed");
+    setTimeout(() => c.el.remove(), 300);
+  });
+  S.cards = S.cards.filter(c => !c.dead);
+  S.correct += n;
+  bumpStreak();
+  SFX.power();
+  flash.className = ""; void flash.offsetWidth; flash.className = "on";
+  say(pick(L.powerup), "wa");
+  checkLevel();
+}
+
+/* ---------------- loop ---------------- */
+
+function frame(t){
+  requestAnimationFrame(frame);
+  if (!S.lastT) S.lastT = t;
+  const dt = Math.min((t - S.lastT) / 1000, 0.05);
+  S.lastT = t;
+  if (!S.on || S.paused || S.over) return;
+
+  S.spawnIn -= dt;
+  const cap = maxCardsFor(S.level);
+  if (S.spawnIn <= 0 && S.cards.length < cap){
+    spawn();
+    S.spawnIn = spawnGapFor(S.level) * (0.75 + Math.random() * 0.5);
+  }
+
+  for (let i = S.cards.length - 1; i >= 0; i--){
+    const c = S.cards[i];
+    c.y += c.vy * dt;
+    c.x = clamp(c.x + c.vx * dt, 4, stage.clientWidth - S.cardW - 4);
+    c.el.style.transform = "translate3d(" + c.x.toFixed(1) + "px," + c.y.toFixed(1) + "px,0)";
+    if (c.y + c.h >= S.floor){
+      landed(c);
+      if (S.over) return;
+    }
+  }
+}
+
+/* ---------------- game lifecycle ---------------- */
+
+function reset(){
+  clearCards();
+  S.score = 0; S.patience = PATIENCE_MAX; S.level = 1;
+  S.streak = 0; S.correct = 0; S.charge = 0;
+  S.killed = 0; S.missed = 0; S.shot = 0;
+  S.spawnIn = 1.0; S.nextLevelAt = CORRECT_PER_LEVEL;
+  S.over = false; S.paused = false;
+  hScore.textContent = "0"; hLevel.textContent = "1"; hCombo.textContent = "x1";
+  hCombo.style.color = "";
+  setPatience(PATIENCE_MAX);
+  charge(0);
+  measure();
+}
+
+function start(){
+  reset();
+  S.on = true;
+  $("ovTitle").hidden = true;
+  $("ovOver").hidden = true;
+  $("ovPause").hidden = true;
+  ac();
+  say("Right. Everyone's talking. Let's see what's actually being said.");
+}
+
+function gameOver(){
+  if (S.over) return;
+  S.over = true; S.on = false;
+  clearCards();
+  powerBtn.disabled = true; powerBtn.classList.remove("ready");
+  dropStreak();
+  const lines = [
+    "Patience gone. Which, to be fair, is what a two-hour workshop does to anyone.",
+    "You've run out of patience. That's not a failure, that's a diagnosis.",
+    "Right. That's me out. Somebody else can chair the next one."
+  ];
+  $("overLine").textContent = pick(lines);
+  $("oScore").textContent = S.score;
+  $("oLevel").textContent = S.level;
+  $("oKilled").textContent = S.killed;
+  $("oMissed").textContent = S.missed;
+  $("oShot").textContent = S.shot;
+  $("ovOver").hidden = false;
+  SFX.shot();
+}
+
+function togglePause(force){
+  if (!S.on || S.over) return;
+  S.paused = force === undefined ? !S.paused : force;
+  $("ovPause").hidden = !S.paused;
+}
+
+/* ---------------- wiring ---------------- */
+
+$("btnStart").addEventListener("click", () => {
+  S.slow = $("optSlow").checked;
+  start();
+});
+$("btnAgain").addEventListener("click", start);
+$("btnHome").addEventListener("click", () => {
+  $("ovOver").hidden = true;
+  $("ovTitle").hidden = false;
+  S.on = false; S.over = false;
+});
+$("btnResume").addEventListener("click", () => togglePause(false));
+$("btnPause").addEventListener("click", () => togglePause());
+powerBtn.addEventListener("click", powerUp);
+
+$("btnMute").addEventListener("click", () => {
+  S.muted = !S.muted;
+  $("btnMute").textContent = S.muted ? "🔇" : "🔊";
+  if (!S.muted) ac();
+});
+
+window.addEventListener("keydown", e => {
+  if (e.code === "Space"){ e.preventDefault(); powerUp(); }
+  else if (e.code === "Escape"){ e.preventDefault(); togglePause(); }
+  else if (e.code === "Enter" && !S.on){
+    if (!$("ovOver").hidden) start();
+    else if (!$("ovTitle").hidden) $("btnStart").click();
+  }
+});
+
+window.addEventListener("resize", () => { if (!S.on) measure(); });
+document.addEventListener("visibilitychange", () => { if (document.hidden) togglePause(true); });
+
+measure();
+setPatience(PATIENCE_MAX);
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
