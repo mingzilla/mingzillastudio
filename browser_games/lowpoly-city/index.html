@@ -214,6 +214,11 @@ const MIN_ZOOM = 6, MAX_ZOOM = 96;       // wide enough to still see the whole i
    sideways speed. Exact screen-space parity would be 1/sin(PITCH) ~= 3.6. */
 const DEPTH_SPEED = 2;
 
+/* World units per second. Note these are on top of DEPTH_SPEED, so walking
+   toward the camera is twice these figures. */
+const WALK_SPEED = 8.8;
+const RUN_SPEED = 16.8;
+
 /* the terrain-scouting `where` rules in the asset files need these */
 Object.assign(H, { STEP, PLAIN, SEA, BASE_Z });
 
@@ -593,7 +598,9 @@ function buildPlayer() {
    screen height. Raise it toward 1.2 for a near plan view. */
 const PITCH = 0.28;
 const SINP = Math.sin(PITCH), COSP = Math.cos(PITCH);
-const cam = { x: 0, y: 0, z: 0, c: 1, s: 0, yaw: 0.5, zoom: 44, target: 44 };
+/* START_ZOOM is where the camera opens at. Raise it for a closer view. */
+const START_ZOOM = 66;
+const cam = { x: 0, y: 0, z: 0, c: 1, s: 0, yaw: 0.5, zoom: START_ZOOM, target: START_ZOOM };
 const view = { w: 0, h: 0, dpr: 1 };
 
 function project(x, y, z, out) {
@@ -1054,7 +1061,7 @@ function update(dt) {
     let dx = sx * cam.c + sy * cam.s;
     let dy = -sx * cam.s + sy * cam.c;
 
-    const step = (running ? 8.4 : 4.4) * dt;
+    const step = (running ? RUN_SPEED : WALK_SPEED) * dt;
     if (tryMove(player.x + dx * step, player.y + dy * step)) { /* clean */ }
     else if (tryMove(player.x + dx * step, player.y)) { dy = 0; }
     else if (tryMove(player.x, player.y + dy * step)) { dx = 0; }
