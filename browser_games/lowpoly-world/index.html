@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lowpoly Valley — a little village</title>
+<style>
+  :root{
+    --ink:#2b3440;
+    --panel:rgba(255,253,247,.90);
+    --edge:rgba(120,105,80,.28);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;overflow:hidden;background:#bfe0ef}
+  body{
+    font-family:ui-rounded,"Segoe UI Rounded",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    color:var(--ink);
+    -webkit-tap-highlight-color:transparent;
+  }
+  canvas{display:block;position:fixed;inset:0;width:100%;height:100%}
+
+  #hud{
+    position:fixed;top:14px;left:14px;z-index:10;
+    background:var(--panel);border:1px solid var(--edge);border-radius:16px;
+    padding:12px 14px;box-shadow:0 8px 24px rgba(60,50,30,.18);
+    max-width:300px;backdrop-filter:blur(6px);
+  }
+  #hud h1{margin:0 0 2px;font-size:16px}
+  #hud .sub{font-size:11px;opacity:.6;margin:0 0 10px;letter-spacing:.04em;text-transform:uppercase}
+  .keys{display:grid;grid-template-columns:auto 1fr;gap:5px 10px;font-size:12.5px;align-items:center}
+  .keys kbd{
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;
+    background:#f0ece1;border:1px solid var(--edge);border-bottom-width:2px;
+    border-radius:6px;padding:2px 6px;white-space:nowrap;
+  }
+  #stats{
+    margin-top:10px;padding-top:9px;border-top:1px solid var(--edge);
+    font-size:11.5px;opacity:.72;display:flex;gap:10px;flex-wrap:wrap;
+    font-variant-numeric:tabular-nums;
+  }
+  #stats b{font-weight:700}
+
+  #seedbar{
+    position:fixed;bottom:14px;left:14px;z-index:10;
+    background:var(--panel);border:1px solid var(--edge);border-radius:14px;
+    padding:8px 10px;display:flex;gap:8px;align-items:center;
+    box-shadow:0 6px 18px rgba(60,50,30,.16);font-size:12px;
+  }
+  #seedbar input{
+    width:96px;font:inherit;font-size:12px;padding:4px 7px;
+    border:1px solid var(--edge);border-radius:8px;background:#fff;color:inherit;
+  }
+  #seedbar button{
+    font:inherit;font-size:12px;font-weight:600;cursor:pointer;
+    background:#e9f0d8;border:1px solid var(--edge);border-radius:8px;padding:5px 11px;color:inherit;
+  }
+  #seedbar button:hover{background:#dfe9c8}
+
+  #hint{
+    position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:10;
+    background:rgba(43,52,64,.72);color:#fff;font-size:12.5px;
+    padding:7px 14px;border-radius:999px;pointer-events:none;
+    opacity:0;transition:opacity .5s;
+  }
+  #hint.on{opacity:1}
+
+  /* Hide-everything mode. Opacity rather than display so nothing reflows.
+     The hint is pulled left by half its width to centre it, so sliding it up
+     has to carry that -50% along or it jumps sideways as it fades. */
+  #hud,#seedbar,#hint{transition:opacity .25s ease,transform .25s ease}
+  body.ui-off #hud,
+  body.ui-off #seedbar{opacity:0;transform:translateY(-8px);pointer-events:none}
+  body.ui-off #hint{opacity:0;transform:translate(-50%,-8px);pointer-events:none}
+
+  #uiToggle,#sndToggle{
+    position:fixed;top:14px;right:14px;z-index:11;
+    width:34px;height:34px;padding:0;border-radius:10px;
+    background:var(--panel);border:1px solid var(--edge);color:var(--ink);
+    font-size:15px;line-height:1;cursor:pointer;display:grid;place-items:center;
+    box-shadow:0 6px 18px rgba(60,50,30,.16);
+    opacity:.5;transition:opacity .2s;
+  }
+  /* the sound button sits to the left of the panel one */
+  #sndToggle{right:56px}
+  #uiToggle:hover,#sndToggle:hover{opacity:1}
+  body.ui-off #uiToggle,body.ui-off #sndToggle{opacity:.22}
+  body.ui-off #uiToggle:hover,body.ui-off #sndToggle:hover{opacity:1}
+  @media (prefers-reduced-motion:reduce){#hud,#seedbar,#hint{transition:none}}
+
+  /* ---------------------------------------------------------------
+     On-screen controls.
+     The stick sits bottom centre and the two buttons stack where the
+     right thumb already rests. Shown on a coarse pointer, and on a
+     narrow window so it can be tried out on a desktop.
+     --------------------------------------------------------------- */
+  #pad{
+    position:fixed;left:50%;bottom:0;transform:translateX(-50%);z-index:12;
+    width:168px;height:168px;display:none;place-items:center;
+    pointer-events:none;                 /* only the ring is a hit target, so
+                                            everything around it still wheels */
+  }
+  #stick{
+    width:124px;height:124px;border-radius:50%;display:grid;place-items:center;
+    pointer-events:auto;
+    background:rgba(255,253,247,.30);border:1.5px solid rgba(120,105,80,.45);
+    box-shadow:0 6px 18px rgba(60,50,30,.14),inset 0 0 22px rgba(255,255,255,.40);
+    backdrop-filter:blur(3px);
+    touch-action:none;-webkit-user-select:none;user-select:none;
+  }
+  #knob{
+    width:54px;height:54px;border-radius:50%;
+    background:var(--panel);border:1.5px solid var(--edge);
+    box-shadow:0 4px 12px rgba(60,50,30,.26);
+  }
+  #acts{
+    position:fixed;right:12px;bottom:16px;z-index:12;
+    display:none;flex-direction:column;gap:10px;
+    touch-action:none;-webkit-user-select:none;user-select:none;
+  }
+  .act{
+    width:54px;height:54px;padding:0;border-radius:50%;
+    font:inherit;font-size:22px;line-height:1;color:var(--ink);cursor:pointer;
+    background:var(--panel);border:1px solid var(--edge);
+    box-shadow:0 6px 18px rgba(60,50,30,.16);
+    display:grid;place-items:center;
+    transition:transform .08s,background .08s;
+  }
+  .act.down{background:#e9f0d8;transform:scale(.92)}
+
+  /* The pad and the buttons are how you play, so "hide the panel" leaves them
+     alone — and the hint has to clear the heel of the stick. */
+  @media (pointer:coarse){
+    #pad{display:grid}
+    #acts{display:flex}
+    #hint{bottom:158px}
+  }
+  /* Narrow: there is no room left of the stick for the seed bar, so it rides
+     above it, and the hint goes above that. */
+  @media (max-width:700px){
+    #pad{display:grid}
+    #acts{display:flex}
+    #seedbar{bottom:152px;left:12px}
+    #hint{bottom:204px}
+  }
+
+  #fail{
+    position:fixed;inset:0;z-index:50;display:none;
+    align-items:center;justify-content:center;text-align:center;
+    background:#f7f3e8;padding:30px;
+  }
+  #fail div{max-width:420px}
+  #fail h2{margin:0 0 8px;font-size:20px}
+  #fail p{margin:0;font-size:14px;line-height:1.5;opacity:.75}
+
+  @media (max-width:640px){
+    #hud{max-width:230px;padding:10px 11px}
+    .keys{font-size:11.5px}
+    #stats{display:none}
+  }
+</style>
+</head>
+<body>
+
+<canvas id="view"></canvas>
+
+<div id="hud">
+  <h1>Lowpoly Valley</h1>
+  <p class="sub">a little village</p>
+  <div class="keys">
+    <kbd>W A S D</kbd><span>walk</span>
+    <kbd>Q</kbd> <span>turn the camera</span>
+    <kbd>E</kbd> <span>turn the other way</span>
+    <kbd>Shift</kbd><span>run</span>
+    <kbd>Space</kbd><span>plant a tree</span>
+    <kbd>&minus; +</kbd><span>zoom</span>
+    <kbd>H</kbd><span>hide this panel</span>
+    <kbd>M</kbd><span>mute the animals</span>
+  </div>
+  <div id="stats">
+    <span>fps <b id="sFps">–</b></span>
+    <span>tiles <b id="sTiles">–</b></span>
+    <span>trees <b id="sTrees">–</b></span>
+    <span>beasts <b id="sBeasts">–</b></span>
+    <span>builds <b id="sBuilds">–</b></span>
+    <span id="sWhere">–</span>
+  </div>
+</div>
+
+<button id="uiToggle" type="button" title="Hide the panel (H)" aria-label="Hide or show the panel">&#9776;</button>
+<button id="sndToggle" type="button" title="Mute (M)" aria-label="Mute the animals">&#128266;</button>
+
+<div id="seedbar">
+  <label for="seed">seed</label>
+  <input id="seed" value="7" inputmode="numeric" autocomplete="off" spellcheck="false">
+  <button id="regen">New valley</button>
+</div>
+
+<div id="hint"></div>
+
+<div id="pad">
+  <div id="stick"><div id="knob"></div></div>
+</div>
+
+<div id="acts">
+  <button id="actPlant" class="act" type="button" aria-label="Plant a tree">&#127795;</button>
+  <button id="actTurnL" class="act" type="button" aria-label="Turn the camera left">&#8634;</button>
+  <button id="actTurnR" class="act" type="button" aria-label="Turn the camera right">&#8635;</button>
+</div>
+
+<div id="fail">
+  <div>
+    <h2>Couldn't load D3</h2>
+    <p>The page pulls d3 v7 from a CDN, so it needs an internet connection the first
+       time. Check the network and reload.</p>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+
+<!-- shared plumbing -->
+<script src="assets/core__palette.js"></script>
+<script src="assets/core__random.js"></script>
+<script src="assets/core__hex.js"></script>
+<script src="assets/core__biome.js"></script>
+<script src="assets/core__primitives.js"></script>
+<script src="assets/core__creature.js"></script>
+<script src="assets/core__registry.js"></script>
+
+<!-- trees, scrub, rock -->
+<script src="assets/nature__tree.js"></script>
+<script src="assets/nature__fir.js"></script>
+<script src="assets/nature__birch.js"></script>
+<script src="assets/nature__palm.js"></script>
+<script src="assets/nature__cypress.js"></script>
+<script src="assets/nature__blossom.js"></script>
+<script src="assets/nature__dead.js"></script>
+<script src="assets/nature__bush.js"></script>
+<script src="assets/nature__rock.js"></script>
+<script src="assets/nature__shrub.js"></script>
+<script src="assets/nature__hedge.js"></script>
+<script src="assets/nature__fern.js"></script>
+<script src="assets/nature__flowerbush.js"></script>
+
+<!-- buildings -->
+<script src="assets/building__house.js"></script>
+<script src="assets/building__church.js"></script>
+<script src="assets/building__barn.js"></script>
+<script src="assets/building__well.js"></script>
+<script src="assets/building__keep.js"></script>
+<script src="assets/building__lighthouse.js"></script>
+<script src="assets/building__windmill.js"></script>
+<script src="assets/building__bridge.js"></script>
+<script src="assets/building__tavern.js"></script>
+<script src="assets/building__watermill.js"></script>
+<script src="assets/building__boathouse.js"></script>
+<script src="assets/building__watchtower.js"></script>
+<script src="assets/building__pillars.js"></script>
+
+<!-- things that move -->
+<script src="assets/vehicle__boat.js"></script>
+<script src="assets/animal__sheep.js"></script>
+<script src="assets/animal__cow.js"></script>
+<script src="assets/animal__deer.js"></script>
+<script src="assets/animal__goat.js"></script>
+<script src="assets/animal__hen.js"></script>
+<script src="assets/animal__bird.js"></script>
+
+<!-- the game itself. Load order is the dependency order: each file uses
+     the ones above it, and nothing below it at load time. -->
+<script src="assets/game__terrain.js"></script>
+<script src="assets/game__world.js"></script>
+<script src="assets/game__river.js"></script>
+<script src="assets/game__placement.js"></script>
+
+<!-- you, the camera, and how it all gets drawn -->
+<script src="assets/game__player.js"></script>
+<script src="assets/game__camera.js"></script>
+<script src="assets/game__render.js"></script>
+<script src="assets/game__scene.js"></script>
+
+<!-- input, and the loop that ties it together -->
+<script src="assets/game__input.js"></script>
+<script src="assets/game__touch.js"></script>
+<script src="assets/game__sound.js"></script>
+<script src="assets/game__movement.js"></script>
+<script src="assets/game__boot.js"></script>
+</body>
+</html>
