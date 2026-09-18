@@ -8,7 +8,7 @@ description: Decisions for building a low-poly Dorfromantik-style browser game
 - one folder is the root, opened from `index.html`
 - d3 from a CDN. no build step, no other dependencies
 - no image files and no image-generation model — every shape is built from generated geometry or drawn paths
-- one file per entity in `assets/`, named by group: `animal__cat.js`, `building__church.js`, `nature__tree.js`, `vehicle__boat.js`, `core__*.js` for shared plumbing
+- one folder per entity in `assets/`, named by group: `animal__cat/`, `building__church/`, `nature__tree/`, `vehicle__boat/`. `core__*.js` and `game__*.js` stay flat in `assets/` — they are shared plumbing, not entities
 - plain `<script>` tags, not ES modules, so it still opens from `file://`
 - every entity — characters, animals, buildings, trees — is low-poly geometry built from a handful of primitives (prism, cone, blob, box, gable roof)
 - each asset registers itself: `defEntity({ key, group, spawn, create, anim })`

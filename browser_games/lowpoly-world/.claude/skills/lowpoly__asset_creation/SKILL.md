@@ -3,13 +3,14 @@ name: lowpoly__asset_creation
 description: The three files of one asset - the ASCII sketch, the size json, the generated entity - and the page that edits them. Use when creating, resizing or regenerating an asset for lowpoly-world.
 ---
 
-## An asset is three files
+## An asset is a folder
 
-- all three share the name of the `<script>` entry in `index.html`:
-    - `assets/<id>.md` — the ASCII sketch. nothing else
-    - `assets/<id>.json` — the layer and the size in units
-    - `assets/<id>.js` — the entity, generated from the two above
+- `assets/<id>/`, named by the id that `index.html` loads it under:
+    - `<id>.md` — the ASCII sketch. nothing else
+    - `<id>.json` — the layer and the size in units
+    - `<id>.js` — the entity, generated from the two above
 - drafts are the same with a suffix: `<id>__1.md`, `<id>__2.md`, `<id>__3.md`
+- `assets/` beside the folders holds only the shared plumbing, `core__*.js` and `game__*.js`
 
 ## The sketch
 
