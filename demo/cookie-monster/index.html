@@ -51,6 +51,7 @@
 
   #over{
     position:fixed;inset:0;display:grid;place-items:center;pointer-events:none;
+    z-index:20;
     opacity:0;transition:opacity .3s;
   }
   #over.on{opacity:1;pointer-events:auto}
@@ -67,29 +68,34 @@
   }
   #over button:active{transform:translateY(1px)}
 
-  /* The thumb pad. Hidden until the body says there is a coarse pointer, so
-     a desktop never sees it. touch-action:none is what stops the browser
-     scrolling the page out from under a thumb that is dragging on it. */
+  /* The stick, after simzilla's core__stick.js. Shown on a coarse pointer and
+     on a narrow window — a narrow desktop should be able to try it, and that
+     is also how you find out it exists. --stick shrinks it on a short screen,
+     where a 124px ring would eat half the field. */
+  :root{ --stick:min(124px,26vh) }
   #pad{
-    position:fixed; left:20px; bottom:calc(20px + env(safe-area-inset-bottom,0px));
-    width:min(36vw,150px); aspect-ratio:1; border-radius:50%;
-    background:rgba(255,253,247,.40); border:1px solid var(--edge);
-    box-shadow:0 8px 24px rgba(60,50,30,.16); backdrop-filter:blur(4px);
-    display:none; touch-action:none; user-select:none; -webkit-user-select:none;
+    position:fixed; left:50%; bottom:calc(14px + env(safe-area-inset-bottom,0px));
+    transform:translateX(-50%); z-index:12;
+    display:none; place-items:center;
+    pointer-events:none;   /* only the ring is a hit target, so a tap beside it
+                              still lands on the game */
   }
-  body.touch #pad{display:block}
-  body.touch .keys{display:none}
-  #pad i{
-    position:absolute; width:20%; height:20%; border-radius:3px;
-    border-left:4px solid var(--ink); border-top:4px solid var(--ink);
-    opacity:.38; transition:opacity .08s;
+  #stick{
+    width:var(--stick); aspect-ratio:1; border-radius:50%;
+    display:grid; place-items:center; pointer-events:auto;
+    background:rgba(255,253,247,.30); border:1.5px solid rgba(120,105,80,.45);
+    box-shadow:0 6px 18px rgba(60,50,30,.14), inset 0 0 22px rgba(255,255,255,.40);
+    backdrop-filter:blur(3px);
+    touch-action:none; user-select:none; -webkit-user-select:none;
   }
-  #pad .u{top:17%; left:40%; transform:rotate(45deg)}
-  #pad .d{bottom:17%; left:40%; transform:rotate(225deg)}
-  #pad .l{left:17%; top:40%; transform:rotate(-45deg)}
-  #pad .r{right:17%; top:40%; transform:rotate(135deg)}
-  #pad[data-dir*="u"] .u, #pad[data-dir*="d"] .d,
-  #pad[data-dir*="l"] .l, #pad[data-dir*="r"] .r{opacity:1}
+  #knob{
+    width:calc(var(--stick) * .44); aspect-ratio:1; border-radius:50%;
+    background:var(--panel); border:1.5px solid var(--edge);
+    box-shadow:0 4px 12px rgba(60,50,30,.26);
+  }
+  body.pad #pad{display:grid}
+  @media (pointer:coarse){ #pad{display:grid} .keys{display:none} }
+  @media (max-width:700px){ #pad{display:grid} }
 </style>
 </head>
 <body>
@@ -110,7 +116,7 @@
 
 <button id="toggle" type="button" aria-label="Hide or show the panel">&#9776;</button>
 
-<div id="pad" aria-hidden="true"><i class="u"></i><i class="d"></i><i class="l"></i><i class="r"></i></div>
+<div id="pad" aria-hidden="true"><div id="stick"><div id="knob"></div></div></div>
 
 <div id="over">
   <div class="card">

@@ -133,63 +133,72 @@ const KEYS = {
 };
 function held(list) { return list.some(k => keys[k]) ? 1 : 0; }
 
-/* ------------------------------------------------------------- the pad
-   A phone has no WASD. The pad is ONE surface, not four buttons: a thumb
-   lands anywhere on it and slides, which is how a thumb actually behaves,
-   and a pointer captured on the middle keeps reporting where it is. The
-   direction is then just where the thumb is relative to the middle, so all
-   eight directions and every slide between them come free. It writes the
-   same four keys the keyboard writes, and nothing downstream knows. */
-const padEl = document.getElementById("pad");
-const PAD_DIRS = [["w", 0, -1], ["s", 0, 1], ["a", -1, 0], ["d", 1, 0]];
+/* ------------------------------------------------------------ the stick
+   After simzilla's core__stick.js, which already got the awkward parts
+   right: one pointer id per stick, capture so a thumb that slides off the
+   ring keeps steering, a dead zone so a resting thumb is not input, and knob
+   travel shorter than the ring so the knob never leaves it.
 
-function padTouch(e) {
-  const r = padEl.getBoundingClientRect();
-  const dx = (e.clientX - (r.left + r.width / 2)) / (r.width * 0.34);
-  const dy = (e.clientY - (r.top + r.height / 2)) / (r.width * 0.34);
-  let dir = "";
-  for (const [k, ux, uy] of PAD_DIRS) {
-    const on = ux ? dx * ux > 0.55 : dy * uy > 0.55;
-    keys[k] = on ? 1 : 0;
-    if (on) dir += ux < 0 ? "l" : ux > 0 ? "r" : uy < 0 ? "u" : "d";
-  }
-  padEl.dataset.dir = dir;
+   It writes an analogue pair rather than four keys, so a thumb pushed a
+   little walks a little. The keyboard folds into the same pair and the
+   movement below cannot tell which of the two it is reading. */
+const stickEl = document.getElementById("stick");
+const knobEl = document.getElementById("knob");
+const stick = { x: 0, y: 0, mag: 0, live: false, id: null, cx: 0, cy: 0, r: 1 };
+const DEAD_ZONE = 0.16;      // of the radius, so a thumb resting off-centre is still
+const KNOB_TRAVEL = 0.55;    // of the radius; further and the knob leaves the ring
+
+function knobPaint() {
+  const t = stick.r * KNOB_TRAVEL;
+  knobEl.style.transform = "translate(" + (stick.x * t) + "px," + (-stick.y * t) + "px)";
 }
-function padRelease() {
-  keys.w = keys.a = keys.s = keys.d = 0;
-  padEl.dataset.dir = "";
+
+function stickCentre() {
+  const b = stickEl.getBoundingClientRect();
+  stick.cx = b.left + b.width / 2;
+  stick.cy = b.top + b.height / 2;
+  stick.r = b.width / 2;
 }
-/* Whose thumb is on it is tracked here rather than asked of the browser's
-   pointer capture, so a stray move from a second finger cannot steer, and
-   the release cannot be undone by the last move of the one that let go. */
-let padPtr = null;
-padEl.addEventListener("pointerdown", e => {
-  padPtr = e.pointerId;
-  padEl.setPointerCapture(e.pointerId);
-  padTouch(e);
+
+function stickSet(px, py) {
+  const dx = px - stick.cx, dy = py - stick.cy;
+  const d = Math.hypot(dx, dy) || 1;
+  const reach = Math.min(d, stick.r);
+  stick.mag = reach / stick.r < DEAD_ZONE ? 0 : reach / stick.r;
+  if (!stick.mag) { stick.x = 0; stick.y = 0; return; }
+  stick.x = dx * reach / d / stick.r;
+  stick.y = -(dy * reach / d / stick.r);   // screen up is "away from the camera"
+}
+
+function stickEnd(e) {
+  if (e && e.pointerId !== stick.id) return;
+  stick.live = false; stick.id = null;
+  stick.x = 0; stick.y = 0; stick.mag = 0;
+  knobPaint();
+}
+
+stickEl.addEventListener("pointerdown", e => {
+  if (stick.live) return;                  // one thumb on the stick
   e.preventDefault();
+  stickCentre();
+  stick.live = true; stick.id = e.pointerId;
+  stickEl.setPointerCapture(e.pointerId);
+  stickSet(e.clientX, e.clientY);
+  knobPaint();
 });
-padEl.addEventListener("pointermove", e => {
-  if (e.pointerId === padPtr) padTouch(e);
+stickEl.addEventListener("pointermove", e => {
+  if (!stick.live || e.pointerId !== stick.id) return;
+  e.preventDefault();
+  stickSet(e.clientX, e.clientY);
+  knobPaint();
 });
-const padEnd = e => {
-  if (e.pointerId !== padPtr) return;
-  padPtr = null;
-  padRelease();
-};
-padEl.addEventListener("pointerup", padEnd);
-padEl.addEventListener("pointercancel", padEnd);
+stickEl.addEventListener("pointerup", stickEnd);
+stickEl.addEventListener("pointercancel", stickEnd);
+window.addEventListener("blur", () => stickEnd());
 
-/* Show it only where there is a thumb. any-pointer covers a touchscreen
-   laptop as well as a phone; ontouchstart is the fallback for old Safari,
-   which does not know matchMedia. #pad in the URL forces it on, so a desktop
-   can see what the phone gets. */
-const coarse = window.matchMedia
-  ? window.matchMedia("(any-pointer: coarse)").matches
-  : ("ontouchstart" in window);
-if (coarse || (window.location && window.location.hash === "#pad")) {
-  document.body.classList.add("touch");
-}
+/* A narrow window shows the stick too — that is how a desktop finds it — so
+   the hash is only for forcing it on at full width. */
+if (window.location && window.location.hash === "#pad") document.body.classList.add("pad");
 
 /* --------------------------------------------------------------- update */
 
@@ -204,12 +213,18 @@ function update(dt) {
   if (GAME.shake > 0) GAME.shake = Math.max(0, GAME.shake - dt * 3);
   if (say.t > 0) say.t -= dt;
 
-  const up = held(KEYS.up) - held(KEYS.down), rt = held(KEYS.right) - held(KEYS.left);
+  /* Stick and keys fold into one analogue pair here, and it is the last place
+     that knows the difference. The stick wins while a thumb is on it, so a
+     half push is not fought by a key left over from before. */
+  const kx = held(KEYS.right) - held(KEYS.left);
+  const ky = held(KEYS.up) - held(KEYS.down);
+  const ax = stick.mag ? stick.x : kx, ay = stick.mag ? stick.y : ky;
   let mx = 0, my = 0, want = 0;
-  if ((up || rt) && !GAME.over && monster.stun <= 0) {
-    mx = UPX * up + RGX * rt; my = UPY * up + RGY * rt;
-    const L = Math.hypot(mx, my); mx /= L; my /= L;
-    want = 1;
+  if ((ax || ay) && !GAME.over && monster.stun <= 0) {
+    mx = UPX * ay + RGX * ax; my = UPY * ay + RGY * ax;
+    const L = Math.hypot(mx, my);
+    if (L > 1) { mx /= L; my /= L; }   // two keys at once is 1.41 units of push
+    want = Math.min(1, L);             // analogue: a small push waddles slowly
   }
 
   monster.moving += (want - monster.moving) * Math.min(1, dt * 12);
