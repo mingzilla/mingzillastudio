@@ -133,6 +133,64 @@ const KEYS = {
 };
 function held(list) { return list.some(k => keys[k]) ? 1 : 0; }
 
+/* ------------------------------------------------------------- the pad
+   A phone has no WASD. The pad is ONE surface, not four buttons: a thumb
+   lands anywhere on it and slides, which is how a thumb actually behaves,
+   and a pointer captured on the middle keeps reporting where it is. The
+   direction is then just where the thumb is relative to the middle, so all
+   eight directions and every slide between them come free. It writes the
+   same four keys the keyboard writes, and nothing downstream knows. */
+const padEl = document.getElementById("pad");
+const PAD_DIRS = [["w", 0, -1], ["s", 0, 1], ["a", -1, 0], ["d", 1, 0]];
+
+function padTouch(e) {
+  const r = padEl.getBoundingClientRect();
+  const dx = (e.clientX - (r.left + r.width / 2)) / (r.width * 0.34);
+  const dy = (e.clientY - (r.top + r.height / 2)) / (r.width * 0.34);
+  let dir = "";
+  for (const [k, ux, uy] of PAD_DIRS) {
+    const on = ux ? dx * ux > 0.55 : dy * uy > 0.55;
+    keys[k] = on ? 1 : 0;
+    if (on) dir += ux < 0 ? "l" : ux > 0 ? "r" : uy < 0 ? "u" : "d";
+  }
+  padEl.dataset.dir = dir;
+}
+function padRelease() {
+  keys.w = keys.a = keys.s = keys.d = 0;
+  padEl.dataset.dir = "";
+}
+/* Whose thumb is on it is tracked here rather than asked of the browser's
+   pointer capture, so a stray move from a second finger cannot steer, and
+   the release cannot be undone by the last move of the one that let go. */
+let padPtr = null;
+padEl.addEventListener("pointerdown", e => {
+  padPtr = e.pointerId;
+  padEl.setPointerCapture(e.pointerId);
+  padTouch(e);
+  e.preventDefault();
+});
+padEl.addEventListener("pointermove", e => {
+  if (e.pointerId === padPtr) padTouch(e);
+});
+const padEnd = e => {
+  if (e.pointerId !== padPtr) return;
+  padPtr = null;
+  padRelease();
+};
+padEl.addEventListener("pointerup", padEnd);
+padEl.addEventListener("pointercancel", padEnd);
+
+/* Show it only where there is a thumb. any-pointer covers a touchscreen
+   laptop as well as a phone; ontouchstart is the fallback for old Safari,
+   which does not know matchMedia. #pad in the URL forces it on, so a desktop
+   can see what the phone gets. */
+const coarse = window.matchMedia
+  ? window.matchMedia("(any-pointer: coarse)").matches
+  : ("ontouchstart" in window);
+if (coarse || (window.location && window.location.hash === "#pad")) {
+  document.body.classList.add("touch");
+}
+
 /* --------------------------------------------------------------- update */
 
 function update(dt) {
@@ -386,6 +444,11 @@ function resize() {
   canvas.width = Math.round(view.w * view.dpr);
   canvas.height = Math.round(view.h * view.dpr);
   ctx.setTransform(view.dpr, 0, 0, view.dpr, 0, 0);
+  /* A phone is a fraction of a desktop's pixels, so a fixed zoom would show
+     a fifth of the field and the cookies would be off the screen. Sixteen
+     units across, whatever the screen is — a 1280 desktop lands on the 80 it
+     was tuned at. */
+  cam.zoom = Math.max(22, Math.min(88, view.w / 16));
 }
 
 window.addEventListener("resize", resize);
