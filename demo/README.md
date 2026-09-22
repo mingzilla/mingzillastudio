@@ -9,7 +9,7 @@ flowchart LR
     B --> K
     B --> L
     B --> C
-    click K "https://mingzilla.github.io/mingzillastudio/browser_games/kenny-game/"
-    click L "https://mingzilla.github.io/mingzillastudio/browser_games/lowpoly-city/"
-    click C "https://mingzilla.github.io/mingzillastudio/browser_games/cookie-monster/"
+    click K "https://mingzilla.github.io/mingzillastudio/demo/kenny-game/"
+    click L "https://mingzilla.github.io/mingzillastudio/demo/lowpoly-city/"
+    click C "https://mingzilla.github.io/mingzillastudio/demo/cookie-monster/"
 ```
