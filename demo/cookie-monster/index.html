@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cookie Monster</title>
+<style>
+  :root{ --ink:#2b3440; --panel:rgba(255,253,247,.90); --edge:rgba(120,105,80,.28); }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;overflow:hidden;background:#bfe0ef}
+  body{
+    font-family:ui-rounded,"Segoe UI Rounded",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    color:var(--ink); -webkit-tap-highlight-color:transparent;
+  }
+  canvas{display:block;position:fixed;inset:0;width:100%;height:100%}
+
+  #hud{
+    position:fixed;top:14px;left:14px;min-width:186px;
+    background:var(--panel);border:1px solid var(--edge);border-radius:14px;
+    padding:11px 13px;box-shadow:0 8px 24px rgba(60,50,30,.18);
+    backdrop-filter:blur(6px);
+  }
+  #hud h1{margin:0 0 8px;font-size:14px;letter-spacing:.01em}
+  .row{display:flex;align-items:baseline;justify-content:space-between;gap:14px}
+  .row b{font-size:22px;line-height:1.15;font-variant-numeric:tabular-nums}
+  .row span{font-size:11px;text-transform:uppercase;letter-spacing:.08em;opacity:.62}
+  #time.low{color:#c8493c}
+  #combo{
+    min-height:15px;margin-top:2px;font-size:12px;font-weight:700;
+    letter-spacing:.06em;color:#c9762c;
+  }
+  .keys{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:12px;
+        align-items:center;margin-top:9px;padding-top:9px;border-top:1px solid var(--edge)}
+  .keys kbd{
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;
+    background:#f0ece1;border:1px solid var(--edge);border-bottom-width:2px;
+    border-radius:5px;padding:1px 5px;white-space:nowrap;
+  }
+  #hud,#toggle{transition:opacity .25s}
+  body.ui-off #hud{opacity:0;pointer-events:none}
+
+  #toggle{
+    position:fixed;top:14px;right:14px;
+    width:32px;height:32px;padding:0;border-radius:9px;
+    background:var(--panel);border:1px solid var(--edge);color:var(--ink);
+    font-size:14px;line-height:1;cursor:pointer;display:grid;place-items:center;
+    box-shadow:0 6px 18px rgba(60,50,30,.16); opacity:.5;
+  }
+  #toggle:hover{opacity:1}
+
+  #over{
+    position:fixed;inset:0;display:grid;place-items:center;pointer-events:none;
+    opacity:0;transition:opacity .3s;
+  }
+  #over.on{opacity:1;pointer-events:auto}
+  #over .card{
+    background:var(--panel);border:1px solid var(--edge);border-radius:18px;
+    padding:22px 30px;text-align:center;box-shadow:0 16px 44px rgba(60,50,30,.24);
+    backdrop-filter:blur(6px);
+  }
+  #over h2{margin:0 0 4px;font-size:15px;letter-spacing:.10em;text-transform:uppercase;opacity:.65}
+  #over #final{font-size:26px;font-weight:700;margin-bottom:14px}
+  #over button{
+    font:inherit;font-size:13px;padding:8px 16px;border-radius:10px;cursor:pointer;
+    color:#fff;background:#c9762c;border:1px solid #a95f1f;border-bottom-width:3px;
+  }
+  #over button:active{transform:translateY(1px)}
+</style>
+</head>
+<body>
+
+<canvas id="stage"></canvas>
+
+<div id="hud">
+  <h1>Cookie Monster</h1>
+  <div class="row"><b id="score">0</b><span>crumbs</span></div>
+  <div class="row"><b id="time">75</b><span>seconds</span></div>
+  <div id="combo"></div>
+  <div class="keys">
+    <kbd>W A S D</kbd><span>waddle</span>
+    <kbd>R</kbd><span>another go</span>
+    <kbd>H</kbd><span>hide this</span>
+  </div>
+</div>
+
+<button id="toggle" type="button" aria-label="Hide or show the panel">&#9776;</button>
+
+<div id="over">
+  <div class="card">
+    <h2>Time up</h2>
+    <div id="final"></div>
+    <button id="again" type="button">Again (R)</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+
+<!-- the low-poly kit -->
+<script src="assets/shapes.js"></script>
+
+<!-- one file per thing in the world -->
+<script src="assets/monster.js"></script>
+<script src="assets/cookie.js"></script>
+<script src="assets/props.js"></script>
+
+<!-- the game around them -->
+<script src="assets/game.js"></script>
+</body>
+</html>
