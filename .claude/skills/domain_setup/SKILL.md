@@ -12,4 +12,4 @@ This is a public repo, passwords are strictly not allowed to be stored in this p
 ### Cloudflare Setup
 
 - `npm install -g wrangler`
-- 
+- `CLOUDFLARE_API_TOKEN` is required - if not available, let claude guide through the creation and the rest of the setup
