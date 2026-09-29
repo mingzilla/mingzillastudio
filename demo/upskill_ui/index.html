@@ -320,7 +320,7 @@ flowchart LR
     { name: 'BossZ', net: 'ok',
       network: [{ n: 'unit__arch__context_tradeoff', v: '1' }, { n: 'unit__arch__read_write_boundary', v: '1' }, { n: 'unit__coding__mcp', v: '1' }],
       pub: [] },
-    { name: 'Luke', net: 'ok', network: [], pub: [] }
+    { name: 'LukeDoesNotShare', net: 'ok', network: [], pub: [] }
   ];
   var sandbox = [
     { n: 'askKenny', from: '', v: '1' },
@@ -495,9 +495,9 @@ flowchart LR
   var members = [
     { user: 'mingzilla', nick: 'Ming', net: 'ok', pub: 'ok' },
     { user: 'SmoggiKen', nick: 'Ken', net: 'no access', pub: 'ok' },
-    { user: 'member3', nick: 'Name3', net: 'ok', pub: 'ok' },
-    { user: 'member4', nick: 'Name4', net: 'ok', pub: 'ok' },
-    { user: 'alice', nick: 'Alice', net: 'requested', pub: 'ok' },
+    { user: 'BossZ', nick: 'BossZ', net: 'ok', pub: 'ok' },
+    { user: 'NiceCharlie', nick: 'NiceCharlie', net: 'ok', pub: 'ok' },
+    { user: 'LukeDoesNotShare', nick: 'LukeDoesNotShare', net: 'requested', pub: 'ok' },
     { user: 'bob', nick: 'Bob', net: 'ok', pub: 'ok' }
   ];
 
