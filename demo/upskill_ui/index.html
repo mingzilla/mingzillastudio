@@ -1,0 +1,555 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<title>Upskill Wireframe</title>
+<link rel="stylesheet" href="reset.css">
+<link rel="stylesheet" href="wireframe.css">
+</head>
+<body>
+
+<div class="bar">
+  <div class="nav">
+    <div class="logo">/upskill</div>
+    <div class="tabs">
+      <div class="tab on" data-t="sharing">Sharing</div>
+      <div class="tab" data-t="receiving">Receiving</div>
+      <div class="tab" data-t="setup">Setup</div>
+    </div>
+  </div>
+  <div class="row" id="share-to">
+    share to:
+    <div class="seg">
+      <button class="on">network</button>
+      <button>public</button>
+    </div>
+  </div>
+</div>
+
+<div class="screen on" id="sharing">
+  <div class="cols">
+    <div class="col c50">
+      <div class="box">
+        <div class="ph">My Skills</div>
+        <div class="split">
+          <div class="sc">
+            <div class="row"><input class="grow" id="have-search" placeholder="Search: What I have"></div>
+            <div class="list" id="have-list">
+          <div class="proj">
+            <div class="gh">core__unit_skills</div>
+            <div class="sub">
+              <div class="gh sub-h" title="core__unit_skills/.claude/skills">default</div>
+              <div class="item"><span class="name" title="unit__agent__flow_structure">unit__agent__flow_structure</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__agent__flow_walk">unit__agent__flow_walk</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__agent__skill_with_sandbox">unit__agent__skill_with_sandbox</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__coding__python">unit__coding__python</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__coding__sh">unit__coding__sh</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__coding__what_how_dispatch">unit__coding__what_how_dispatch</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__context__upfront_cost">unit__context__upfront_cost</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__diagram__erd">unit__diagram__erd</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__diagram__flowchart">unit__diagram__flowchart</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__disambiguation__by_taxonomy">unit__disambiguation__by_taxonomy</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__doc__forward_desired">unit__doc__forward_desired</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__response__ASD-STE100">unit__response__ASD-STE100</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__response_to_user">unit__response_to_user</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__rule__make_concise">unit__rule__make_concise</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__skill__create_flow_skill">unit__skill__create_flow_skill</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__skill__create_unit_skill">unit__skill__create_unit_skill</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__skill__promote">unit__skill__promote</span><button>share</button></div>
+            </div>
+            <div class="sub">
+              <div class="gh sub-h" title="core__unit_skills/.claude/skills__on_demand">on_demand</div>
+              <div class="item"><span class="name" title="unit__agent__verify_dependencies">unit__agent__verify_dependencies</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__arch__context_tradeoff">unit__arch__context_tradeoff</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__arch__desired_and_dry_run">unit__arch__desired_and_dry_run</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__arch__orchestration_in_code">unit__arch__orchestration_in_code</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__arch__read_write_boundary">unit__arch__read_write_boundary</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__coding__cross_platform">unit__coding__cross_platform</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__coding__mcp">unit__coding__mcp</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__disambiguation__by_taxonomy">unit__disambiguation__by_taxonomy</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__discover__interview_user">unit__discover__interview_user</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__explain__highest_level">unit__explain__highest_level</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__harness__cross_session_messaging">unit__harness__cross_session_messaging</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__project__cold_start">unit__project__cold_start</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__project__install_graft">unit__project__install_graft</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__rule__scan_dependencies">unit__rule__scan_dependencies</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__rule__scan_violations">unit__rule__scan_violations</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__skill__break_down">unit__skill__break_down</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__skill__verify_dependencies">unit__skill__verify_dependencies</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__skill__what_is_a_skill">unit__skill__what_is_a_skill</span><button>share</button></div>
+            </div>
+            <div class="sub">
+              <div class="gh sub-h" title="core__unit_skills/.claude/skills__sdlc">sdlc</div>
+              <div class="item"><span class="name" title="flow__sdlc">flow__sdlc</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__design__01__user_journey_options">unit__design__01__user_journey_options</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__design__02__decision">unit__design__02__decision</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__design__03__rewrite_with_agreement">unit__design__03__rewrite_with_agreement</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__design__04__data_relationship">unit__design__04__data_relationship</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__design__05__improve_ui_with_data">unit__design__05__improve_ui_with_data</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__design__08__high_level_folder_structure">unit__design__08__high_level_folder_structure</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__design__09__prompt_design">unit__design__09__prompt_design</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__design__dashboard_prototype">unit__design__dashboard_prototype</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__design__structure__3_tier__backend">unit__design__structure__3_tier__backend</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__design__structure__3_tier__frontend">unit__design__structure__3_tier__frontend</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__design__structure__db__customizable_entities">unit__design__structure__db__customizable_entities</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__design__ui_prototype">unit__design__ui_prototype</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__ticket__create">unit__ticket__create</span><button>share</button></div>
+            </div>
+            <div class="sub">
+              <div class="gh sub-h" title="core__unit_skills/.claude/skills__teamwork">teamwork</div>
+              <div class="item"><span class="name" title="unit__harness__teamwork__enable">unit__harness__teamwork__enable</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__harness__teamwork__operate">unit__harness__teamwork__operate</span><button>share</button></div>
+            </div>
+          </div>
+            </div>
+          </div>
+          <div class="sc">
+            <div class="row"><input class="grow" placeholder="Search: What I share"></div>
+            <div class="list" id="shared-list">
+              <div class="empty" id="shared-empty">you have not shared any skills</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col c50">
+      <div class="box panel">
+        <div class="ph">Skill Details</div>
+        <div id="pempty" class="empty">click on a skill to show details here</div>
+        <div id="pfull" style="display:none">
+          <div class="tabs">
+            <div class="tab on" id="ptab-skill">SKILL.md</div>
+            <div class="tab" id="ptab-usage">usage.md</div>
+          </div>
+          <div id="pname"></div>
+          <div id="pbody" class="md"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="receiving">
+  <div class="cols">
+    <div class="col cnet">
+      <div class="box">
+        <div class="ph">My Network</div>
+        <div class="split">
+          <div class="sc fixed">
+            <div class="row"><input class="grow" id="people-search" placeholder="Search: Name"></div>
+            <div class="list" id="people-list"></div>
+          </div>
+          <div class="sc">
+            <div class="row"><input class="grow" id="their-search" placeholder="Search: Their skills"></div>
+            <div class="list" id="their-list"><div class="empty">click on a person to see their skills</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col c25">
+      <div class="box">
+        <div class="ph">My Skills</div>
+        <div class="row"><input class="grow" id="sandbox-search" placeholder="Search: My Sandbox" title="upskill__sandbox/.claude/skills"></div>
+        <div class="list" id="sandbox-list"></div>
+      </div>
+    </div>
+    <div class="col c25x2">
+      <div class="box panel">
+        <div class="ph">Skill Details</div>
+        <div id="rempty" class="empty">click on a skill to show details here</div>
+        <div id="rfull" style="display:none">
+          <div class="tabs">
+            <div class="tab on" id="rtab-skill">SKILL.md</div>
+            <div class="tab" id="rtab-usage">usage.md</div>
+          </div>
+          <div id="rname"></div>
+          <div id="rbody" class="md"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="setup">
+  <div class="box">
+    <div class="ph">My Repos</div>
+    <div class="row"><div class="c1">github username</div><input class="grow" id="repo-user" placeholder="e.g. mingzilla"><div class="c2"><button id="repo-apply" disabled>Apply</button></div></div>
+    <div class="row"><div class="c1">private</div><input class="grow repo" id="repo-private" disabled><div class="c2" id="st-private"></div></div>
+    <div class="row"><div class="c1">network</div><input class="grow repo" id="repo-network" disabled><div class="c2" id="st-network"></div></div>
+    <div class="row"><div class="c1">public</div><input class="grow repo" id="repo-public" disabled><div class="c2" id="st-public"></div></div>
+  </div>
+
+  <div class="box">
+    <div class="ph">My Network</div>
+    <div class="tools">
+      <div class="c span4"><input class="u" placeholder="username"><input class="n" placeholder="nickname"><button>Add</button></div>
+      <div></div>
+      <div class="c span4"><button id="links-toggle">Show Links</button><span class="grow"></span><button title="Ask every member who has not given you access to their network skills">Request All</button><button title="Give everyone who has asked access to your network skills">Authorize All</button></div>
+    </div>
+    <div class="grid" id="net-grid"></div>
+  </div>
+</div>
+
+<script type="text/plain" id="md-skill">
+# skill1
+
+Sample SKILL.md content.
+
+| Section | Holds |
+|---------|-------|
+| Actions | index of actions |
+| Key files | which file to edit |
+</script>
+<script type="text/plain" id="md-usage">
+## Usage
+
+Use `skill1` for a skill's `SKILL.md`
+
+## Why should I care?
+
+```mermaid
+flowchart LR
+    IN["a skill's SKILL.md"]
+    S["sections, no prose"]
+    K["Key files"]
+    D["Decisions"]
+    IN --> S --> K --> D
+    style IN fill: #e8f5e9
+    style S fill: #e8f5e9
+    style K fill: #e8f5e9
+    style D fill: #e8f5e9
+```
+</script>
+
+<script>
+  mermaid.initialize({ startOnLoad: false });
+
+  function show(which, pre) {
+    pre = pre || 'p';
+    document.getElementById(pre + 'tab-skill').classList.toggle('on', which === 'skill');
+    document.getElementById(pre + 'tab-usage').classList.toggle('on', which === 'usage');
+    var body = document.getElementById(pre + 'body');
+    body.innerHTML = marked.parse(document.getElementById('md-' + which).textContent);
+    body.querySelectorAll('code.language-mermaid').forEach(function (c) {
+      var d = document.createElement('div');
+      d.className = 'mermaid';
+      d.textContent = c.textContent;
+      c.parentNode.replaceWith(d);
+    });
+    mermaid.run({ nodes: body.querySelectorAll('.mermaid') });
+  }
+
+  ['p', 'r'].forEach(function (pre) {
+    document.getElementById(pre + 'tab-skill').onclick = function () { show('skill', pre); };
+    document.getElementById(pre + 'tab-usage').onclick = function () { show('usage', pre); };
+  });
+
+  document.getElementById('have-search').oninput = function () {
+    var q = this.value.toLowerCase();
+    document.querySelectorAll('#have-list .sub').forEach(function (g) {
+      var any = false;
+      g.querySelectorAll('.item').forEach(function (i) {
+        var hit = i.querySelector('.name').textContent.toLowerCase().indexOf(q) >= 0;
+        i.style.display = hit ? '' : 'none';
+        any = any || hit;
+      });
+      g.style.display = any ? '' : 'none';
+    });
+  };
+
+  var sharedList = document.getElementById('shared-list');
+  var sharedEmpty = document.getElementById('shared-empty');
+
+  function markShared(name, shared) {
+    document.querySelectorAll('#have-list .item').forEach(function (i) {
+      if (i.querySelector('.name').textContent !== name) return;
+      var b = i.querySelector('button');
+      b.textContent = shared ? 'shared' : 'share';
+      b.classList.toggle('done', shared);
+    });
+  }
+
+  function refreshEmpty() {
+    var none = sharedList.querySelectorAll('.item').length === 0;
+    sharedEmpty.style.display = none ? 'flex' : 'none';
+  }
+
+  document.getElementById('sharing').addEventListener('click', function (e) {
+    var item = e.target.closest('.item');
+    if (!item) return;
+    var btn = e.target.closest('button');
+    var name = item.querySelector('.name').textContent;
+
+    if (btn && item.parentNode === sharedList) {
+      item.remove();
+      markShared(name, false);
+      refreshEmpty();
+      return;
+    }
+
+    if (btn) {
+      if (btn.classList.contains('done')) return;
+      var row = document.createElement('div');
+      row.className = 'item';
+      row.innerHTML = '<span class="name"></span><button class="x" aria-label="remove"></button>';
+      row.querySelector('.name').textContent = name;
+      sharedList.insertBefore(row, sharedEmpty);
+      markShared(name, true);
+      refreshEmpty();
+      return;
+    }
+
+    document.querySelectorAll('#sharing .item').forEach(function (i) { i.classList.remove('sel'); });
+    item.classList.add('sel');
+    document.getElementById('pname').textContent = name;
+    document.getElementById('pempty').style.display = 'none';
+    document.getElementById('pfull').style.display = 'flex';
+    show('skill');
+  });
+
+  var people = [
+    { name: 'Ming', net: 'ok',
+      network: [{ n: 'unit__skill__create_unit_skill', v: '1' }, { n: 'unit__skill__promote', v: '2' }, { n: 'unit__coding__python', v: '1' }],
+      pub: [{ n: 'unit__response_to_user', v: '1' }, { n: 'unit__rule__make_concise', v: '1' }] },
+    { name: 'Ken', net: 'no access', network: [],
+      pub: [{ n: 'unit__coding__sh', v: '1' }, { n: 'unit__diagram__flowchart', v: '1' }, { n: 'unit__coding__python', v: '2' }] },
+    { name: 'Alice', net: 'requested', network: [],
+      pub: [{ n: 'unit__project__cold_start', v: '1' }] },
+    { name: 'Name3', net: 'ok',
+      network: [{ n: 'unit__arch__context_tradeoff', v: '1' }, { n: 'unit__arch__read_write_boundary', v: '1' }, { n: 'unit__coding__mcp', v: '1' }],
+      pub: [] },
+    { name: 'Bob', net: 'ok', network: [], pub: [] }
+  ];
+  var sandbox = [
+    { n: 'askKenny', from: '', v: '1' },
+    { n: 'unit__skill__create_unit_skill', from: 'Ming', v: '1' },
+    { n: 'unit__skill__promote', from: 'Ming', v: '1' },
+    { n: 'unit__coding__python', from: 'Ming', v: '1' }
+  ];
+  var current = null;
+
+  function allOf(p) { return p.network.concat(p.pub); }
+  function count(p) { return allOf(p).length; }
+  function inSandbox(n) { return sandbox.filter(function (e) { return e.n === n; })[0]; }
+
+  function stateOf(k) {
+    var e = inSandbox(k.n);
+    if (!e) return 'receive';
+    return e.v === k.v ? 'received' : 'update';
+  }
+
+  function outOfDate(e) {
+    if (!current) return false;
+    var k = allOf(current).filter(function (x) { return x.n === e.n; })[0];
+    return !!k && k.v !== e.v;
+  }
+
+  function matches(el, q) {
+    return el.querySelector('.name').textContent.toLowerCase().indexOf(q) >= 0;
+  }
+
+  function filterList(listId, inputId) {
+    var q = document.getElementById(inputId).value.toLowerCase();
+    document.querySelectorAll('#' + listId + ' .item').forEach(function (i) {
+      i.style.display = matches(i, q) ? '' : 'none';
+    });
+  }
+
+  function renderPeople() {
+    var sorted = people.slice().sort(function (a, b) {
+      var za = count(a) === 0, zb = count(b) === 0;
+      if (za !== zb) return za ? 1 : -1;
+      return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+    });
+    document.getElementById('people-list').innerHTML = sorted.map(function (p) {
+      var cls = 'item' + (count(p) === 0 ? ' zero' : '') + (p === current ? ' sel' : '');
+      return '<div class="' + cls + '" data-p="' + p.name + '"><span class="name">' + p.name + '</span><span class="cnt">(' + count(p) + ')</span></div>';
+    }).join('');
+    filterList('people-list', 'people-search');
+  }
+
+  function skillRows(list) {
+    if (list.length === 0) return '<div class="note">none shared</div>';
+    return list.map(function (k) {
+      var st = stateOf(k);
+      var cls = 'item' + (st === 'update' ? ' old' : '');
+      var tip = st === 'update' ? ' title="differs from your sandbox copy"' : '';
+      return '<div class="' + cls + '"><span class="name" title="' + k.n + '">' + k.n + '</span><button class="' + (st === 'received' ? 'done' : '') + '"' + tip + '>' + ({ receive: 'Get', received: 'Owned', update: 'update' })[st] + '</button></div>';
+    }).join('');
+  }
+
+  function renderTheirs() {
+    var box = document.getElementById('their-list');
+    if (!current) {
+      box.innerHTML = '<div class="empty">click on a person to see their skills</div>';
+      return;
+    }
+    if (count(current) === 0) {
+      box.innerHTML = '<div class="empty">' + current.name + ' has not shared any skills</div>';
+      return;
+    }
+    var net;
+    if (current.net === 'no access') net = '<div class="note">no access <button id="ask">request</button></div>';
+    else if (current.net === 'requested') net = '<div class="note">requested</div>';
+    else net = skillRows(current.network);
+    box.innerHTML = '<div class="gh">network</div>' + net + '<div class="gh">public</div>' + skillRows(current.pub);
+    filterList('their-list', 'their-search');
+  }
+
+  function renderSandbox() {
+    var sorted = sandbox.slice().sort(function (a, b) { return a.n.toLowerCase().localeCompare(b.n.toLowerCase()); });
+    document.getElementById('sandbox-list').innerHTML = sorted.map(function (e) {
+      var old = outOfDate(e);
+      var from = e.from ? '<span class="cnt">(' + e.from + ')</span>' : '';
+      return '<div class="item' + (old ? ' old' : '') + '"><span class="name" title="' + e.n + '">' + e.n + '</span>' + from + '</div>';
+    }).join('');
+    filterList('sandbox-list', 'sandbox-search');
+  }
+
+  function pick(item, title) {
+    document.querySelectorAll('#their-list .item, #sandbox-list .item').forEach(function (i) { i.classList.remove('sel'); });
+    item.classList.add('sel');
+    document.getElementById('rname').textContent = title;
+    document.getElementById('rempty').style.display = 'none';
+    document.getElementById('rfull').style.display = 'flex';
+    show('skill', 'r');
+  }
+
+  document.getElementById('people-search').oninput = function () { filterList('people-list', 'people-search'); };
+  document.getElementById('their-search').oninput = function () { filterList('their-list', 'their-search'); };
+  document.getElementById('sandbox-search').oninput = function () { filterList('sandbox-list', 'sandbox-search'); };
+
+  document.getElementById('people-list').addEventListener('click', function (e) {
+    var item = e.target.closest('.item');
+    if (!item) return;
+    current = people.filter(function (p) { return p.name === item.dataset.p; })[0];
+    renderPeople();
+    renderTheirs();
+    renderSandbox();
+  });
+
+  document.getElementById('their-list').addEventListener('click', function (e) {
+    if (e.target.id === 'ask') {
+      current.net = 'requested';
+      renderTheirs();
+      return;
+    }
+    var item = e.target.closest('.item');
+    if (!item) return;
+    var name = item.querySelector('.name').textContent;
+
+    if (e.target.closest('button')) {
+      var k = allOf(current).filter(function (x) { return x.n === name; })[0];
+      if (stateOf(k) === 'received') return;
+      var entry = { n: k.n, from: current.name, v: k.v };
+      var at = sandbox.findIndex(function (x) { return x.n === name; });
+      if (at >= 0) sandbox[at] = entry; else sandbox.push(entry);
+      renderTheirs();
+      renderSandbox();
+      return;
+    }
+
+    pick(item, current.name + ' / ' + name);
+  });
+
+  document.getElementById('sandbox-list').addEventListener('click', function (e) {
+    var item = e.target.closest('.item');
+    if (!item) return;
+    pick(item, 'sandbox / ' + item.querySelector('.name').textContent);
+  });
+
+  renderPeople();
+  renderSandbox();
+
+  document.querySelectorAll('.tabs > .tab[data-t]').forEach(function (t) {
+    t.onclick = function () {
+      document.querySelectorAll('.tabs > .tab[data-t], .screen').forEach(function (e) { e.classList.remove('on'); });
+      t.classList.add('on');
+      document.getElementById(t.dataset.t).classList.add('on');
+      document.getElementById('share-to').style.display = t.dataset.t === 'sharing' ? '' : 'none';
+    };
+  });
+
+  var repoUser = document.getElementById('repo-user');
+  var repoApply = document.getElementById('repo-apply');
+
+  repoUser.oninput = function () {
+    var has = repoUser.value.trim() !== '';
+    repoApply.disabled = !has;
+    document.querySelectorAll('.repo').forEach(function (i) { i.disabled = !has; });
+  };
+
+  repoApply.onclick = function () {
+    var u = repoUser.value.trim();
+    var base = 'https://github.com/' + u + '/';
+    document.getElementById('repo-private').value = base + 'private_skills.git';
+    document.getElementById('repo-network').value = base + 'skills_shared_with_network.git';
+    document.getElementById('repo-public').value = base + 'public_skills.git';
+    document.getElementById('st-private').textContent = 'ok';
+    document.getElementById('st-network').textContent = 'ok';
+    document.getElementById('st-public').innerHTML = '<button>setup</button>';
+  };
+
+  var members = [
+    { user: 'mingzilla', nick: 'Ming', net: 'ok', pub: 'ok' },
+    { user: 'SmoggiKen', nick: 'Ken', net: 'no access', pub: 'ok' },
+    { user: 'member3', nick: 'Name3', net: 'ok', pub: 'ok' },
+    { user: 'member4', nick: 'Name4', net: 'ok', pub: 'ok' },
+    { user: 'alice', nick: 'Alice', net: 'requested', pub: 'ok' },
+    { user: 'bob', nick: 'Bob', net: 'ok', pub: 'ok' }
+  ];
+
+  function groups() {
+    return '<div class="h g span2">Member</div><div class="h g span2">Your access to their skills</div>';
+  }
+
+  function cols() {
+    return '<div class="h h2">username</div><div class="h h2">display as</div><div class="h h2">network skills</div><div class="h h2">public skills</div>';
+  }
+
+  function first(m) {
+    if (!m) return '<div></div><div></div><div></div><div></div>';
+    var net = m.net === 'no access' ? '<button title="Ask ' + m.user + ' for access to their network skills">request</button>' : m.net;
+    return '<div class="c"><input value="' + m.user + '"></div><div class="c"><input value="' + m.nick + '"></div>' +
+      '<div class="c">' + net + '</div><div class="c">' + m.pub + '</div>';
+  }
+
+  function url(m, type) {
+    if (!m) return '<div class="urls span4"></div>';
+    var repo = type === 'network' ? 'skills_shared_with_network.git' : 'public_skills.git';
+    return '<div class="c urls span4"><div class="lbl">' + type + '</div><input value="https://github.com/' + m.user + '/' + repo + '"></div>';
+  }
+
+  function renderMembers() {
+    var sorted = members.slice().sort(function (a, b) { return a.user.toLowerCase().localeCompare(b.user.toLowerCase()); });
+    var html = groups() + '<div></div>' + groups() + cols() + '<div></div>' + cols();
+    for (var i = 0; i < sorted.length; i += 2) {
+      var l = sorted[i], r = sorted[i + 1];
+      html += first(l) + '<div></div>' + first(r);
+      html += url(l, 'network') + '<div class="urls"></div>' + url(r, 'network');
+      html += url(l, 'public') + '<div class="urls"></div>' + url(r, 'public');
+    }
+    document.getElementById('net-grid').innerHTML = html;
+  }
+
+  renderMembers();
+
+  document.getElementById('links-toggle').onclick = function () {
+    var grid = document.getElementById('net-grid');
+    grid.classList.toggle('show-links');
+    this.textContent = grid.classList.contains('show-links') ? 'Hide Links' : 'Show Links';
+  };
+
+  document.querySelectorAll('.seg button').forEach(function (b) {
+    b.onclick = function () {
+      document.querySelectorAll('.seg button').forEach(function (e) { e.classList.remove('on'); });
+      b.classList.add('on');
+    };
+  });
+
+</script>
+
+</body>
+</html>
