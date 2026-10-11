@@ -1,0 +1,2 @@
+- [IF] asked to use a skill but not present here, [THEN] check `../skills__on_demand` and adopt `progressive disclosure`.
+- [IF] `skills/.gitignore` exists next to `link_from_lib.yaml`, [THEN] `.gitignore` is only to exclude these symlink or duplicate skills from version control. Those are skills are to be used.
