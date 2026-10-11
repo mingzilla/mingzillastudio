@@ -21,6 +21,7 @@ Only what `content.md` does not hold (metrics, links, media, results), keyed by 
 ### Upskill (Skill Sharing App)
 
 - Demo (interactive prototype): https://mingzillastudio.co.uk/demo/upskill_ui/
+- Image: assets/06__upskill.jpg
 - Repo: https://github.com/mingzilla/upskill
 - Video: https://www.youtube.com/watch?v=fHlu_i5Ul3U
 - Audience: non-technical people sharing AI skills within a team
@@ -32,3 +33,13 @@ Only what `content.md` does not hold (metrics, links, media, results), keyed by 
 - Result: **2 days** — idea to a playable multiplayer world
 - Demo: https://simzilla.mingzillastudio.co.uk/index.html?player=demo
 - Image: `assets/05__simzilla.jpg`
+
+## Extra topics
+
+Topics shown on the page that are not in `content.md` yet (move them there if you like).
+
+### Harness Engineering for Coding
+
+- Section: AI Harness Engineering
+- Challenge: A small requirement shouldn't cause LLM to make widespread code and test changes.
+- What: I structure code so responsibilities, implementation variants and their tests remain isolated.

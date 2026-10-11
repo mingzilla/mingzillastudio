@@ -24,9 +24,9 @@ My current focus is converting that experience into **shareable skills** - reusa
 ## Stats
 
 - 20+ years building large systems
-- 250+ AI engineering videos
 - 50+ agent skills managed
-- 10M+ records processed
+- 10M+ records searched
+- 1m+ files and websites processed
 
 ## Recent Work
 
@@ -36,16 +36,18 @@ A selection of projects from the last 18 months — LLM-assisted systems at scal
 
 Spent 11 years as a principal implementation authority for Panintelligence's multi-tenanted BI platform (**PowerBI equivalent**), architecting and implementing approximately 60% of the system across frontend and backend.
 
-- Multi-Tenanted Security Control
-- Supports +15 Data Connections
-- Data Connection Management
-- Layout Control
-- Report Generation
+- Frontend: reactive pattern · modular CSS · advanced change detection control for UI performance
+- Backend: convention over configuration · 3-tier with DDD · extreme low code
+- Multi-level permissions control
+- Multi-tenanted security control
+- Data connection management (+15 data connections)
+- Layout control
+- Report generation
 
 ## Connect
 
-- [YouTube](https://www.youtube.com/@mingzillastudio) — image `./assets/04__youtube.png` — /upskill Back on YouTube
-- [Bilibili](https://space.bilibili.com/1220871760) — image `./assets/04__video_site.jpg` — 250+ videos · 6k+ subscribers
+- [YouTube](https://www.youtube.com/@mingzillastudio) — image `./assets/04__youtube.png` — primary: videos on AI engineering
+- [Bilibili](https://space.bilibili.com/1220871760) — image `./assets/04__video_site.jpg` — secondary channel
 - [Profile Site](https://mingzilla.github.io/mingzillastudio/2014/) — image `./assets/03__2014_site.jpg` — Mingzilla Studio
 - [CV](https://mingzilla.github.io/mingzillastudio/2026/ming_huang__cv_2026_09__v02.pdf)
 - [Email](mailto:means789@gmail.com)

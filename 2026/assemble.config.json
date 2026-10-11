@@ -1,0 +1,1 @@
+{ "first": ["vendor/react.production.min.js", "vendor/react-dom.production.min.js", "vendor/htm.js", "vendor/d3.min.js", "infra"], "last": ["app.js"], "ignore": "(\\.test\\.js$|^\\.drafts/|^_meta/)" }
