@@ -27,7 +27,6 @@ Rule for all: a still, readable fallback (reduced-motion, mobile, no-JS-timing).
 |---|------|------------------|-----------|
 | 8 | **Agent team at work** | Worker, Reviewer, Researcher, Supervisor as nodes; tickets (dots) move Ticket -> Proposal -> Implement -> Review -> Document, bouncing back from Review sometimes. | agents work unattended, with review |
 | 9 | **Skill layers** | 50+ skills as a layered treemap/sunburst: operational, authoring, project-specific. Click a layer to collapse the rest. | skills stay manageable at 50+ |
-| 10 | **Upskill network** | People as nodes; a skill pulse travels from one person to another when "shared". Mirrors the app's Network panel. | the product idea, before opening the demo |
 | 11 | **Career line** | 2014 -> 2025 BI platform, 2026 AI work, 250+ videos, as one timeline with density bumps. | 20+ years, not a recent pivot |
 
 ## Tier 4 — page glue (cheap, high polish)
@@ -40,7 +39,7 @@ Rule for all: a still, readable fallback (reduced-motion, mobile, no-JS-timing).
 ## Suggested cut
 
 Build first: **1 Map, 2 One Diagram, 3 Isolation demo, count-up/progress**. They carry the page's message and reuse one data source (`content.md`).
-Add later by appetite: **5**, **7**, **8** (best story-per-effort), then 4, 6, 9-11.
+Add later by appetite: **5**, **7**, **8** (best story-per-effort), then 4, 6, 9, 11.
 
 ## Open questions
 
