@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mockup 001 — hybrid</title>
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; font: 15px/1.4 system-ui, sans-serif; background: #111318; color: #ddd; }
+.box { border: 1px dashed #556; border-radius: 10px; padding: 14px; }
+.label { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: #889; margin: 0 0 8px; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
+section { margin: 28px 0; }
+img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
+
+/* top_nav */
+.nav { display: flex; gap: 18px; align-items: center; padding: 14px 20px; border-bottom: 1px solid #334; overflow-x: auto; white-space: nowrap; }
+.nav b { margin-right: auto; }
+
+/* hero = intro_text + map */
+.hero { display: grid; grid-template-columns: 1fr 1.4fr; gap: 20px; align-items: center; }
+.hero h1 { font-size: clamp(32px, 5vw, 52px); line-height: 1; margin: 0 0 12px; }
+.map { position: relative; aspect-ratio: 4 / 3; }
+.node { position: absolute; transform: translate(-50%, -50%); border-radius: 50%; background: #5a57ff55; border: 1px solid #8a88ff; display: grid; place-items: center; font-size: 12px; text-align: center; }
+.node.app { background: #00b3a455; border-color: #00b3a4; }
+.node.me { background: #fff2; border-color: #fff; }
+
+/* stat_row */
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.stat strong { display: block; font-size: 34px; }
+
+/* app_row */
+.apps { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.demo { aspect-ratio: 16 / 10; margin: 8px 0; }
+
+/* topic_list */
+.topics { display: grid; grid-template-columns: 1fr 1.4fr; gap: 20px; }
+.topic-row { padding: 12px; border-bottom: 1px solid #334; }
+.topic-row.on { background: #5a57ff22; }
+.panel .diagram { height: 180px; margin: 10px 0; background: #fff1; }
+
+@media (max-width: 800px) {
+  .hero, .apps, .topics { grid-template-columns: 1fr; }
+  .stats { grid-template-columns: 1fr 1fr; }
+  .map { aspect-ratio: 1; }
+}
+</style>
+</head>
+<body>
+
+<div class="nav"><b>Ming Huang</b><a>Map</a><a>Apps</a><a>Work</a><a>About</a><a>Connect</a><a>[CV]</a></div>
+
+<div class="wrap">
+
+  <section class="hero">
+    <div class="box">
+      <p class="label">intro_text</p>
+      <h1>Software Architect / AI Engineer</h1>
+      <p>Making AI-assisted development work at scale</p>
+    </div>
+    <div class="box">
+      <p class="label">map (d3 later) — click a node, topic panel opens</p>
+      <div class="map">
+        <div class="node me" style="left:50%;top:50%;width:70px;height:70px">Ming</div>
+        <div class="node" style="left:22%;top:25%;width:80px;height:80px">harness</div>
+        <div class="node" style="left:78%;top:22%;width:100px;height:100px">search 10M+</div>
+        <div class="node" style="left:80%;top:68%;width:90px;height:90px">websites 1m+</div>
+        <div class="node" style="left:48%;top:84%;width:110px;height:110px">files 1m+</div>
+        <div class="node" style="left:18%;top:68%;width:76px;height:76px">automation</div>
+        <div class="node app" style="left:40%;top:18%;width:64px;height:64px">Simzilla</div>
+        <div class="node app" style="left:62%;top:40%;width:60px;height:60px">Upskill</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="stats">
+    <div class="box stat"><strong>20+</strong>years</div>
+    <div class="box stat"><strong>250+</strong>videos</div>
+    <div class="box stat"><strong>50+</strong>skills</div>
+    <div class="box stat"><strong>10M+</strong>records</div>
+  </section>
+
+  <section class="apps">
+    <div class="box">
+      <p class="label">demo_frame — Simzilla (playable)</p>
+      <div class="demo"><img src="https://picsum.photos/seed/sim/800/500" alt=""></div>
+      <button>Play</button>
+    </div>
+    <div class="box">
+      <p class="label">demo_frame — Upskill (desktop-only prototype; mobile shows poster)</p>
+      <div class="demo"><img src="https://picsum.photos/seed/up/800/500" alt=""></div>
+      <button>Try prototype</button> <button>GitHub</button>
+    </div>
+  </section>
+
+  <section class="topics">
+    <div class="box">
+      <p class="label">topic_list (fallback for skimmers / a11y)</p>
+      <div class="topic-row on">Co-work Agent Team</div>
+      <div class="topic-row">Skill Management</div>
+      <div class="topic-row">Skill Optimisation</div>
+      <div class="topic-row">Whole UK Investment Data</div>
+      <div class="topic-row">PDF Discovery</div>
+      <div class="topic-row">...</div>
+    </div>
+    <div class="box panel">
+      <p class="label">topic_panel</p>
+      <h3>Co-work Agent Team</h3>
+      <p>(challenge) How can I go to bed and my agent teams do work for me reliably?</p>
+      <div class="diagram box">Diagram (d3, animated)</div>
+      <p>what this does … lorem ipsum</p>
+    </div>
+  </section>
+
+  <section class="box"><p class="label">about + connect</p>
+    <div class="apps">
+      <div style="height:120px"><img src="https://picsum.photos/seed/a/600/240" alt=""></div>
+      <div style="height:120px"><img src="https://picsum.photos/seed/b/600/240" alt=""></div>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>
