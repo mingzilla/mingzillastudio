@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>spike — search</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; font: 300 15px/1.7 Jost, system-ui, sans-serif; background: #f3eee3; color: #1a1712; letter-spacing: .02em; }
+h2 { font: 300 clamp(28px, 4vw, 44px)/1.1 "Cormorant Garamond", Georgia, serif; margin: 0 0 6px; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 48px 24px; }
+.note { font-size: 13px; color: #6f675a; margin: 0 0 20px; }
+.panel { background: #0b0a09; color: #e9e2d3; border: 1px solid #2a2620; padding: 24px; position: relative; box-shadow: 0 24px 50px -28px #1a1712; }
+.panel::before { content: ""; position: absolute; top: -1px; left: -1px; width: 28px; height: 28px; border-top: 1px solid #c8a96a; border-left: 1px solid #c8a96a; }
+.label { font-size: 10px; letter-spacing: .28em; text-transform: uppercase; color: #c8a96a; margin: 0 0 14px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h2>Smart Search at Scale</h2>
+  <p class="note">(challenge) How can we handle Smart Search with >10 million records</p>
+  <div class="panel"><p class="label">live traffic — kill an API, add traffic, then add APIs to recover</p><div id="w"></div></div>
+</div>
+<script src="../../vendor/d3.min.js"></script>
+<script src="widgets/theme.js"></script>
+<script src="widgets/search.js"></script>
+<script>
+SearchWidget.draw(document.getElementById('w'), { theme: WidgetTheme.dark, reduceMotion: matchMedia('(prefers-reduced-motion: reduce)').matches && !location.search.includes('motion') });
+</script>
+</body>
+</html>
