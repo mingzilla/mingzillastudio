@@ -357,6 +357,26 @@ flowchart LR
 
 ---
 
+## Recent Apps
+
+### Upskill (Skill Sharing App)
+
+Challenge: How can I share skills with friends?
+
+```mermaid
+flowchart LR
+    A["Ming"] -->|"share skill"| B["Ming's skills"] -->|"receive skill"| C["Ken"]
+    D["Ken"] -->|"share skill"| E["Ken's skills"] -->|"receive skill"| F["Ming"]
+```
+
+### Simzilla (LLM Driven Game World)
+
+Challenge: How much of a playable world can be built in 2 days?
+
+Multiple players play in the same world at the same time. NPCs have mood, emotion and an impression about other NPCs, animals and the world around them — and the LLM drives their decisions and who they chat to.
+
+---
+
 ## Knowledge Sharing
 
 Content Creator: 200+ Videos, 6k+ Subscribers (mid 2026)
@@ -379,3 +399,4 @@ Content Creator: 200+ Videos, 6k+ Subscribers (mid 2026)
 | **Automation – Handle UK Tax Return**                  | Automates the end-to-end tax-document workflow, from collecting and organising source files through extraction, verification and report generation, with repeatable and accurate processing. |
 | **Similarity Search at Scale (Vector DB)**             | Builds and operates a vector database capable of storing and searching more than 10 million records while balancing storage size, creation speed and query performance.                      |
 | **Smart Search at Scale (Micro Services)**             | Provides scalable search across more than 10 million records using a distributed architecture with load balancing, multiple APIs, caching and a database backend.                            |
+| **Upskill (Skill Sharing App)**                        | Makes sharing a skill a one-sentence action, and receiving one just as simple, so friends keep passing on what already works for them. |
