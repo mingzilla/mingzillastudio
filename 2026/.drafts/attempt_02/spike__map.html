@@ -46,7 +46,7 @@ const data = { nodes: [
   { id: 'simzilla', kind: 'app', label: 'Simzilla', figure: '2 days', weight: .35, ax: .38, ay: .14, mx: 0.46, my: 0.33, challenge: 'How much of a playable world can be built in 2 days?' },
   { id: 'upskill', kind: 'app', label: 'Upskill', weight: .35, ax: .66, ay: .42, mx: 0.75, my: 0.42, challenge: 'How can I share skills with friends?' },
 ] };
-const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const still = matchMedia('(prefers-reduced-motion: reduce)').matches && !location.search.includes('motion');
 let dark = true;
 const w = MapWidget.draw(document.getElementById('map'), data, {
   theme: MapWidget.themes.dark, reduceMotion: still,
