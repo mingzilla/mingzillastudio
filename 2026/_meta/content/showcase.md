@@ -30,7 +30,6 @@ Only what `content.md` does not hold (metrics, links, media, results), keyed by 
 
 ### Simzilla (LLM Driven Game World)
 
-- Result: **2 days** — idea to a playable multiplayer world
 - Demo: https://simzilla.mingzillastudio.co.uk/index.html?player=demo
 - Image: `assets/05__simzilla.jpg`
 

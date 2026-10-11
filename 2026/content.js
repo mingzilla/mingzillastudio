@@ -235,10 +235,6 @@ const CONTENT = {
      "applications": [],
      "extras": [
       {
-       "k": "Result",
-       "v": "**2 days** — idea to a playable multiplayer world"
-      },
-      {
        "k": "Demo",
        "v": "https://simzilla.mingzillastudio.co.uk/index.html?player=demo"
       },

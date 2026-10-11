@@ -6,6 +6,6 @@ function Topic({ topic, tone }) {
       <h3>${topic.title}</h3>
       <p className="challenge"><span>Challenge</span> ${topic.challenge}</p>
       ${topic.what.map((x, i) => html`<p className="what" key=${i}><${Rich} text=${x} /></p>`)}
-      ${w ? html`<${Panel} label=${w[1]}><${WidgetHost} widget=${w[0]} tone=${tone === 'dark' ? 'light' : 'dark'} /><//>` : null}
+      ${w ? html`<${WidgetPanel} label=${w[1]} widget=${w[0]} bandTone=${tone} />` : null}
     </article>`;
 }

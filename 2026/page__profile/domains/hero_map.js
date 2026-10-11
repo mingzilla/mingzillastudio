@@ -9,7 +9,7 @@ class HeroMap {
       { id: 'websites', kind: 'cluster', label: 'Websites', figure: '1m+', weight: .8, ax: .84, ay: .72, mx: .78, my: .72, target: 'websites', section: 'websites', challenge: ch('llm-summary-for-millions-of-websites-scale-and-speed') },
       { id: 'files', kind: 'cluster', label: 'Files', figure: '1m+', weight: .8, ax: .5, ay: .86, mx: .42, my: .84, target: 'files', section: 'files', challenge: ch('pdf-extracted-text-to-tables-llm-with-code') },
       { id: 'automation', kind: 'cluster', label: 'Automation', weight: .6, ax: .16, ay: .72, mx: .16, my: .66, target: 'automation', section: 'automation', challenge: ch('ui-and-test-automation-at-scale') },
-      { id: 'simzilla', kind: 'app', label: 'Simzilla', figure: '2 days', weight: .35, ax: .38, ay: .14, mx: .46, my: .33, target: 'simzilla-llm-driven-game-world', section: 'apps', challenge: ch('simzilla-llm-driven-game-world') },
+      { id: 'simzilla', kind: 'app', label: 'Simzilla', weight: .35, ax: .38, ay: .14, mx: .46, my: .33, target: 'simzilla-llm-driven-game-world', section: 'apps', challenge: ch('simzilla-llm-driven-game-world') },
       { id: 'upskill', kind: 'app', label: 'Upskill', weight: .35, ax: .66, ay: .42, mx: .75, my: .42, target: 'upskill-skill-sharing-app', section: 'apps', challenge: ch('upskill-skill-sharing-app') },
     ];
   }

@@ -16,3 +16,9 @@
 
 - [DRAFTS] `2026/.drafts/attempt_01` = first React port (kept for reference, not loaded). `attempt_02` = mockups 001-005, text prototypes and spikes that became `common/widgets`.
 - [MOCKUP] Order of work: md WHAT first, then divs-only html mockup, then one real spike, then assemble.
+
+## Apps and motion
+
+- [APPS] One row per app: media on one side, title/text/controls on the other, so unequal text never unbalances the layout. Simzilla = a dark-gold phone frame, 400px wide, that plays in place; no panel around it. Upskill = a thin dark-gold tablet-style frame around its poster (no panel, no extra background); clicking it opens the prototype in its own page.
+- [APPS] A running game is destroyed by Close, or automatically when scrolled ~500px out of view. No "result" line under an app.
+- [MOTION] No auto-play. Every widget panel shows its staged still frame until the visitor presses Play (top-right of the caption row, `WidgetPanel`); Stop returns to the still frame. A playing widget is destroyed when its section leaves the screen or the tab is hidden (`useInView`, 80px margin).

@@ -1,11 +1,13 @@
-// true while the element is on (or near) the screen.
-function useInView(ref, margin = '160px') {
-  const [seen, setSeen] = useState(false);
+// true while the element is on (or just near) the screen AND the browser tab is visible.
+function useInView(ref, margin = '80px') {
+  const [near, setNear] = useState(false), [tab, setTab] = useState(!document.hidden);
   useEffect(() => {
-    if (!('IntersectionObserver' in window)) { setSeen(true); return; }
-    const io = new IntersectionObserver(([e]) => setSeen(e.isIntersecting), { rootMargin: margin });
+    const onVis = () => setTab(!document.hidden);
+    document.addEventListener('visibilitychange', onVis);
+    if (!('IntersectionObserver' in window)) { setNear(true); return () => document.removeEventListener('visibilitychange', onVis); }
+    const io = new IntersectionObserver(([e]) => setNear(e.isIntersecting), { rootMargin: margin });
     io.observe(ref.current);
-    return () => io.disconnect();
+    return () => { io.disconnect(); document.removeEventListener('visibilitychange', onVis); };
   }, []);
-  return seen;
+  return near && tab;   // only while the section is on screen and the tab is visible
 }
