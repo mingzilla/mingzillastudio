@@ -64,7 +64,7 @@ const MapWidget = {
     layout(); paint(theme);
 
     const ro = new ResizeObserver(() => { layout(); }); ro.observe(host);
-    const t0 = performance.now();
+    const t0 = 0;
     const timer = d3.timer(now => {
       const t = (now - t0) / 1000;
       nodes.forEach(n => {

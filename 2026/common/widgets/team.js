@@ -125,7 +125,7 @@ const TeamWidget = {
 
     layout(); label(); build(); paint();
     const ro = new ResizeObserver(() => { layout(); build(); paint(); }); ro.observe(host);
-    let last = performance.now();
+    let last = 0;   // d3.timer passes ms elapsed since the timer started
     const timer = d3.timer(now => {
       const dt = Math.min(.1, (now - last) / 1000) * st.speed; last = now;
       if (still) { if (!tickets.length) { for (let i = 0; i < 5; i++) tickets.push({ id: nextId++, s: i * .8, dir: 1, bad: i === 3, hold: 0, reviewed: true, impl: true, ship: false, fade: 0 }); st.done = 4; st.bounced = 1; } }

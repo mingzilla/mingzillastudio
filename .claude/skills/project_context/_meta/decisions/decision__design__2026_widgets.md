@@ -22,3 +22,8 @@
 - [APPS] One row per app: media on one side, title/text/controls on the other, so unequal text never unbalances the layout. Simzilla = a dark-gold phone frame, 400px wide, that plays in place; no panel around it. Upskill = a thin dark-gold tablet-style frame around its poster (no panel, no extra background); clicking it opens the prototype in its own page.
 - [APPS] A running game is destroyed by Close, or automatically when scrolled ~500px out of view. No "result" line under an app.
 - [MOTION] No auto-play. Every widget panel shows its staged still frame until the visitor presses Play (top-right of the caption row, `WidgetPanel`); Stop returns to the still frame. A playing widget is destroyed when its section leaves the screen or the tab is hidden (`useInView`, 80px margin).
+
+## Gotchas
+
+- [D3TIMER] `d3.timer(cb)` passes ms elapsed since THAT timer started, not `performance.now()`. Start `last` / `t0` at 0. Mixing them made every widget's clock start at minus the page's uptime, so widgets created late sat frozen until a restart reset their own start time.
+- [VERIFY] Test motion on a page that has been open for ~20s, not a fresh load, with `reducedMotion: 'reduce'` emulated and Play pressed (that is Ming's setup).

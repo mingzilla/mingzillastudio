@@ -21,7 +21,7 @@ const WidgetKit = {
     cfg.init(s); if (s.still && cfg.stillClock) s.clock = cfg.stillClock;
     layout();
     const ro = new ResizeObserver(layout); ro.observe(host);
-    let last = performance.now();
+    let last = 0;   // d3.timer passes ms elapsed since the timer started
     const timer = d3.timer(now => { const dt = Math.min(.1 * s.speed, (now - last) / 1000 * s.speed); last = now; if (!s.still) s.clock += dt; cfg.frame(s, s.still ? 0 : dt); });
     return { state: s, setTheme(t) { s.T = t; paint(); }, destroy() { timer.stop(); ro.disconnect(); s.root.selectAll('*').remove(); } };
   },

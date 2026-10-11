@@ -124,7 +124,7 @@ const SearchWidget = {
     layout(); paint();
     if (still) { for (let i = 0; i < 60; i++) { step(.1); } }
     const ro = new ResizeObserver(layout); ro.observe(host);
-    let last = performance.now();
+    let last = 0;   // d3.timer passes ms elapsed since the timer started
     const timer = d3.timer(now => { const dt = Math.min(.1, (now - last) / 1000); last = now; if (!still) step(dt); draw(); });
     return { setTheme(t) { T = t; paint(); }, destroy() { timer.stop(); ro.disconnect(); root.selectAll('*').remove(); } };
   },

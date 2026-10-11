@@ -77,7 +77,7 @@ const WallWidget = {
     cv.addEventListener('pointermove', onMove); cv.addEventListener('pointerleave', () => { hover = -1; tip.style('opacity', 0); });
     label(); layout();
     const ro = new ResizeObserver(layout); ro.observe(host);
-    let last = performance.now();
+    let last = 0;   // d3.timer passes ms elapsed since the timer started
     const timer = d3.timer(now => { const dt = Math.min(.1, (now - last) / 1000); last = now; draw(dt); });
     return { setTheme(x) { T = x; }, destroy() { timer.stop(); ro.disconnect(); root.selectAll('*').remove(); } };
   },

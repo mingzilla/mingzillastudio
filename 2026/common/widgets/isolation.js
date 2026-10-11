@@ -109,7 +109,7 @@ const IsolationWidget = {
     if (still) { due = { L: {}, R: {} }; clock = 10; const s = leaves[4]; due.R[s.id] = 0; [0, 1, 2, 4, 5, 6, 8, 9, 10, 11, 12, 3, 7].forEach(i => { due.L[i] = 0; }); }
     const ro = new ResizeObserver(() => { layout(); }); ro.observe(host);
     btn.on('click', () => { run(null, null); });
-    let last = performance.now();
+    let last = 0;   // d3.timer passes ms elapsed since the timer started
     const timer = d3.timer(now => {
       const dt = Math.min(.1, (now - last) / 1000); last = now;
       if (!still) {

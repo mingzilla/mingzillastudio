@@ -107,7 +107,7 @@ const RaceWidget = {
     layout();
     if (still) { for (let i = 0; i < 600; i++) { step(.05); if (holdUntil > 0) break; } holdUntil = -1; }
     const ro = new ResizeObserver(layout); ro.observe(host);
-    let last = performance.now();
+    let last = 0;   // d3.timer passes ms elapsed since the timer started
     const timer = d3.timer(now => { const dt = Math.min(.1, (now - last) / 1000); last = now; if (!still) step(dt); draw(); });
     return { setTheme(x) { T = x; paint(); }, destroy() { timer.stop(); ro.disconnect(); root.selectAll('*').remove(); } };
   },
