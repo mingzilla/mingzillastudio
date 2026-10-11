@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mockup 005 — luxury</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root { --bg: #0b0a09; --ink: #e9e2d3; --mute: #8f877a; --gold: #c8a96a; --line: #2a2620; }
+* { box-sizing: border-box; }
+body { margin: 0; font: 300 15px/1.7 Jost, system-ui, sans-serif; background: var(--bg); color: var(--ink); letter-spacing: .02em; }
+h1, h3 { font-family: "Cormorant Garamond", Georgia, serif; font-weight: 300; letter-spacing: 0; }
+.box { border: 1px solid var(--line); padding: 28px; position: relative; }
+.box::before { content: ""; position: absolute; top: -1px; left: -1px; width: 28px; height: 28px; border-top: 1px solid var(--gold); border-left: 1px solid var(--gold); }
+.label { font-size: 10px; letter-spacing: .28em; text-transform: uppercase; color: var(--gold); margin: 0 0 14px; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+section { margin: 72px 0; }
+img { display: block; width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) sepia(.35) contrast(1.05) brightness(.85); }
+
+.nav { display: flex; gap: 32px; align-items: center; padding: 22px 32px; border-bottom: 1px solid var(--line); overflow-x: auto; white-space: nowrap; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: var(--mute); }
+.nav b { margin-right: auto; font: 400 22px "Cormorant Garamond", Georgia, serif; letter-spacing: .08em; color: var(--ink); text-transform: none; }
+
+.hero { display: grid; grid-template-columns: 1fr 1.4fr; gap: 40px; align-items: center; }
+.hero h1 { font-size: clamp(40px, 6vw, 72px); line-height: 1; margin: 0 0 20px; }
+.hero .box:first-child { border: 0; padding-left: 0; }
+.hero .box:first-child::before { display: none; }
+.map { position: relative; aspect-ratio: 4 / 3; }
+.node { position: absolute; transform: translate(-50%, -50%); border-radius: 50%; border: 1px solid #c8a96a88; display: grid; place-items: center; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; text-align: center; color: var(--mute); }
+.node.app { border-color: var(--gold); color: var(--gold); background: #c8a96a14; }
+.node.me { border-color: var(--ink); color: var(--ink); font: 400 15px "Cormorant Garamond", serif; text-transform: none; }
+
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.stat { border: 0 !important; border-left: 1px solid var(--line) !important; text-align: center; color: var(--mute); font-size: 10px; letter-spacing: .24em; text-transform: uppercase; }
+.stat:first-child { border-left: 0 !important; }
+.stat::before { display: none; }
+.stat strong { display: block; font: 300 56px/1.1 "Cormorant Garamond", Georgia, serif; color: var(--gold); letter-spacing: 0; text-transform: none; }
+
+.apps { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+.demo { aspect-ratio: 16 / 10; margin: 8px 0 20px; }
+button { background: none; border: 1px solid var(--gold); color: var(--gold); padding: 10px 22px; font: 400 10px Jost, sans-serif; letter-spacing: .26em; text-transform: uppercase; cursor: pointer; }
+button:hover { background: var(--gold); color: var(--bg); }
+
+.topics { display: grid; grid-template-columns: 1fr 1.4fr; gap: 40px; }
+.topic-row { padding: 14px 0; border-bottom: 1px solid var(--line); color: var(--mute); font-family: "Cormorant Garamond", Georgia, serif; font-size: 20px; }
+.topic-row.on { color: var(--gold); padding-left: 14px; border-left: 1px solid var(--gold); }
+.panel h3 { font-size: 34px; margin: 0 0 8px; }
+.panel .diagram { height: 180px; margin: 18px 0; border: 1px solid var(--line); background: none; color: var(--mute); }
+
+@media (max-width: 800px) {
+  .hero, .apps, .topics { grid-template-columns: 1fr; gap: 24px; }
+  .stats { grid-template-columns: 1fr 1fr; }
+  .stat:nth-child(3) { border-left: 0 !important; }
+  .stat:nth-child(n+3) { border-top: 1px solid var(--line); }
+  .map { aspect-ratio: 1; }
+  section { margin: 48px 0; }
+  .box { padding: 20px; }
+}
+
+.progress { position: fixed; top: 0; left: 0; height: 2px; width: 34%; background: var(--gold); z-index: 9; }
+.nav { position: sticky; top: 0; background: var(--bg); z-index: 8; }
+h2 { font: 300 clamp(30px, 4vw, 46px)/1.1 "Cormorant Garamond", Georgia, serif; margin: 0 0 6px; }
+.no { font: 400 11px Jost, sans-serif; letter-spacing: .28em; color: var(--gold); }
+.note { font-size: 12px; color: var(--mute); margin: 0; }
+.work { display: grid; grid-template-columns: 200px 1fr; gap: 48px; align-items: start; }
+.index { position: sticky; top: 90px; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--mute); }
+.index div { padding: 9px 0; border-bottom: 1px solid var(--line); }
+.index .on { color: var(--gold); }
+.chapter { margin-bottom: 96px; }
+.topic { margin: 36px 0 56px; }
+.topic h3 { font-size: 28px; margin: 0 0 4px; }
+.widget { margin-top: 14px; border: 1px solid var(--line); background: #c8a96a08; display: grid; place-items: center; text-align: center; padding: 18px; min-height: 200px; }
+.widget b { font: 400 10px Jost, sans-serif; letter-spacing: .26em; text-transform: uppercase; color: var(--gold); display: block; margin-bottom: 6px; }
+.widget.tall { min-height: 300px; }
+.widget.hero-w { min-height: 340px; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.pill { display: inline-block; border: 1px solid var(--line); padding: 3px 12px; font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--mute); margin: 0 6px 6px 0; }
+.ambient { position: absolute; inset: 0; pointer-events: none; opacity: .5; background: radial-gradient(circle at 20% 30%, #c8a96a22, transparent 40%), radial-gradient(circle at 80% 70%, #c8a96a14, transparent 45%); }
+@media (max-width: 800px) {
+  .work { grid-template-columns: 1fr; gap: 20px; }
+  .index { position: static; display: flex; gap: 8px; overflow-x: auto; white-space: nowrap; }
+  .index div { border: 1px solid var(--line); padding: 6px 12px; }
+  .two { grid-template-columns: 1fr; }
+  .chapter { margin-bottom: 56px; }
+}
+
+/* alternating bands */
+.band { background: var(--bg); color: var(--ink); padding: 8px 0; }
+.band.light { --bg: #f3eee3; --ink: #1a1712; --mute: #6f675a; --gold: #8c6a2c; --line: #d9d0bd; }
+.band.light img { filter: grayscale(1) sepia(.25) contrast(1.05) brightness(1); }
+.band.light .widget { background: #8c6a2c0d; }
+.band section { margin: 56px 0; }
+.band .chapter { margin: 40px 0; }
+.band .stats { border-color: var(--line); }
+
+/* floating mini-map nav */
+.minimap { position: fixed; right: 22px; bottom: 22px; z-index: 9; width: 168px; padding: 12px 14px 10px; background: #0b0a09ee; border: 1px solid #c8a96a66; backdrop-filter: blur(6px); color: #e9e2d3; }
+.minimap .cur { font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: #c8a96a; margin: 0 0 8px; }
+.minimap .field { position: relative; height: 96px; }
+.minimap i { position: absolute; width: 10px; height: 10px; border-radius: 50%; border: 1px solid #c8a96a99; transform: translate(-50%, -50%); }
+.minimap i.on { background: #c8a96a; box-shadow: 0 0 10px #c8a96a; }
+.minimap i.app { border-color: #e9e2d3; }
+.minimap i.me { width: 14px; height: 14px; border-color: #e9e2d3; }
+.minimap p.hint { font-size: 9px; letter-spacing: .12em; color: #8f877a; margin: 6px 0 0; }
+@media (max-width: 800px) {
+  .minimap { left: 12px; right: 12px; bottom: 12px; width: auto; display: flex; align-items: center; gap: 14px; padding: 10px 14px; }
+  .minimap .cur { margin: 0; white-space: nowrap; }
+  .minimap .field { flex: 1; height: 14px; }
+  .minimap i { top: 50% !important; }
+  .minimap p.hint { display: none; }
+}
+
+/* inverted panels: light panels on dark bands, dark panels on light bands */
+.band.dark .box:not(.stat):not(.hero .box:first-child), .band.dark .widget {
+  --bg: #f3eee3; --ink: #1a1712; --mute: #6f675a; --gold: #8c6a2c; --line: #d9d0bd;
+  background: var(--bg); color: var(--ink); border-color: var(--line); box-shadow: 0 24px 50px -28px #000;
+}
+.band.light .box:not(.stat), .band.light .widget {
+  --bg: #0b0a09; --ink: #e9e2d3; --mute: #8f877a; --gold: #c8a96a; --line: #2a2620;
+  background: var(--bg); color: var(--ink); border-color: var(--line); box-shadow: 0 24px 50px -28px #1a1712;
+}
+.band.dark .box:not(.stat):not(.hero .box:first-child) img { filter: grayscale(1) sepia(.25) contrast(1.05) brightness(1); }
+.band.light .box:not(.stat) img { filter: grayscale(1) sepia(.35) contrast(1.05) brightness(.85); }
+.band.dark .box:not(.stat):not(.hero .box:first-child) button { color: var(--gold); border-color: var(--gold); }
+.band.dark .box:not(.stat):not(.hero .box:first-child) button:hover { background: var(--gold); color: var(--bg); }
+.band.dark .node { border-color: #8c6a2c99; color: #6f675a; }
+.band.dark .node.app { border-color: #8c6a2c; color: #8c6a2c; background: #8c6a2c14; }
+.band.dark .node.me { border-color: #1a1712; color: #1a1712; }
+</style>
+</head>
+<body>
+<div class="progress"></div>
+<div class="nav"><b>Ming Huang</b><a>Map</a><a>Apps</a><a>Work</a><a>About</a><a>YouTube</a><a>[CV]</a></div>
+
+<div class="minimap" title="floating mini-map nav: tiny version of the hero map; the current chapter glows; click a dot to jump">
+  <p class="cur">01 · Harness</p>
+  <div class="field"><i class="me" style="left:50%;top:50%"></i><i class="on" style="left:15%;top:20%"></i><i class="" style="left:85%;top:15%"></i><i class="" style="left:88%;top:75%"></i><i class="" style="left:50%;top:92%"></i><i class="" style="left:12%;top:80%"></i><i class="app" style="left:32%;top:10%"></i><i class="app" style="left:70%;top:45%"></i></div>
+  <p class="hint">click a dot to jump</p>
+</div>
+<div class="band dark"><div class="wrap"><section class="hero" style="position:relative"><div class="ambient"></div>
+  <div class="box"><p class="label">intro_text</p><h1>Software Architect / AI Engineer</h1><p>Making AI-assisted development work at scale</p></div>
+  <div class="box"><p class="label">1 · the map — bubble size = scale; hover = challenge; click = jump to topic</p>
+  <div class="map">
+    <div class="node me" style="left:50%;top:50%;width:70px;height:70px">Ming</div>
+    <div class="node" style="left:22%;top:25%;width:80px;height:80px">harness</div>
+    <div class="node" style="left:78%;top:22%;width:100px;height:100px">search 10M+</div>
+    <div class="node" style="left:80%;top:68%;width:90px;height:90px">websites 1m+</div>
+    <div class="node" style="left:48%;top:84%;width:110px;height:110px">files 1m+</div>
+    <div class="node" style="left:18%;top:68%;width:76px;height:76px">automation</div>
+    <div class="node app" style="left:40%;top:18%;width:64px;height:64px">Simzilla</div>
+    <div class="node app" style="left:62%;top:40%;width:60px;height:60px">Upskill</div>
+  </div></div></section></div></div>
+<div class="band light"><div class="wrap"><section class="stats"><div class="box stat"><strong>20+</strong>years</div><div class="box stat"><strong>?</strong>youtube videos (TBC)</div><div class="box stat"><strong>50+</strong>skills</div><div class="box stat"><strong>10M+</strong>records</div></section></div></div>
+<div class="band dark"><div class="wrap"><section><p class="no">APPS</p><h2>Recent work</h2>
+  <div class="apps" style="margin-top:20px">
+   <div class="box"><p class="label">Simzilla — LLM driven game world, 2 days</p><div class="demo"><img src="https://picsum.photos/seed/sim/800/500" alt=""></div><button>Play</button></div>
+   <div class="box"><p class="label">Upskill — skill sharing (prototype desktop-only; mobile = poster)</p><div class="demo"><img src="https://picsum.photos/seed/up/800/500" alt=""></div><button>Try prototype</button> <button>GitHub</button></div>
+  </div></section></div></div>
+<div class="band light"><div class="wrap"><div class="chapter"><p class="no">01</p><h2>AI Harness Engineering</h2><div class="topic"><h3>Co-work Agent Team</h3><p class="note">(challenge) How can I go to bed and my agent teams do work for me reliably?</p><div class="two"><div class="widget "><div><b>2 · shared diagram</b><p class="note">mermaid -> d3; light travels along arrows</p></div></div><div class="widget "><div><b>8 · agent team at work</b><p class="note">tickets move between roles; bounce back from review</p></div></div></div></div><div class="topic"><h3>Skill Management</h3><p class="note">(challenge) manage skills when there are 50+</p><div class="widget "><div><b>9 · skill layers</b><p class="note">treemap: operational / authoring / project; click a layer</p></div></div></div><div class="topic"><h3>Skill Optimisation</h3><p class="note">(challenge)</p><div class="widget "><div><b>2 · shared diagram</b><p class="note"></p></div></div></div><div class="topic"><h3>Harness for coding</h3><p class="note">(challenge) a small requirement should not cause widespread changes</p><div class="widget hero-w"><div><b>3 · isolation demo</b><p class="note">WHAT -> HOW -> CASE tree; toggle: ripple everywhere vs one branch lights up</p></div></div></div></div></div></div>
+<div class="band dark"><div class="wrap"><div class="chapter"><p class="no">02</p><h2>LLM Processing for Millions of Files</h2><div class="topic"><h3>Whole UK Investment Data</h3><p class="note">(challenge)</p><div class="widget "><div><b>2 · shared diagram</b><p class="note"></p></div></div></div><div class="topic"><h3>PDF Discovery &amp; Processing</h3><p class="note">(challenge)</p><div class="widget "><div><b>2 · shared diagram</b><p class="note"></p></div></div></div><div class="topic"><h3>PDF Text to Tables</h3><p class="note">(challenge) at 5 min per record, millions via LLM is impossible</p><div class="two"><div class="widget "><div><b>5 · 5 minutes vs millions</b><p class="note">one-at-a-time lane vs sharded parallel lane</p></div></div><div class="widget "><div><b>6 · classification long tail</b><p class="note">100% classified, ~12% long tail</p></div></div></div></div><div class="widget "><div><b>4 · scale field</b><p class="note">10M+ records as a dot field filling the screen</p></div></div></div></div></div>
+<div class="band light"><div class="wrap"><div class="chapter"><p class="no">03</p><h2>LLM Summary for Millions of Websites</h2><div class="topic"><h3>Scale &amp; Speed</h3><p class="note">(challenge)</p><div class="widget "><div><b>2 · shared diagram</b><p class="note"></p></div></div></div></div></div></div>
+<div class="band dark"><div class="wrap"><div class="chapter"><p class="no">04</p><h2>LLM Assisted Automation</h2><div class="topic"><h3>UI &amp; Test Automation</h3><p class="note">(challenge)</p><div class="widget "><div><b>2 · shared diagram</b><p class="note"></p></div></div></div><div class="topic"><h3>Videos to Knowledge</h3><p class="note">(challenge)</p><div class="widget "><div><b>2 · shared diagram</b><p class="note"></p></div></div></div><div class="topic"><h3>UK Tax Return</h3><p class="note">(challenge)</p><div class="widget "><div><b>2 · shared diagram</b><p class="note"></p></div></div></div></div></div></div>
+<div class="band light"><div class="wrap"><div class="chapter"><p class="no">05</p><h2>10 Million Records Search</h2><div class="topic"><h3>Similarity Search (Vector DB)</h3><p class="note">(challenge)</p><div class="widget "><div><b>2 · shared diagram</b><p class="note"></p></div></div></div><div class="topic"><h3>Smart Search (Micro Services)</h3><p class="note">(challenge)</p><div class="widget tall"><div><b>7 · search load</b><p class="note">requests stream UI -> LB -> API x n -> cache -> DB; slider adds APIs</p></div></div></div></div></div></div>
+<div class="band dark"><div class="wrap"><div class="chapter"><p class="no">06</p><h2>Embedded BI Platform</h2><p class="note">(lead text, feature chips)</p><div><span class="pill">multi-tenanted security</span><span class="pill">15+ data connections</span><span class="pill">layout control</span><span class="pill">reports</span></div><div class="widget "><div><b>11 · career line</b><p class="note">2014-2025 BI -> 2026 AI; 20+ years</p></div></div></div></div></div>
+<div class="band light"><div class="wrap"><section><p class="no">ABOUT</p><h2>About</h2><p class="note">About text (3 paragraphs) + 3 focus cards</p></section></div></div>
+<div class="band dark"><div class="wrap"><section><p class="no">CONNECT</p><h2>YouTube</h2>
+ <div class="box" style="margin-top:20px"><p class="label">youtube — primary</p>
+  <div class="two"><div class="demo"><img src="https://picsum.photos/seed/yt/800/500" alt=""></div>
+  <div><p class="note">(channel stats — numbers TBC)</p><div class="widget" style="min-height:90px"><div><b>latest videos</b><p class="note">3-4 thumbnails, newest first</p></div></div><p style="margin-top:20px"><button>Open YouTube</button></p></div></div></div>
+ <p style="margin-top:24px"><span class="pill">Bilibili</span><span class="pill">LinkedIn</span><span class="pill">GitHub</span><span class="pill">Email</span><span class="pill">CV</span></p></section></div></div>
+</body>
+</html>
