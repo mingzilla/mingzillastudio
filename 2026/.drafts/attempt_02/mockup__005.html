@@ -126,6 +126,11 @@ h2 { font: 300 clamp(30px, 4vw, 46px)/1.1 "Cormorant Garamond", Georgia, serif; 
 .band.dark .node { border-color: #8c6a2c99; color: #6f675a; }
 .band.dark .node.app { border-color: #8c6a2c; color: #8c6a2c; background: #8c6a2c14; }
 .band.dark .node.me { border-color: #1a1712; color: #1a1712; }
+.band.dark .box.keep-dark { --bg: #0b0a09 !important; --ink: #e9e2d3 !important; --mute: #8f877a !important; --gold: #c8a96a !important; --line: #2a2620 !important; background: #0b0a09 !important; color: #e9e2d3 !important; border-color: #2a2620 !important; box-shadow: none !important; }
+.band.hero-band { background: radial-gradient(110% 80% at 88% -15%, #c8a96a40, transparent 58%), radial-gradient(70% 60% at 0% 0%, #c8a96a22, transparent 62%), #0b0a09; }
+.band.dark .keep-dark .node { border-color: #c8a96a88; color: #8f877a; background: none; }
+.band.dark .keep-dark .node.app { border-color: #c8a96a; color: #c8a96a; background: #c8a96a14; }
+.band.dark .keep-dark .node.me { border-color: #e9e2d3; color: #e9e2d3; }
 </style>
 </head>
 <body>
@@ -137,9 +142,9 @@ h2 { font: 300 clamp(30px, 4vw, 46px)/1.1 "Cormorant Garamond", Georgia, serif; 
   <div class="field"><i class="me" style="left:50%;top:50%"></i><i class="on" style="left:15%;top:20%"></i><i class="" style="left:85%;top:15%"></i><i class="" style="left:88%;top:75%"></i><i class="" style="left:50%;top:92%"></i><i class="" style="left:12%;top:80%"></i><i class="app" style="left:32%;top:10%"></i><i class="app" style="left:70%;top:45%"></i></div>
   <p class="hint">click a dot to jump</p>
 </div>
-<div class="band dark"><div class="wrap"><section class="hero" style="position:relative"><div class="ambient"></div>
-  <div class="box"><p class="label">intro_text</p><h1>Software Architect / AI Engineer</h1><p>Making AI-assisted development work at scale</p></div>
-  <div class="box"><p class="label">1 · the map — bubble size = scale; hover = challenge; click = jump to topic</p>
+<div class="band dark hero-band"><div class="wrap"><section class="hero" style="position:relative"><div class="ambient"></div>
+  <div class="box keep-dark"><p class="label">intro_text</p><h1>Software Architect / AI Engineer</h1><p>Making AI-assisted development work at scale</p></div>
+  <div class="box keep-dark"><p class="label">1 · the map — bubble size = scale; hover = challenge; click = jump to topic</p>
   <div class="map">
     <div class="node me" style="left:50%;top:50%;width:70px;height:70px">Ming</div>
     <div class="node" style="left:22%;top:25%;width:80px;height:80px">harness</div>
