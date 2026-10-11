@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mockup 002 — luxury</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root { --bg: #0b0a09; --ink: #e9e2d3; --mute: #8f877a; --gold: #c8a96a; --line: #2a2620; }
+* { box-sizing: border-box; }
+body { margin: 0; font: 300 15px/1.7 Jost, system-ui, sans-serif; background: var(--bg); color: var(--ink); letter-spacing: .02em; }
+h1, h3 { font-family: "Cormorant Garamond", Georgia, serif; font-weight: 300; letter-spacing: 0; }
+.box { border: 1px solid var(--line); padding: 28px; position: relative; }
+.box::before { content: ""; position: absolute; top: -1px; left: -1px; width: 28px; height: 28px; border-top: 1px solid var(--gold); border-left: 1px solid var(--gold); }
+.label { font-size: 10px; letter-spacing: .28em; text-transform: uppercase; color: var(--gold); margin: 0 0 14px; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+section { margin: 72px 0; }
+img { display: block; width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) sepia(.35) contrast(1.05) brightness(.85); }
+
+.nav { display: flex; gap: 32px; align-items: center; padding: 22px 32px; border-bottom: 1px solid var(--line); overflow-x: auto; white-space: nowrap; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: var(--mute); }
+.nav b { margin-right: auto; font: 400 22px "Cormorant Garamond", Georgia, serif; letter-spacing: .08em; color: var(--ink); text-transform: none; }
+
+.hero { display: grid; grid-template-columns: 1fr 1.4fr; gap: 40px; align-items: center; }
+.hero h1 { font-size: clamp(40px, 6vw, 72px); line-height: 1; margin: 0 0 20px; }
+.hero .box:first-child { border: 0; padding-left: 0; }
+.hero .box:first-child::before { display: none; }
+.map { position: relative; aspect-ratio: 4 / 3; }
+.node { position: absolute; transform: translate(-50%, -50%); border-radius: 50%; border: 1px solid #c8a96a88; display: grid; place-items: center; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; text-align: center; color: var(--mute); }
+.node.app { border-color: var(--gold); color: var(--gold); background: #c8a96a14; }
+.node.me { border-color: var(--ink); color: var(--ink); font: 400 15px "Cormorant Garamond", serif; text-transform: none; }
+
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.stat { border: 0 !important; border-left: 1px solid var(--line) !important; text-align: center; color: var(--mute); font-size: 10px; letter-spacing: .24em; text-transform: uppercase; }
+.stat:first-child { border-left: 0 !important; }
+.stat::before { display: none; }
+.stat strong { display: block; font: 300 56px/1.1 "Cormorant Garamond", Georgia, serif; color: var(--gold); letter-spacing: 0; text-transform: none; }
+
+.apps { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+.demo { aspect-ratio: 16 / 10; margin: 8px 0 20px; }
+button { background: none; border: 1px solid var(--gold); color: var(--gold); padding: 10px 22px; font: 400 10px Jost, sans-serif; letter-spacing: .26em; text-transform: uppercase; cursor: pointer; }
+button:hover { background: var(--gold); color: var(--bg); }
+
+.topics { display: grid; grid-template-columns: 1fr 1.4fr; gap: 40px; }
+.topic-row { padding: 14px 0; border-bottom: 1px solid var(--line); color: var(--mute); font-family: "Cormorant Garamond", Georgia, serif; font-size: 20px; }
+.topic-row.on { color: var(--gold); padding-left: 14px; border-left: 1px solid var(--gold); }
+.panel h3 { font-size: 34px; margin: 0 0 8px; }
+.panel .diagram { height: 180px; margin: 18px 0; border: 1px solid var(--line); background: none; color: var(--mute); }
+
+@media (max-width: 800px) {
+  .hero, .apps, .topics { grid-template-columns: 1fr; gap: 24px; }
+  .stats { grid-template-columns: 1fr 1fr; }
+  .stat:nth-child(3) { border-left: 0 !important; }
+  .stat:nth-child(n+3) { border-top: 1px solid var(--line); }
+  .map { aspect-ratio: 1; }
+  section { margin: 48px 0; }
+  .box { padding: 20px; }
+}
+</style>
+</head>
+<body>
+
+<div class="nav"><b>Ming Huang</b><a>Map</a><a>Apps</a><a>Work</a><a>About</a><a>Connect</a><a>[CV]</a></div>
+
+<div class="wrap">
+
+  <section class="hero">
+    <div class="box">
+      <p class="label">intro_text</p>
+      <h1>Software Architect / AI Engineer</h1>
+      <p>Making AI-assisted development work at scale</p>
+    </div>
+    <div class="box">
+      <p class="label">map (d3 later) — click a node, topic panel opens</p>
+      <div class="map">
+        <div class="node me" style="left:50%;top:50%;width:70px;height:70px">Ming</div>
+        <div class="node" style="left:22%;top:25%;width:80px;height:80px">harness</div>
+        <div class="node" style="left:78%;top:22%;width:100px;height:100px">search 10M+</div>
+        <div class="node" style="left:80%;top:68%;width:90px;height:90px">websites 1m+</div>
+        <div class="node" style="left:48%;top:84%;width:110px;height:110px">files 1m+</div>
+        <div class="node" style="left:18%;top:68%;width:76px;height:76px">automation</div>
+        <div class="node app" style="left:40%;top:18%;width:64px;height:64px">Simzilla</div>
+        <div class="node app" style="left:62%;top:40%;width:60px;height:60px">Upskill</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="stats">
+    <div class="box stat"><strong>20+</strong>years</div>
+    <div class="box stat"><strong>250+</strong>videos</div>
+    <div class="box stat"><strong>50+</strong>skills</div>
+    <div class="box stat"><strong>10M+</strong>records</div>
+  </section>
+
+  <section class="apps">
+    <div class="box">
+      <p class="label">demo_frame — Simzilla (playable)</p>
+      <div class="demo"><img src="https://picsum.photos/seed/sim/800/500" alt=""></div>
+      <button>Play</button>
+    </div>
+    <div class="box">
+      <p class="label">demo_frame — Upskill (desktop-only prototype; mobile shows poster)</p>
+      <div class="demo"><img src="https://picsum.photos/seed/up/800/500" alt=""></div>
+      <button>Try prototype</button> <button>GitHub</button>
+    </div>
+  </section>
+
+  <section class="topics">
+    <div class="box">
+      <p class="label">topic_list (fallback for skimmers / a11y)</p>
+      <div class="topic-row on">Co-work Agent Team</div>
+      <div class="topic-row">Skill Management</div>
+      <div class="topic-row">Skill Optimisation</div>
+      <div class="topic-row">Whole UK Investment Data</div>
+      <div class="topic-row">PDF Discovery</div>
+      <div class="topic-row">...</div>
+    </div>
+    <div class="box panel">
+      <p class="label">topic_panel</p>
+      <h3>Co-work Agent Team</h3>
+      <p>(challenge) How can I go to bed and my agent teams do work for me reliably?</p>
+      <div class="diagram box">Diagram (d3, animated)</div>
+      <p>what this does … lorem ipsum</p>
+    </div>
+  </section>
+
+  <section class="box"><p class="label">about + connect</p>
+    <div class="apps">
+      <div style="height:120px"><img src="https://picsum.photos/seed/a/600/240" alt=""></div>
+      <div style="height:120px"><img src="https://picsum.photos/seed/b/600/240" alt=""></div>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>

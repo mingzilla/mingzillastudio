@@ -1,0 +1,26 @@
+.topnav { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 28px; padding: 0 32px; height: 62px; background: #0b0a09f2; border-bottom: 1px solid #2a2620; backdrop-filter: blur(6px); }
+.topnav .progress { position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: #c8a96a; transform-origin: 0 50%; transform: scaleX(0); }
+.brand { font: 400 22px "Cormorant Garamond", Georgia, serif; letter-spacing: .08em; text-decoration: none; color: #e9e2d3; white-space: nowrap; margin-right: auto; }
+.nav-links { display: flex; gap: 26px; margin: 0; padding: 0; list-style: none; align-items: center; overflow-x: auto; scrollbar-width: none; }
+.nav-links::-webkit-scrollbar { display: none; }
+.nav-links a { display: inline-block; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: #8f877a; text-decoration: none; white-space: nowrap; padding: 4px 0; border-bottom: 1px solid transparent; }
+.nav-links a:hover, .nav-links a.on { color: #e9e2d3; border-bottom-color: #c8a96a; }
+.nav-links a.cta { border: 1px solid #c8a96a; color: #c8a96a; padding: 7px 14px; }
+.nav-links a.cta:hover { background: #c8a96a; color: #0b0a09; }
+.minimap { position: fixed; right: 22px; bottom: 22px; z-index: 19; width: 168px; padding: 12px 14px 12px; background: #0b0a09ee; border: 1px solid #c8a96a66; backdrop-filter: blur(6px); color: #e9e2d3; }
+.minimap .cur { font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: #c8a96a; margin: 0 0 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.minimap .field { position: relative; height: 96px; }
+.minimap .dot { position: absolute; width: 11px; height: 11px; padding: 0; border-radius: 50%; border: 1px solid #c8a96a99; background: none; transform: translate(-50%, -50%); cursor: pointer; }
+.minimap .dot::after { content: ""; position: absolute; inset: -8px; }
+.minimap .dot.on { background: #c8a96a; box-shadow: 0 0 10px #c8a96a; }
+.minimap .dot.app { border-color: #e9e2d3; }
+.minimap .dot.me { width: 15px; height: 15px; border-color: #e9e2d3; cursor: default; }
+@media (max-width: 800px) {
+  .topnav { padding: 0 16px; gap: 14px; }
+  .brand { font-size: 19px; }
+  .nav-links { gap: 18px; }
+  .minimap { left: 12px; right: 12px; bottom: 12px; width: auto; display: flex; align-items: center; gap: 14px; padding: 10px 14px; }
+  .minimap .cur { margin: 0; flex: 0 0 38%; }
+  .minimap .field { flex: 1; height: 16px; }
+  .minimap .dot { top: 50% !important; }
+}

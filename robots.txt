@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /2014/resource/
+
+Sitemap: https://mingzillastudio.co.uk/sitemap.xml

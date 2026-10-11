@@ -1,0 +1,15 @@
+.panel { --pb: #0b0a09; --pi: #e9e2d3; --pm: #8f877a; --pg: #c8a96a; --pl: #2a2620;
+  background: var(--pb); color: var(--pi); border: 1px solid var(--pl); padding: 26px; position: relative; box-shadow: 0 24px 50px -28px #000; }
+.band.dark .panel:not(.keep-dark) { --pb: #f3eee3; --pi: #1a1712; --pm: #6f675a; --pg: #8c6a2c; --pl: #d9d0bd; }
+.band.light .panel { box-shadow: 0 24px 50px -28px #1a1712; }
+.panel { --bg: var(--pb); --ink: var(--pi); --mute: var(--pm); --gold: var(--pg); --line: var(--pl); }
+.panel::before { content: ""; position: absolute; top: -1px; left: -1px; width: 28px; height: 28px; border-top: 1px solid var(--pg); border-left: 1px solid var(--pg); }
+.panel-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; }
+.panel .label { font-size: 10px; letter-spacing: .28em; text-transform: uppercase; color: var(--pg); margin: 0; }
+.panel .play { flex: none; background: none; border: 1px solid var(--pg); color: var(--pg); padding: 5px 12px; font: 400 10px Jost, sans-serif; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; }
+.panel .play:hover { background: var(--pg); color: var(--pb); }
+.panel .btn { color: var(--pg); border-color: var(--pg); }
+.panel .btn:hover { background: var(--pg); color: var(--pb); }
+.widget-host { width: 100%; }
+.widget-host button { color: var(--pg); }
+@media (max-width: 800px) { .panel { padding: 16px; } }

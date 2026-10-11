@@ -1,0 +1,12 @@
+main section[id]{scroll-margin-top:70px}
+.chapter{padding:72px 48px 60px;border:1px solid var(--line);border-radius:var(--radius);background:linear-gradient(180deg,rgba(255,255,255,.8),rgba(255,255,255,.6));box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 16px 40px -20px rgba(17,18,20,.18);margin:0 auto 44px}
+.chapter-head{display:grid;grid-template-columns:66px 1fr;gap:20px;align-items:start;margin-bottom:52px}
+.chapter-no{font:600 12px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--muted);letter-spacing:.08em;padding-top:10px}
+.chapter h2,.legacy h2{font-size:clamp(34px,5vw,48px);letter-spacing:-.045em;line-height:1;margin:0;max-width:820px}
+.band{padding:36px 0}
+.band-grey{background:rgba(17,18,20,.07);border-top:1px solid rgba(17,18,20,.1);border-bottom:1px solid rgba(17,18,20,.1)}
+.band-grey .chapter{margin-bottom:0}
+.band+section.chapter{margin-top:36px}
+@media (max-width:820px){.band{padding:28px 0}.chapter{padding:56px 28px 48px}.chapter-head{grid-template-columns:1fr;gap:10px}.chapter-no{padding:0}}
+@media (max-width:540px){.chapter{padding:44px 16px 38px}.band{padding:22px 0}.chapter h2,.legacy h2{font-size:38px}}
+.chapter-no{color:var(--accent)}
