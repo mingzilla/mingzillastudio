@@ -1,5 +1,5 @@
 // Parses _meta/content/{content,showcase,profile}.md -> content.json, and writes the crawlable static HTML
-// (between the seo markers in index.html) plus sitemap.xml.   Run: node _meta/scripts/build_content.js   (from 2026/)
+// (between the seo markers in index.html) plus ../sitemap.xml (repo root).   Run: node _meta/scripts/build_content.js   (from 2026/)
 // content.md = the topics (challenge, what, diagram source). showcase.md = extras per topic + extra topics. profile.md = the rest of the page.
 const fs = require('fs');
 const path = require('path');
@@ -91,5 +91,6 @@ const idx = path.join(root, 'index.html'); let html = fs.readFileSync(idx, 'utf8
 html = html.replace(/<!-- seo:start -->[\s\S]*<!-- seo:end -->/, `<!-- seo:start -->\n<div id="static">\n${staticHtml(content)}\n</div>\n<!-- seo:end -->`);
 fs.writeFileSync(idx, html);
 const today = new Date().toISOString().slice(0, 10);
-fs.writeFileSync(path.join(root, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>https://mingzillastudio.co.uk/2026/</loc><lastmod>${today}</lastmod></url>\n</urlset>\n`);
+fs.writeFileSync(path.join(root, '..', 'sitemap.xml'),   // domain root = repo root, the only place crawlers look
+   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>https://mingzillastudio.co.uk/2026/</loc><lastmod>${today}</lastmod></url>\n</urlset>\n`);
 console.log(`content.js: ${chapters.length} chapters, ${chapters.reduce((n, c) => n + c.topics.length, 0)} topics`);

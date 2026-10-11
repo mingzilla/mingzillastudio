@@ -8,4 +8,5 @@
 ## SEO
 
 - [SEO] Static semantic HTML sits inside `#root > #static`; React replaces it on mount. Without JS the full text is still there.
-- [SEO] `<title>`, description, canonical `https://mingzillastudio.co.uk/2026/`, Open Graph, Twitter, JSON-LD `Person`, `sitemap.xml`. A site-root `robots.txt` pointing at the sitemap is not created (repo root also serves other folders).
+- [SEO] `<title>`, description, canonical `https://mingzillastudio.co.uk/2026/`, Open Graph, Twitter, JSON-LD `Person`.
+- [SEO] Crawlers only read the domain root, and the domain root is the repo root (CNAME): `robots.txt` and `sitemap.xml` live at the repo root, not in `2026/` or `2014/`. The build script writes `sitemap.xml`; `robots.txt` is hand-written (allows all, blocks `/2014/resource/`, points at the sitemap). Root `index.html` redirects to `/2026/` and carries an absolute canonical.
