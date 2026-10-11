@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>spike — map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; font: 300 15px/1.7 Jost, system-ui, sans-serif; background: #0b0a09; color: #e9e2d3; letter-spacing: .02em; }
+h1 { font: 300 clamp(40px, 6vw, 72px)/1 "Cormorant Garamond", Georgia, serif; margin: 0 0 20px; }
+.band { background: radial-gradient(120% 95% at 35% 45%, #c8a96a70, transparent 66%), radial-gradient(80% 70% at 0% 0%, #c8a96a3a, transparent 66%), radial-gradient(70% 50% at 50% 115%, #c8a96a1c, transparent 70%), #0b0a09; padding: 64px 0; transition: background .3s; }
+.band.light { background: #f3eee3; color: #1a1712; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+.hero { display: grid; grid-template-columns: 1fr 1.4fr; gap: 40px; align-items: center; }
+.panel { border: 1px solid #2a2620; background: #0b0a09; padding: 28px; position: relative; }
+.light .panel { background: #f3eee3; border-color: #d9d0bd; box-shadow: 0 24px 50px -28px #1a1712; }
+.panel::before { content: ""; position: absolute; top: -1px; left: -1px; width: 28px; height: 28px; border-top: 1px solid #c8a96a; border-left: 1px solid #c8a96a; }
+.light .panel::before { border-color: #8c6a2c; }
+.label { font-size: 10px; letter-spacing: .28em; text-transform: uppercase; color: #c8a96a; margin: 0 0 14px; }
+.light .label { color: #8c6a2c; }
+.bar { margin-top: 24px; font-size: 12px; color: #8f877a; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+button { background: none; border: 1px solid #c8a96a; color: #c8a96a; padding: 8px 18px; font: 400 10px Jost, sans-serif; letter-spacing: .26em; text-transform: uppercase; cursor: pointer; }
+@media (max-width: 800px) { .hero { grid-template-columns: 1fr; gap: 24px; } .band { padding: 40px 0; } .panel { padding: 18px; } }
+</style>
+</head>
+<body>
+<div class="band" id="band"><div class="wrap">
+  <div class="hero">
+    <div class="panel"><p class="label">intro</p><h1>Software Architect / AI Engineer</h1><p>Making AI-assisted development work at scale</p></div>
+    <div class="panel"><p class="label">the map — hover for the challenge, click to jump</p><div id="map"></div></div>
+  </div>
+  <div class="bar"><span id="out">selected: –</span><button id="toggle">light / dark</button></div>
+</div></div>
+<script src="../../vendor/d3.min.js"></script>
+<script src="widgets/map.js"></script>
+<script>
+const data = { nodes: [
+  { id: 'me', kind: 'me', label: 'Ming', weight: 0, ax: .5, ay: .5, mx: 0.5, my: 0.5 },
+  { id: 'harness', kind: 'cluster', label: 'Harness', figure: '50+ skills', weight: .65, ax: .2, ay: .24, mx: 0.22, my: 0.22, challenge: 'How can I go to bed and my agent teams do work for me reliably?' },
+  { id: 'search-scale', kind: 'cluster', label: 'Search', figure: '10M+', weight: 1, ax: .8, ay: .2, mx: 0.72, my: 0.14, challenge: 'How can we handle Smart Search with >10 million records' },
+  { id: 'websites', kind: 'cluster', label: 'Websites', figure: '1m+', weight: .8, ax: .84, ay: .72, mx: 0.78, my: 0.72, challenge: 'How can we finish processing millions of long text with LLM very fast and accurate' },
+  { id: 'millions-files', kind: 'cluster', label: 'Files', figure: '1m+', weight: .8, ax: .5, ay: .86, mx: 0.42, my: 0.84, challenge: 'At 5 min per record, processing millions via LLM is impossible' },
+  { id: 'automation', kind: 'cluster', label: 'Automation', weight: .6, ax: .16, ay: .72, mx: 0.16, my: 0.66, challenge: 'How can I handle UI and Test Automation at Scale, and adapt UI changes in isolation' },
+  { id: 'simzilla', kind: 'app', label: 'Simzilla', figure: '2 days', weight: .35, ax: .38, ay: .14, mx: 0.46, my: 0.33, challenge: 'How much of a playable world can be built in 2 days?' },
+  { id: 'upskill', kind: 'app', label: 'Upskill', weight: .35, ax: .66, ay: .42, mx: 0.75, my: 0.42, challenge: 'How can I share skills with friends?' },
+] };
+const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let dark = true;
+const w = MapWidget.draw(document.getElementById('map'), data, {
+  theme: MapWidget.themes.dark, reduceMotion: still,
+  onSelect: n => { document.getElementById('out').textContent = 'selected: ' + n.label + ' → would scroll to #' + n.id; },
+});
+document.getElementById('toggle').onclick = () => {
+  dark = !dark;
+  document.getElementById('band').classList.toggle('light', !dark);
+  w.setTheme(dark ? MapWidget.themes.dark : MapWidget.themes.light);
+};
+</script>
+</body>
+</html>
