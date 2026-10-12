@@ -42,7 +42,7 @@
 .yt-img::after { content: ""; position: absolute; top: 0; right: 0; bottom: 0; width: 22px; background: linear-gradient(to right, transparent, rgba(0,0,0,.2)); border-right: 1px solid rgba(0,0,0,.35); pointer-events: none; }
 .yt-text { padding: 40px; align-self: center; }
 .connect { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; margin: 28px 0 0; }
-.connect a { display: inline-block; border: 1px solid var(--line); padding: 6px 16px; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; text-decoration: none; color: var(--mute); }
+.connect a { display: inline-block; border: 1px solid var(--mute); padding: 6px 16px; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; text-decoration: none; color: var(--ink); }
 .connect a:hover { color: var(--gold); border-color: var(--gold); }
 @media (max-width: 800px) {
   .arch, .focus, .yt { grid-template-columns: 1fr; }
