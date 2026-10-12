@@ -26,8 +26,8 @@
 .arch h3 { font-size: 26px; margin-bottom: 6px; }
 .arch ul { margin: 0; padding: 0; list-style: none; }
 .arch li { padding: 7px 0; border-bottom: 1px solid var(--line); }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 0 0 32px; padding: 0; }
-.chips li { border: 1px solid var(--line); padding: 5px 14px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--mute); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 32px 0 0; padding: 0; }
+.chips li { border: 1px solid var(--mute); padding: 5px 14px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink); }
 .about p { max-width: 800px; margin: 0 0 16px; font-size: 19px; }
 .focus { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 32px; }
 .focus h3 { font-size: 24px; margin-bottom: 8px; }
