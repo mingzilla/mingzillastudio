@@ -8,6 +8,7 @@ img { display: block; max-width: 100%; }
 .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
 .band { background: var(--bg); color: var(--ink); padding: 8px 0; }
 .band.light { --bg: #f3eee3; --ink: #1a1712; --mute: #6f675a; --gold: #8c6a2c; --line: #d9d0bd; }
+.band.dark:not(.hero-band) { background: radial-gradient(60% 40% at 50% 12%, #c8a96a14, transparent 72%), radial-gradient(50% 35% at 50% 88%, #c8a96a0d, transparent 72%), var(--bg); }
 .chapter { padding: 56px 0 40px; }
 .chapter h2 { font-size: clamp(32px, 4.4vw, 52px); line-height: 1.1; margin-bottom: 28px; }
 .band.hero-band { background: radial-gradient(120% 95% at 35% 45%, #c8a96a70, transparent 66%), radial-gradient(80% 70% at 0% 0%, #c8a96a3a, transparent 66%), radial-gradient(70% 50% at 50% 115%, #c8a96a1c, transparent 70%), #0b0a09; }

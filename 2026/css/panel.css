@@ -2,6 +2,7 @@
   background: var(--pb); color: var(--pi); border: 1px solid var(--pl); padding: 26px; position: relative; box-shadow: 0 24px 50px -28px #000; }
 .band.dark .panel:not(.keep-dark) { --pb: #f3eee3; --pi: #1a1712; --pm: #6f675a; --pg: #8c6a2c; --pl: #d9d0bd; }
 .band.light .panel { box-shadow: 0 24px 50px -28px #1a1712; }
+.band.dark .panel:not(.keep-dark) { box-shadow: 0 0 0 1px #c8a96a4d, 0 30px 70px -32px #c8a96a73, inset 0 1px 0 #fffc; }
 .panel { --bg: var(--pb); --ink: var(--pi); --mute: var(--pm); --gold: var(--pg); --line: var(--pl); }
 .panel::before { content: ""; position: absolute; top: -1px; left: -1px; width: 28px; height: 28px; border-top: 1px solid var(--pg); border-left: 1px solid var(--pg); }
 .panel-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; }
