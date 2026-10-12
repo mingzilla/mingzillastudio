@@ -2,13 +2,13 @@
 .hero h1 { font-size: clamp(40px, 6vw, 72px); line-height: 1; margin: 0 0 20px; }
 .hero .sub { margin: 0; font-size: 18px; }
 .hero .sub strong { font-weight: 400; color: #c8a96a; }
-.stat-strip { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin: 56px 0; }
-.stat { text-align: center; padding: 28px 12px; color: var(--mute); font-size: 10px; letter-spacing: .24em; text-transform: uppercase; border-left: 1px solid var(--line); }
+.stat-strip { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin: 8px; }
+.stat { text-align: center; padding: 8px; color: var(--mute); font-size: 10px; letter-spacing: .24em; text-transform: uppercase; border-left: 1px solid var(--line); }
 .stat:first-child { border-left: 0; }
 .stat strong { display: block; font: 300 clamp(40px, 5vw, 60px)/1.1 "Cormorant Garamond", Georgia, serif; color: var(--gold); letter-spacing: 0; text-transform: none; }
 @media (max-width: 800px) {
   .hero { grid-template-columns: 1fr; gap: 24px; padding: 32px 0; }
-  .stat-strip { grid-template-columns: 1fr 1fr; margin: 36px 0; }
+  .stat-strip { grid-template-columns: 1fr 1fr; margin: 16px 0; }
   .stat:nth-child(3) { border-left: 0; }
   .stat:nth-child(n+3) { border-top: 1px solid var(--line); }
 }

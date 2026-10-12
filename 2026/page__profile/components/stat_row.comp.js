@@ -1,6 +1,6 @@
 function StatRow() {
   return html`
-    <${Band} tone="light">
+    <${Band} tone="dark">
       <section className="stat-strip" aria-label="Highlights">
         ${CONTENT.profile.stats.map((s, i) => html`
           <div className="stat" key=${s.label}>

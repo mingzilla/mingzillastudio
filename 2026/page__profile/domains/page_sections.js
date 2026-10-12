@@ -3,6 +3,7 @@
 class PageSections {
   static all() {
     return [
+      { id: 'about', nav: 'About', tone: 'light', kind: 'about' },
       { id: 'apps', nav: 'Apps', tone: 'dark', kind: 'apps', chapter: 'recent-apps' },
       { id: 'harness', nav: 'AI Harness', tone: 'light', kind: 'chapter', chapter: 'ai-harness-engineering' },
       { id: 'files', nav: 'Files', tone: 'dark', kind: 'chapter', chapter: 'llm-processing-for-millions-of-files' },
@@ -10,8 +11,7 @@ class PageSections {
       { id: 'automation', nav: 'Automation', tone: 'dark', kind: 'chapter', chapter: 'llm-assisted-automation-pipelines' },
       { id: 'search', nav: 'Search', tone: 'light', kind: 'chapter', chapter: '10-million-records-search' },
       { id: 'bi', nav: 'BI Platform', tone: 'dark', kind: 'bi' },
-      { id: 'about', nav: 'About', tone: 'light', kind: 'about' },
-      { id: 'youtube', nav: null, tone: 'dark', kind: 'youtube' },
+      { id: 'youtube', nav: null, tone: 'light', kind: 'youtube' },
     ];
   }
   static chapter(slug) { return CONTENT.chapters.find(c => c.slug === slug); }
