@@ -7,6 +7,8 @@
 .nav-links a:hover, .nav-links a.on { color: #e9e2d3; border-bottom-color: #c8a96a; }
 .nav-links a.cta { border: 1px solid #c8a96a; color: #c8a96a; padding: 7px 14px; }
 .nav-links a.cta:hover { background: #c8a96a; color: #0b0a09; }
+.flip { flex: none; background: none; border: 1px solid #2a2620; color: #c8a96a; width: 34px; height: 34px; font-size: 16px; line-height: 1; cursor: pointer; padding: 0; }
+.flip:hover, .flip[aria-pressed=true] { border-color: #c8a96a; }
 .minimap { position: fixed; right: 22px; bottom: 22px; z-index: 19; width: 168px; padding: 12px 14px 12px; background: #0b0a09ee; border: 1px solid #c8a96a66; backdrop-filter: blur(6px); color: #e9e2d3; }
 .minimap .cur { font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: #c8a96a; margin: 0 0 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .minimap .field { position: relative; height: 96px; }

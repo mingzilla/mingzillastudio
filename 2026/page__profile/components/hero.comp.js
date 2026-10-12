@@ -1,7 +1,7 @@
-function Hero() {
+function Hero({ tone = 'dark' }) {
   const p = CONTENT.profile;
   return html`
-    <${Band} tone="dark" extra="hero-band" id="top">
+    <${Band} tone=${tone} extra="hero-band" id="top">
       <header className="hero">
         <${Panel} keepDark=${true} label="Ming Huang">
           <h1>${p.hero.title}</h1>

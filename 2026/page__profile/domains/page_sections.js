@@ -14,6 +14,7 @@ class PageSections {
       { id: 'youtube', nav: null, tone: 'light', kind: 'youtube' },
     ];
   }
+  static invert(tone) { return tone === 'dark' ? 'light' : 'dark'; }
   static chapter(slug) { return CONTENT.chapters.find(c => c.slug === slug); }
   static topic(slug) { return CONTENT.chapters.flatMap(c => c.topics).find(t => t.slug === slug); }
 }
