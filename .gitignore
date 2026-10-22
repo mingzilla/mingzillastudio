@@ -137,3 +137,14 @@ dist
 
 # graft's local graph cache — regenerable, not committed (run `graft build`).
 /graft/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+
+# Node
+node_modules/
