@@ -1,0 +1,6 @@
+{
+  "first": ["vendor/react.production.min.js", "vendor/react-dom.production.min.js", "vendor/htm.js"],
+  "last": ["app__root.js"],
+  "tiers": ["enums", "store", "util", "domains", "domain_store_data", "editor_store", "aggregates", "services", "components"],
+  "ignore": "\\.test\\.js$|^_test_support/"
+}

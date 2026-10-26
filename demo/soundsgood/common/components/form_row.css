@@ -1,0 +1,12 @@
+.form-row { min-height: 26px; display: grid; grid-template-columns: 100px 300px 120px; column-gap: 8px; align-items: center; margin: 6px 0; }
+.form-row__label { color: var(--text-muted); }
+.form-row__control { min-width: 0; }
+.form-row__control input, .form-row__control select, .form-row__control .text-input { display: block; width: 100%; height: 26px; padding: 0 8px; background: var(--bg-input); border: 1px solid var(--border-input); border-radius: 3px; color: inherit; }
+.form-row__control input:focus, .form-row__control select:focus { border-color: var(--accent); outline: none; }
+.form-row__split { display: flex; gap: 6px; }
+.form-row__split select { flex: 0 0 42%; width: 42%; }
+.form-row__split select:only-child { flex: 1 1 auto; width: 100%; }
+.form-row__split input { flex: 1 1 auto; min-width: 0; }
+.form-row__action .button, .form-row__action .check-box { width: 100%; height: 26px; }
+.form-row__action .button { padding: 0 8px; }
+.form-row__action .check-box { justify-content: flex-start; }

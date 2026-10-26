@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Soundsgood</title>
+<link rel="stylesheet" href="common/css/tokens.css">
+<link rel="stylesheet" href="common/css/base.css">
+<link rel="stylesheet" href="common/css/app.css">
+<link rel="stylesheet" href="common/components/activity_bar.css">
+<link rel="stylesheet" href="common/components/menu.css">
+<link rel="stylesheet" href="common/components/tab_strip.css">
+<link rel="stylesheet" href="common/components/field.css">
+<link rel="stylesheet" href="common/components/form_row.css">
+<link rel="stylesheet" href="common/components/snackbar.css">
+<link rel="stylesheet" href="common/components/control_bar.css">
+<link rel="stylesheet" href="common/components/dialog.css">
+<link rel="stylesheet" href="common/components/tree.css">
+<link rel="stylesheet" href="common/components/common_controls.css">
+<link rel="stylesheet" href="page__workspace/workspace__page.css">
+</head>
+<body>
+<div id="root"></div>
+<!-- scripts:start -->
+<script src="vendor/react.production.min.js"></script>
+<script src="vendor/react-dom.production.min.js"></script>
+<script src="vendor/htm.js"></script>
+
+<script src="common/enums/enum_value.js"></script>
+<script src="common/enums/content_filter.js"></script>
+<script src="common/enums/job_state.js"></script>
+<script src="common/enums/new_task_kind.js"></script>
+<script src="common/enums/shape.js"></script>
+<script src="common/enums/stage.js"></script>
+<script src="common/enums/tab_kind.js"></script>
+<script src="common/enums/topic_folder.js"></script>
+<script src="common/enums/typo_state.js"></script>
+<script src="common/store/broadcaster.js"></script>
+<script src="common/store/central_store.js"></script>
+<script src="common/store/change_detection.js"></script>
+<script src="common/store/immutable.js"></script>
+<script src="common/store/use_guard.js"></script>
+<script src="common/util/data_mirror.js"></script>
+<script src="common/util/date_text.util.js"></script>
+<script src="common/util/debounce.js"></script>
+<script src="common/util/guard.js"></script>
+<script src="common/util/html.js"></script>
+<script src="common/util/mirror_inputs.js"></script>
+<script src="common/util/name_normalize.util.js"></script>
+<script src="common/domains/group.js"></script>
+<script src="common/domains/inbox_file.js"></script>
+<script src="common/domains/item.js"></script>
+<script src="common/domains/job.js"></script>
+<script src="common/domains/job_stats.js"></script>
+<script src="common/domains/note.js"></script>
+<script src="common/domains/plan_row.js"></script>
+<script src="common/domains/task.js"></script>
+<script src="common/domains/topic.js"></script>
+<script src="common/domains/voice_typo.js"></script>
+<script src="common/domain_store_data/group_store_data.js"></script>
+<script src="common/domain_store_data/inbox_store_data.js"></script>
+<script src="common/domain_store_data/item_store_data.js"></script>
+<script src="common/domain_store_data/system_active_items.js"></script>
+<script src="common/domain_store_data/task_store_data.js"></script>
+<script src="common/domain_store_data/topic_store_data.js"></script>
+<script src="common/domain_store_data/user_preference_store_data.js"></script>
+<script src="common/domain_store_data/voice_typo_store_data.js"></script>
+<script src="common/components/activity_bar.comp.js"></script>
+<script src="common/components/check_box.comp.js"></script>
+<script src="common/components/column_divider.comp.js"></script>
+<script src="common/components/control_bar.comp.js"></script>
+<script src="common/components/dialog.comp.js"></script>
+<script src="common/components/field.comp.js"></script>
+<script src="common/components/form_row.comp.js"></script>
+<script src="common/components/icons.js"></script>
+<script src="common/components/job_dot.comp.js"></script>
+<script src="common/components/menu.comp.js"></script>
+<script src="common/components/menu_position.js"></script>
+<script src="common/components/segmented.comp.js"></script>
+<script src="common/components/side_resize.comp.js"></script>
+<script src="common/components/snackbar.comp.js"></script>
+<script src="common/components/status_mark.comp.js"></script>
+<script src="common/components/tab_strip.comp.js"></script>
+<script src="common/components/view_switch.comp.js"></script>
+<script src="common/domain_crud_api/group_api.js"></script>
+<script src="common/domain_crud_api/inbox_api.js"></script>
+<script src="common/domain_crud_api/item_api.js"></script>
+<script src="common/domain_crud_api/note_api.js"></script>
+<script src="common/domain_crud_api/plan_api.js"></script>
+<script src="common/domain_crud_api/preference_api.js"></script>
+<script src="common/domain_crud_api/prototype/prototype_world.js"></script>
+<script src="common/domain_crud_api/task_api.js"></script>
+<script src="common/domain_crud_api/topic_api.js"></script>
+<script src="common/domain_crud_api/voice_typo_api.js"></script>
+
+<script src="central/app_central_store_data.js"></script>
+<script src="central/central_store_data.js"></script>
+
+<script src="vendor/d3.min.js"></script>
+
+<script src="page__workspace/util/breadcrumb.util.js"></script>
+<script src="page__workspace/util/content_scope.util.js"></script>
+<script src="page__workspace/util/item_marks.util.js"></script>
+<script src="page__workspace/util/job_order.util.js"></script>
+<script src="page__workspace/util/job_readiness.util.js"></script>
+<script src="page__workspace/util/jobs_view.util.js"></script>
+<script src="page__workspace/util/plan_table.util.js"></script>
+<script src="page__workspace/util/stage_rules.util.js"></script>
+<script src="page__workspace/util/tab_id.util.js"></script>
+<script src="page__workspace/util/task_state.util.js"></script>
+<script src="page__workspace/util/workspace_icons.js"></script>
+<script src="page__workspace/domains/task_editor_data.js"></script>
+<script src="page__workspace/domains/workspace_store_data.js"></script>
+<script src="page__workspace/services/layout__service.js"></script>
+<script src="page__workspace/services/navigation__service.js"></script>
+<script src="page__workspace/services/new_task__service.js"></script>
+<script src="page__workspace/services/note__service.js"></script>
+<script src="page__workspace/services/notice__service.js"></script>
+<script src="page__workspace/services/prototype_load__service.js"></script>
+<script src="page__workspace/services/selection__service.js"></script>
+<script src="page__workspace/services/settings__service.js"></script>
+<script src="page__workspace/services/task__service.js"></script>
+<script src="page__workspace/services/topic__service.js"></script>
+<script src="page__workspace/services/voice_typo__service.js"></script>
+<script src="page__workspace/components/create_task_dialog.comp.js"></script>
+<script src="page__workspace/components/create_task_dialog.util.js"></script>
+<script src="page__workspace/components/footer_breadcrumb.comp.js"></script>
+<script src="page__workspace/components/footer_breadcrumb.util.js"></script>
+<script src="page__workspace/components/item_tab.comp.js"></script>
+<script src="page__workspace/components/item_tab.util.js"></script>
+<script src="page__workspace/components/jobs_column.comp.js"></script>
+<script src="page__workspace/components/jobs_column.util.js"></script>
+<script src="page__workspace/components/jobs_failed_list.comp.js"></script>
+<script src="page__workspace/components/jobs_not_running.comp.js"></script>
+<script src="page__workspace/components/jobs_overview.comp.js"></script>
+<script src="page__workspace/components/jobs_task_table.comp.js"></script>
+<script src="page__workspace/components/list_column.comp.js"></script>
+<script src="page__workspace/components/list_column.util.js"></script>
+<script src="page__workspace/components/meeting_audio_task_tab.comp.js"></script>
+<script src="page__workspace/components/meeting_audio_task_tab.util.js"></script>
+<script src="page__workspace/components/note_tab.comp.js"></script>
+<script src="page__workspace/components/note_tab.util.js"></script>
+<script src="page__workspace/components/notices.comp.js"></script>
+<script src="page__workspace/components/notices.util.js"></script>
+<script src="page__workspace/components/pause_confirm_dialog.comp.js"></script>
+<script src="page__workspace/components/settings_tab.comp.js"></script>
+<script src="page__workspace/components/settings_tab.util.js"></script>
+<script src="page__workspace/components/shape_bar.comp.js"></script>
+<script src="page__workspace/components/shape_bar.util.js"></script>
+<script src="page__workspace/components/stage_proceed.comp.js"></script>
+<script src="page__workspace/components/stage_tag.comp.js"></script>
+<script src="page__workspace/components/tab_content.comp.js"></script>
+<script src="page__workspace/components/tab_content.util.js"></script>
+<script src="page__workspace/components/task_tab.comp.js"></script>
+<script src="page__workspace/components/task_tab.util.js"></script>
+<script src="page__workspace/components/text_task_tab.comp.js"></script>
+<script src="page__workspace/components/text_task_tab.util.js"></script>
+<script src="page__workspace/components/top_bar.comp.js"></script>
+<script src="page__workspace/components/top_bar.util.js"></script>
+<script src="page__workspace/components/topic_tab.comp.js"></script>
+<script src="page__workspace/components/topic_tab.util.js"></script>
+<script src="page__workspace/components/url_task_tab.comp.js"></script>
+<script src="page__workspace/components/url_task_tab.util.js"></script>
+<script src="page__workspace/components/voice_typos_tab.comp.js"></script>
+<script src="page__workspace/components/voice_typos_tab.util.js"></script>
+<script src="page__workspace/components/workspace_tab_strip.comp.js"></script>
+<script src="page__workspace/components/workspace_tab_strip.util.js"></script>
+<script src="page__workspace/workspace__page.js"></script>
+<script src="page__workspace/workspace__page.util.js"></script>
+<script src="page__workspace/workspace__page_bridges.js"></script>
+
+<script src="app__root.js"></script>
+<!-- scripts:end -->
+</body>
+</html>

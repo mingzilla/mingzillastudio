@@ -1,0 +1,11 @@
+.control-bar { position: relative; display: flex; align-items: center; gap: 4px; padding: 4px 8px; border-bottom: 1px solid var(--border); }
+.control-bar__button { height: 22px; padding: 0 10px; border: 1px solid var(--border-input); border-radius: 2px; background: var(--bg-input); }
+.control-bar__button:hover:not(:disabled) { background: var(--bg-hover); }
+.control-bar__button:disabled { opacity: .45; cursor: default; }
+.control-bar__button--primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+.control-bar__button--primary:hover:not(:disabled) { background: var(--accent); filter: brightness(1.1); }
+.control-bar__fields { display: flex; gap: 8px; margin-left: 12px; flex: 1; min-width: 0; }
+.control-bar__fields > * { flex: 0 1 220px; min-width: 0; }
+.control-bar__button--icon { display: inline-flex; align-items: center; justify-content: center; width: 28px; padding: 0; }
+.control-bar__button--active { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+.control-bar__fields > .control-bar__title { flex: 0 1 auto; max-width: 100%; color: var(--text-strong); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

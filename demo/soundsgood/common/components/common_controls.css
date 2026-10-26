@@ -1,0 +1,28 @@
+.check-box { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; white-space: nowrap; }
+.check-box--disabled { opacity: .6; cursor: default; }
+.check-box input { margin: 0; accent-color: var(--accent); }
+.view-switch { display: flex; gap: 0; border-bottom: 1px solid var(--border); }
+.view-switch__view { height: 26px; padding: 0 12px; color: var(--text-muted); border-bottom: 2px solid transparent; }
+.view-switch__view--active { color: var(--text-strong); border-bottom-color: var(--accent); }
+.view-switch__count { margin-left: 2px; padding: 0 5px; border-radius: 8px; background: var(--bg-hover); font-size: 10px; }
+.status-mark { display: inline-block; width: 8px; height: 8px; border-radius: 50%; border: 1px solid var(--text-muted); }
+.status-mark--on { border-color: transparent; }
+.status-mark--ok.status-mark--on { background: var(--ok); }
+.status-mark--warn.status-mark--on { background: var(--warn); }
+.button { height: 22px; padding: 0 12px; border: 1px solid var(--border-input); border-radius: 2px; background: var(--bg-input); white-space: nowrap; }
+.button:hover:not(:disabled) { background: var(--bg-hover); }
+.button:disabled { opacity: .45; cursor: default; }
+.button--primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+.button--primary:hover:not(:disabled) { background: var(--accent); filter: brightness(1.1); }
+.button--small { height: 18px; padding: 0 6px; font-size: 11px; }
+.button--danger { color: var(--danger); }
+.text-area { display: block; width: 100%; min-height: 160px; padding: 6px; resize: vertical; background: var(--bg-input); border: 1px solid var(--border-input); border-radius: 2px; line-height: 18px; white-space: pre; }
+.text-area:focus, .text-input:focus { border-color: var(--accent); outline: none; }
+.text-input { width: 100%; height: 22px; padding: 0 6px; background: var(--bg-input); border: 1px solid var(--border-input); border-radius: 2px; }
+.text-input--table { height: 18px; }
+.badge { padding: 0 6px; border-radius: 8px; background: var(--bg-hover); color: var(--text-muted); font-size: 10px; line-height: 14px; }
+.badge--running { background: var(--accent); color: var(--accent-text); }
+.badge--ready, .badge--editing, .badge--not_running { background: var(--bg-selected); color: var(--text-strong); }
+.badge--failed { background: var(--danger); color: #fff; }
+.badge--done { background: var(--ok); color: #fff; }
+.badge--cancelled { background: var(--bg-hover); }

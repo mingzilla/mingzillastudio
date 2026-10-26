@@ -1,0 +1,96 @@
+:root {
+    --font: ui-monospace, "Cascadia Code", "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+    --font-size: 12px;
+    --row-height: 22px;
+    --bg-editor: #1f1f1f;
+    --bg-side: #181818;
+    --bg-input: #313131;
+    --bg-hover: #2a2d2e;
+    --bg-selected: #04395e;
+    --bg-menu: #202020;
+    --border: #2b2b2b;
+    --border-input: #3c3c3c;
+    --text: #cccccc;
+    --text-strong: #ffffff;
+    --text-muted: #8b8b8b;
+    --accent: #0078d4;
+    --accent-text: #ffffff;
+    --danger: #f85149;
+    --ok: #3fb950;
+    --danger-bg: #3b1d1d;
+    --warn: #cca700;
+    --attention: #f0883e;
+    --status-bg: #0078d4;
+    --status-text: #ffffff;
+    --chart-1: #4e9bd8;
+    --chart-2: #e08a3c;
+    --chart-3: #5ab38a;
+    --chart-4: #c06fd6;
+    --chart-5: #d6b84e;
+    --chart-6: #e0647a;
+    --chart-7: #4ec5c8;
+    --chart-8: #9a8fe0;
+    color-scheme: dark;
+}
+
+@media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+        --bg-editor: #ffffff;
+        --bg-side: #f8f8f8;
+        --bg-input: #ffffff;
+        --bg-hover: #f0f0f0;
+        --bg-selected: #e4e6f1;
+        --bg-menu: #ffffff;
+        --border: #e5e5e5;
+        --border-input: #cecece;
+        --text: #3b3b3b;
+        --text-strong: #000000;
+        --text-muted: #6e6e6e;
+        --accent: #005fb8;
+        --danger: #c9302c;
+        --ok: #2e7d32;
+        --danger-bg: #fdecea;
+        --warn: #946f00;
+        --attention: #b85c00;
+        --status-bg: #005fb8;
+        --chart-1: #1f77b4;
+        --chart-2: #d9731a;
+        --chart-3: #2a9d6a;
+        --chart-4: #a64ac0;
+        --chart-5: #b38f10;
+        --chart-6: #cf3f5c;
+        --chart-7: #17a2a6;
+        --chart-8: #6e60c9;
+        color-scheme: light;
+    }
+}
+
+:root[data-theme="light"] {
+    --bg-editor: #ffffff;
+    --bg-side: #f8f8f8;
+    --bg-input: #ffffff;
+    --bg-hover: #f0f0f0;
+    --bg-selected: #e4e6f1;
+    --bg-menu: #ffffff;
+    --border: #e5e5e5;
+    --border-input: #cecece;
+    --text: #3b3b3b;
+    --text-strong: #000000;
+    --text-muted: #6e6e6e;
+    --accent: #005fb8;
+    --danger: #c9302c;
+    --ok: #2e7d32;
+    --danger-bg: #fdecea;
+    --warn: #946f00;
+    --attention: #b85c00;
+    --status-bg: #005fb8;
+    --chart-1: #1f77b4;
+    --chart-2: #d9731a;
+    --chart-3: #2a9d6a;
+    --chart-4: #a64ac0;
+    --chart-5: #b38f10;
+    --chart-6: #cf3f5c;
+    --chart-7: #17a2a6;
+    --chart-8: #6e60c9;
+    color-scheme: light;
+}
