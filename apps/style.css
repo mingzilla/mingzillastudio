@@ -1,0 +1,7 @@
+body { font-family: system-ui, sans-serif; line-height: 1.6; max-width: 42rem; margin: 2rem auto; padding: 0 1rem; color: #1a1a1a; background: #fff; }
+a { color: #0b57d0; }
+footer { margin-top: 3rem; font-size: 0.9rem; }
+@media (prefers-color-scheme: dark) {
+  body { color: #e8e8e8; background: #161616; }
+  a { color: #8ab4f8; }
+}
