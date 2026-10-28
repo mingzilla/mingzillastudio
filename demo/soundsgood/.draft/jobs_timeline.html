@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>draft — jobs timeline</title>
+<link rel="stylesheet" href="../common/css/tokens.css">
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; overflow-x: auto; font: 400 var(--font-size)/1.5 var(--font); background: var(--bg-editor); color: var(--text); }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+.wrap { max-width: 980px; min-width: 528px; margin: 0 auto; padding: 32px 24px 64px; }
+h1 { font-size: 15px; font-weight: 500; color: var(--text-strong); margin: 0 0 4px; }
+.note { color: var(--text-muted); margin: 0 0 18px; }
+.panel { position: relative; min-width: 480px; background: var(--bg-side); border: 1px solid var(--border); padding: 18px 20px 14px; }
+.panel::before { content: ""; position: absolute; top: -1px; left: -1px; width: 26px; height: 26px; border-top: 1px solid var(--accent); border-left: 1px solid var(--accent); }
+.label { font-size: 10px; letter-spacing: .24em; text-transform: uppercase; color: var(--accent); margin: 0 0 12px; }
+.btn { height: 22px; padding: 0 10px; border: 1px solid var(--border-input); border-radius: 2px; color: var(--text); white-space: nowrap; }
+.btn:hover:not(:disabled) { background: var(--bg-hover); }
+.btn:disabled { opacity: .35; cursor: default; }
+.btn--primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+.btn--primary:hover:not(:disabled) { background: var(--accent); filter: brightness(1.12); }
+
+.overview { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px 28px; margin-bottom: 14px; }
+.pair__head { flex-wrap: wrap; gap: 0 8px; display: flex; justify-content: space-between; margin-bottom: 5px; color: var(--text-muted); }
+.pair__head b { color: var(--text-strong); font-weight: 500; }
+.bar { position: relative; height: 6px; background: var(--bg-input); display: flex; overflow: hidden; }
+.bar__done { background: var(--text-muted); opacity: .75; transition: width .3s; }
+.bar__running { background: var(--accent); transition: width .3s; }
+.bar__elapsed { background: var(--text-muted); opacity: .75; transition: width .3s; }
+
+.toolbar { flex-wrap: wrap; display: flex; align-items: center; gap: 8px; padding: 8px 0 10px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin-bottom: 4px; }
+.toolbar__space { flex: 1; }
+.git-state { color: var(--text-muted); white-space: nowrap; }
+.git-state b { color: var(--text-strong); font-weight: 500; }
+.chip { padding: 0 8px; border-radius: 9px; font-size: 11px; }
+.chip--danger { background: var(--danger-bg); color: var(--danger); }
+
+.row { position: relative; display: grid; grid-template-columns: 16px 30px minmax(110px, 170px) minmax(110px, 1fr) 56px 24px; align-items: center; column-gap: 10px; min-height: 52px; padding: 6px 0; }
+.row::before { content: ""; position: absolute; left: 40px; top: 0; bottom: 0; width: 0; border-left: 2px solid var(--text-muted); opacity: .55; }
+.row:first-child::before { top: 50%; }
+.row:last-child::before { bottom: 50%; }
+.row--running::before, .row--failed::before { border-left-color: var(--accent); opacity: .9; }
+.row--pending::before, .row--paused::before { border-left-style: dashed; opacity: .4; }
+.moves { display: flex; flex-direction: column; align-items: center; }
+.icon { width: 20px; height: 18px; display: grid; place-items: center; color: var(--text-muted); border-radius: 2px; }
+.icon svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.icon:hover:not(:disabled) { background: var(--bg-hover); color: var(--text-strong); }
+.icon:disabled { opacity: .2; cursor: default; }
+.icon--hidden { visibility: hidden; }
+.actions { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.icon--action { width: 24px; height: 22px; border: 1px solid var(--border-input); }
+.node { position: relative; z-index: 1; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--bg-side); border: 2px solid var(--text-muted); color: var(--text-muted); }
+.node svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.row--done .node { background: var(--text-muted); color: var(--bg-side); }
+.row--running .node { border-color: var(--accent); color: var(--accent); animation: ring 1.8s ease-out infinite; }
+.row--pending .node, .row--paused .node { border-style: dashed; }
+.row--paused .node { border-color: var(--warn); color: var(--warn); }
+.row--failed .node { border-color: var(--danger); color: var(--danger); }
+@keyframes ring { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent); } 100% { box-shadow: 0 0 0 9px transparent; } }
+.name { min-width: 0; }
+.name__title { color: var(--text-strong); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+.name__title:hover { text-decoration: underline; }
+.name__sub { color: var(--text-muted); font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row--done .name__title { color: var(--text-muted); }
+
+.strip { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.line { display: flex; align-items: center; gap: 6px; }
+.line__tag { width: 10px; color: var(--text-muted); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; opacity: .8; }
+.cells { flex: 1; display: flex; gap: 1px; min-width: 0; overflow: hidden; }
+.cell { flex: 1 1 0; max-width: 16px; min-width: 2px; height: 8px; border: 1px solid var(--text-muted); opacity: .45; }
+.cell--DONE { background: var(--text-muted); border-color: var(--text-muted); opacity: .75; }
+.cell--RUNNING { background: var(--accent); border-color: var(--accent); opacity: 1; animation: pulse 1.1s ease-in-out infinite; }
+.cell--READY { opacity: .8; }
+.cell--NOT_READY { border-style: dotted; opacity: .3; }
+.cell--FAILED { background: var(--danger); border-color: var(--danger); opacity: 1; }
+@keyframes pulse { 50% { opacity: .35; } }
+.count { text-align: right; color: var(--text-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.count b { color: var(--text); font-weight: 500; }
+.row--done .count b { color: var(--text-muted); }
+.checkpoint { color: var(--text-muted); font-size: 11px; }
+
+.tryit { margin-top: 14px; padding: 10px 12px; border: 1px dashed var(--border-input); color: var(--text-muted); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.tryit__title { font-size: 10px; letter-spacing: .24em; text-transform: uppercase; margin-right: 6px; }
+.toast { height: 18px; margin-top: 8px; color: var(--text-muted); font-size: 11px; }
+.legend { display: flex; gap: 16px; margin-top: 10px; color: var(--text-muted); font-size: 11px; flex-wrap: wrap; }
+.legend span::before { content: ""; display: inline-block; width: 10px; height: 8px; margin-right: 6px; vertical-align: -1px; border: 1px solid var(--text-muted); }
+.legend .l-done::before { background: var(--text-muted); }
+.legend .l-run::before { background: var(--accent); border-color: var(--accent); }
+.legend .l-ready::before { opacity: .8; }
+.legend .l-wait::before { border-style: dotted; opacity: .5; }
+.legend .l-fail::before { background: var(--danger); border-color: var(--danger); }
+.empty { padding: 26px 0; text-align: center; color: var(--text-muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Jobs timeline</h1>
+  <p class="note">Draft of the jobs panel (userflow__002 R75 to R80). Fake data. The look follows the app tokens; the cells are the progress strip: one cell for each job, one line for each stage.</p>
+  <div class="panel">
+    <p class="label">tasks in run order — running above, pending below, the git task last</p>
+    <div class="overview">
+      <div class="pair"><div class="pair__head"><span>items</span><span><b id="items-done">0</b> done / <b id="items-left">0</b> remaining</span></div><div class="bar"><span class="bar__done" id="bar-done"></span><span class="bar__running" id="bar-running"></span></div></div>
+      <div class="pair"><div class="pair__head"><span>time</span><span><b id="time-elapsed">0:00</b> elapsed / <b id="time-left">~0:00</b> remaining</span></div><div class="bar"><span class="bar__elapsed" id="bar-elapsed"></span></div></div>
+    </div>
+    <div class="toolbar">
+      <span class="git-state" id="git-state"></span>
+      <button class="btn" id="git-now" title="Put a commit-and-push task at the top of the list">Commit &amp; push now</button>
+      <span class="toolbar__space"></span>
+      <span class="chip chip--danger" id="attention" hidden></span>
+      <button class="btn" id="archive">Archive finished tasks</button>
+    </div>
+    <div id="timeline"></div>
+    <div class="legend"><span class="l-done">done</span><span class="l-run">running</span><span class="l-ready">ready</span><span class="l-wait">waits for an earlier stage</span><span class="l-fail">failed</span></div>
+  </div>
+  <div class="tryit">
+    <span class="tryit__title">try it</span>
+    <button class="btn" id="add">Add a task</button>
+    <button class="btn" id="fail">Fail a running job</button>
+    <button class="btn" id="speed">Speed 1×</button>
+    <button class="btn" id="reset">Reset</button>
+    <span>The chevrons move an idle task; a running task is paused first. Finished tasks stay until archived.</span>
+  </div>
+  <div class="toast" id="toast"></div>
+</div>
+<script src="../vendor/d3.min.js"></script>
+<script>
+const CAPACITY = { YOUTUBE: 1, TRANSCRIPT: 2, SUMMARY: 5, CONSOLIDATE: 1, GIT: 1 };
+const ICONS = {
+  download: '<path d="M12 4v10M8 10l4 4 4-4M5 19h14"/>',
+  transcribe: '<path d="M4 12h2M8 8v8M12 5v14M16 8v8M20 12h-2"/>',
+  summarise: '<path d="M5 7h14M5 12h10M5 17h7"/>',
+  consolidate: '<path d="M6 5v6a4 4 0 0 0 4 4h8M14 11l4 4-4 4M6 19v-2"/>',
+  git: '<circle cx="7" cy="6" r="2"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="9" r="2"/><path d="M7 8v8M17 11c0 4-6 3-10 5"/>',
+  check: '<path d="M5 12l4.5 4.5L19 7"/>',
+  pause: '<path d="M9 6v12M15 6v12"/>',
+  alert: '<path d="M12 6v7M12 17v.5"/>',
+  play: '<path d="M8 5l11 7-11 7z"/>',
+  edit: '<path d="M4 20h4L19 9l-4-4L4 16zM13 7l4 4"/>',
+  up: '<path d="M6 15l6-6 6 6"/>',
+  down: '<path d="M6 9l6 6 6-6"/>',
+};
+const STAGE = {
+  TRANSCRIBE: { tag: 't', lane: 'TRANSCRIPT', dur: 0.9 },
+  SUMMARISE: { tag: 's', lane: 'SUMMARY', dur: 3.2 },
+  CONSOLIDATE: { tag: 'c', lane: 'CONSOLIDATE', dur: 8 },
+  GIT: { tag: 'g', lane: 'GIT', dur: 3 },
+};
+const rnd = d3.randomLcg(7);
+let state, speed = 1, nextId = 1;
+
+const work = (name, sub, icon, count, stages, done = 0) => ({
+  id: nextId++, kind: 'work', name, sub, icon, paused: false, archived: false, files: 0,
+  stages: stages.map((key, s) => ({ key, cells: d3.range(count).map((i) => ({ state: i < done ? 'DONE' : 'READY', left: 0, item: i + 1 })), index: s })),
+});
+const git = () => ({ id: nextId++, kind: 'git', name: 'Commit & push', sub: 'stage · commit · push', icon: 'git', paused: false, archived: false, files: 0, stages: [{ key: 'GIT', index: 0, cells: [{ state: 'READY', left: 0, item: 1 }] }] });
+
+function fresh() {
+  nextId = 1;
+  const finished = work('bilibili · ming_ai', 'transcribe, summarise', 'transcribe', 18, ['TRANSCRIBE', 'SUMMARISE'], 18);
+  state = {
+    now: 0, runStart: 0, uncommitted: 3, ahead: 1,
+    tasks: [finished, work('youtube · cole_medin', 'transcribe, summarise', 'transcribe', 36, ['TRANSCRIBE', 'SUMMARISE']), work('bilibili · weiyi', 'transcribe, summarise', 'transcribe', 24, ['TRANSCRIBE', 'SUMMARISE']), work('consolidate notes', 'one batch of 14 day files', 'consolidate', 1, ['CONSOLIDATE']), git()],
+  };
+  finished.files = 0;
+}
+
+const live = () => state.tasks.filter((t) => !t.archived);
+const cellsOf = (t) => t.stages.flatMap((s) => s.cells);
+const isDone = (t) => cellsOf(t).every((c) => c.state === 'DONE');
+const statusOf = (t) => {
+  const cells = cellsOf(t);
+  if (cells.every((c) => c.state === 'DONE')) return 'done';
+  if (cells.some((c) => c.state === 'FAILED')) return 'failed';
+  if (t.paused) return 'paused';
+  return cells.some((c) => c.state === 'RUNNING') ? 'running' : 'pending';
+};
+
+function ready(task, stage, cell) {
+  if (stage.index > 0 && task.stages[stage.index - 1].cells[cell.item - 1].state !== 'DONE') return false;
+  if (task.kind !== 'git') return true;
+  const above = live().slice(0, live().indexOf(task)).filter((t) => t.kind !== 'git');
+  return above.every((t) => cellsOf(t).every((c) => c.state === 'DONE' || c.state === 'FAILED'));
+}
+
+function schedule() {
+  const used = {};
+  live().forEach((t) => t.stages.forEach((s) => s.cells.forEach((c) => { if (c.state === 'RUNNING') used[STAGE[s.key].lane] = (used[STAGE[s.key].lane] || 0) + 1; })));
+  live().filter((t) => !t.paused).forEach((t) => t.stages.forEach((s) => s.cells.forEach((c) => {
+    const lane = STAGE[s.key].lane;
+    if (c.state !== 'READY' || (used[lane] || 0) >= CAPACITY[lane] || !ready(t, s, c)) return;
+    c.state = 'RUNNING';
+    c.left = STAGE[s.key].dur * (0.7 + rnd() * 0.6);
+    used[lane] = (used[lane] || 0) + 1;
+  })));
+}
+
+function step(dt) {
+  state.now += dt;
+  live().forEach((t) => {
+    const before = isDone(t);
+    t.stages.forEach((s) => s.cells.forEach((c) => {
+      if (c.state !== 'RUNNING') return;
+      c.left -= dt;
+      if (c.left > 0) return;
+      c.state = 'DONE';
+      if (t.kind === 'work') t.files += 1;
+    }));
+    if (!before && isDone(t)) finish(t);
+  });
+  schedule();
+}
+
+function finish(task) {
+  if (task.kind === 'git') {
+    state.uncommitted = 0;
+    state.ahead = 0;
+    toast('pushed: nothing uncommitted, nothing ahead');
+    return;
+  }
+  state.uncommitted = Math.max(0, state.uncommitted - task.files);
+  state.ahead += 1;
+  toast(`committed the files of "${task.name}" (one commit for the task)`);
+}
+
+function keepGitLast() {
+  const gits = live().filter((t) => t.kind === 'git' && !isDone(t));
+  const pending = live().filter((t) => t.kind === 'work' && !isDone(t));
+  if (pending.length === 0) return;
+  const tasks = state.tasks;
+  for (let i = tasks.length - 2; i >= 0; i--) {
+    const a = tasks[i], b = tasks[i + 1];
+    const idle = (t) => t.kind === 'git' && !t.archived && cellsOf(t).every((c) => c.state === 'READY');
+    if (idle(a) && idle(b)) tasks.splice(i, 1);
+  }
+  const lastLive = live()[live().length - 1];
+  if (!(lastLive.kind === 'git' && !isDone(lastLive))) tasks.push(git());
+  void gits;
+}
+
+function addTask() {
+  if (live().length > 0 && live().every(isDone)) archive();
+  const names = ['youtube · nate_b_jones', 'bilibili · wu_li_dun_cha_she', 'youtube · greg_isenberg', 'meeting audio · 20261027'];
+  const name = names[Math.floor(rnd() * names.length)];
+  const count = 8 + Math.floor(rnd() * 22);
+  const task = work(name, 'transcribe, summarise', 'transcribe', count, ['TRANSCRIBE', 'SUMMARISE']);
+  const at = live().findLastIndex((t) => t.kind === 'git' && !isDone(t));
+  if (at === -1) state.tasks.push(task);
+  else state.tasks.splice(state.tasks.indexOf(live()[at]), 0, task);
+  if (live().filter((t) => t.kind === 'work' && !isDone(t)).length === 1) state.runStart = state.now;
+  keepGitLast();
+  toast(`added "${name}" above the git task`);
+}
+
+function commitNow() {
+  const existing = live().find((t) => t.kind === 'git' && !isDone(t) && cellsOf(t).every((c) => c.state === 'READY'));
+  const task = existing || git();
+  state.tasks = state.tasks.filter((t) => t !== task);
+  const firstOpen = state.tasks.findIndex((t) => !t.archived && !isDone(t));
+  state.tasks.splice(firstOpen === -1 ? state.tasks.length : firstOpen, 0, task);
+  toast('a commit-and-push task is at the top: it waits only for the jobs above it');
+  keepGitLast();
+}
+
+function archive() {
+  const gone = live().filter((t) => isDone(t));
+  gone.forEach((t) => { t.archived = true; });
+  if (gone.length > 0) toast(`archived ${gone.length} finished task${gone.length > 1 ? 's' : ''}`);
+}
+
+function failOne() {
+  const cells = live().flatMap((t) => t.stages.flatMap((s) => s.cells.filter((c) => c.state === 'RUNNING' && t.kind === 'work')));
+  if (cells.length === 0) { toast('no running job to fail'); return; }
+  cells[Math.floor(rnd() * cells.length)].state = 'FAILED';
+  toast('a job failed: its task keeps its place and turns red; the jobs that wait for it stay blocked');
+}
+
+let toastTimer;
+function toast(text) {
+  d3.select('#toast').text(text);
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => d3.select('#toast').text(''), 6000);
+}
+
+const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+function remainingSeconds() {
+  const perLane = {};
+  live().filter((t) => t.kind === 'work').forEach((t) => t.stages.forEach((s) => s.cells.forEach((c) => {
+    if (c.state === 'DONE' || c.state === 'FAILED') return;
+    const lane = STAGE[s.key].lane;
+    perLane[lane] = (perLane[lane] || 0) + (c.state === 'RUNNING' ? c.left : STAGE[s.key].dur);
+  })));
+  return Math.max(0, ...Object.entries(perLane).map(([lane, sum]) => sum / CAPACITY[lane]));
+}
+
+function overview() {
+  const cells = live().filter((t) => t.kind === 'work').flatMap(cellsOf);
+  const done = cells.filter((c) => c.state === 'DONE').length;
+  const running = cells.filter((c) => c.state === 'RUNNING').length;
+  const total = cells.length || 1;
+  d3.select('#items-done').text(done);
+  d3.select('#items-left').text(cells.length - done);
+  d3.select('#bar-done').style('width', `${(done / total) * 100}%`);
+  d3.select('#bar-running').style('width', `${(running / total) * 100}%`);
+  const open = live().some((t) => t.kind === 'work' && !isDone(t));
+  const elapsed = open ? state.now - state.runStart : 0;
+  const left = remainingSeconds();
+  d3.select('#time-elapsed').text(fmt(elapsed));
+  d3.select('#time-left').text(`~${fmt(left)}`);
+  d3.select('#bar-elapsed').style('width', `${elapsed + left === 0 ? 0 : (elapsed / (elapsed + left)) * 100}%`);
+  const failed = cells.filter((c) => c.state === 'FAILED').length;
+  d3.select('#attention').attr('hidden', failed ? null : true).text(`${failed} failed`);
+  d3.select('#git-state').html(`git: <b>${state.uncommitted}</b> uncommitted · <b>${state.ahead}</b> ahead`);
+  d3.select('#archive').attr('disabled', live().some(isDone) ? null : true);
+}
+
+function render() {
+  const rows = live();
+  const root = d3.select('#timeline');
+  root.selectAll('.empty').data(rows.length === 0 ? [0] : []).join('div').attr('class', 'empty').text('Nothing here. Add a task.');
+  const row = root.selectAll('.row').data(rows, (t) => t.id).join((enter) => {
+    const r = enter.append('div');
+    const moves = r.append('span').attr('class', 'moves');
+    moves.append('button').attr('class', 'icon move-up').attr('title', 'Move up').on('click', (_, t) => move(t, -1)).append('svg').attr('viewBox', '0 0 24 24').html(ICONS.up);
+    moves.append('button').attr('class', 'icon move-down').attr('title', 'Move down').on('click', (_, t) => move(t, 1)).append('svg').attr('viewBox', '0 0 24 24').html(ICONS.down);
+    r.append('span').attr('class', 'node').append('svg').attr('viewBox', '0 0 24 24');
+    const name = r.append('span').attr('class', 'name');
+    name.append('div').attr('class', 'name__title').on('click', (_, t) => toast(`opens the tab of "${t.name}": running mode, every job with Cancel / Retry`));
+    name.append('div').attr('class', 'name__sub');
+    r.append('div').attr('class', 'strip');
+    r.append('span').attr('class', 'count');
+    const actions = r.append('span').attr('class', 'actions');
+    actions.append('button').attr('class', 'icon icon--action pause').on('click', (_, t) => { t.paused = !t.paused; toast(t.paused ? `paused "${t.name}"` : `resumed "${t.name}"`); render(); }).append('svg').attr('viewBox', '0 0 24 24');
+    actions.append('button').attr('class', 'icon icon--action edit').attr('title', 'Edit').on('click', (_, t) => toast(`opens the tab of "${t.name}" in edit mode`)).append('svg').attr('viewBox', '0 0 24 24').html(ICONS.edit);
+    return r;
+  }).order();
+  row.attr('class', (t) => `row row--${statusOf(t)}`);
+  row.select('.node svg').html((t) => ICONS[{ done: 'check', paused: 'pause', failed: 'alert' }[statusOf(t)] || t.icon]);
+  row.select('.name__title').text((t) => t.name);
+  row.select('.name__sub').text((t) => (statusOf(t) === 'paused' ? 'paused' : t.sub));
+  row.select('.strip').each(function strip(t) {
+    const lines = d3.select(this).selectAll('.line').data(t.stages, (s) => s.key).join((enter) => {
+      const l = enter.append('div').attr('class', 'line');
+      l.append('span').attr('class', 'line__tag');
+      l.append('div').attr('class', 'cells');
+      return l;
+    });
+    lines.select('.line__tag').text((s) => (t.stages.length > 1 ? STAGE[s.key].tag : ''));
+    lines.select('.cells').each(function cells(s) {
+      d3.select(this).selectAll('.cell').data(s.cells, (c) => c.item).join('span')
+        .attr('class', (c) => `cell cell--${c.state === 'READY' && !ready(t, s, c) ? 'NOT_READY' : c.state}`)
+        .attr('title', (c) => `${t.kind === 'git' ? 'git' : `item ${c.item}`} · ${s.key.toLowerCase()} · ${c.state === 'READY' && !ready(t, s, c) ? 'not ready' : c.state.toLowerCase()}`);
+    });
+  });
+  row.select('.count').html((t) => {
+    const cells = cellsOf(t);
+    if (t.kind === 'git') return statusOf(t) === 'done' ? 'done' : statusOf(t) === 'running' ? 'running' : '<span class="checkpoint">waits</span>';
+    const done = cells.filter((c) => c.state === 'DONE').length;
+    return `<b>${done}</b>/${cells.length}`;
+  });
+  row.select('.actions').classed('icon--hidden', (t) => statusOf(t) === 'done');
+  row.select('.pause').attr('title', (t) => (t.paused ? 'Resume' : 'Pause')).select('svg').html((t) => (t.paused ? ICONS.play : ICONS.pause));
+  row.select('.move-up').attr('disabled', (t) => (canMove(t, -1) ? null : true));
+  row.select('.move-down').attr('disabled', (t) => (canMove(t, 1) ? null : true));
+  overview();
+}
+
+function canMove(task, dir) {
+  const list = live();
+  const at = list.indexOf(task);
+  const other = list[at + dir];
+  return ['pending', 'paused'].includes(statusOf(task)) && other !== undefined && !isDone(other);
+}
+
+function move(task, dir) {
+  if (!canMove(task, dir)) return;
+  const list = live();
+  const other = list[list.indexOf(task) + dir];
+  const a = state.tasks.indexOf(task), b = state.tasks.indexOf(other);
+  [state.tasks[a], state.tasks[b]] = [state.tasks[b], state.tasks[a]];
+  keepGitLast();
+  render();
+}
+
+d3.select('#add').on('click', () => { addTask(); render(); });
+d3.select('#fail').on('click', () => { failOne(); render(); });
+d3.select('#archive').on('click', () => { archive(); render(); });
+d3.select('#git-now').on('click', () => { commitNow(); render(); });
+d3.select('#reset').on('click', () => { fresh(); render(); });
+d3.select('#speed').on('click', function toggle() { speed = speed === 1 ? 4 : 1; d3.select(this).text(`Speed ${speed}×`); });
+
+fresh();
+schedule();
+render();
+d3.interval(() => { step(0.1 * speed); render(); }, 100);
+</script>
+</body>
+</html>
