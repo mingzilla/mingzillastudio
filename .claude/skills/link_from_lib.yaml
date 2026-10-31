@@ -1,9 +1,9 @@
 roots:
-  core__unit: /mnt/e/code/upskill__skills_lib/private_skills/core__unit_skills/.claude/skills
+  skills__core: /mnt/e/code/upskill__skills_lib/private_skills/skills__core
   skills__sdlc: /mnt/e/code/upskill__skills_lib/private_skills/skills__sdlc
 
 links:
-  core__unit:
+  skills__core:
     - unit__coding__sh
     - content_presentation_style:
         type: merge
