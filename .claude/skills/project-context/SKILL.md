@@ -1,5 +1,5 @@
 ---
-name: project_context
+name: project-context
 description: project context by topic
 ---
 
