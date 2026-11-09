@@ -14,21 +14,16 @@ description: read before changing code or docs in mingzillastudio - conventions 
 
 `context md -> content -> context md`. Follow `flow__requirement`, section `SOP`.
 
-## Convention by Topic
+## Convention
 
-`_meta/convention_by_topic/<topic>/` holds how work is done in the project. Defined in `flow__requirement`, section `Convention by Topic`.
+`_meta/convention.md` holds how work is done in the project, in groups. Defined in `flow__requirement`, section `Convention`.
 
-- [ADOPT] when work should follow the project, read `convention.md` of the topic. Nothing else.
-- [PROPOSE] when a solution differs from `convention.md`, read `_agreement.md` first: an option may already be approved or rejected.
-- [EDIT] when changing a convention, read `_agreement.md`, then change both files together.
+- [ADOPT] when work should follow the project, read the index of `_meta/convention.md`, then the groups whose `Read when` matches the task. Nothing else.
+- [PROPOSE] when a solution differs from a rule, check the group's Exceptions first: an option may already be approved or rejected.
+- [EDIT] when changing a rule, change it and its Exceptions together. A new decision that conflicts with an earlier one: alert the author, resolve it, mark the earlier `(overridden)`.
 - [DIRECTION] a rule says `new`, `touched` or `all` code. A convention may name a direction to move in.
+- [STATE] the convention is not in `_meta/convention.md` yet: read the file for the topic in `_meta/decisions/decision__*.md` instead.
 
 ## Requirements
 
 - [REQUIREMENT] `_meta/requirement__high_level.md`
-
-## Topics
-
-| Topic | Where |
-|-------|-------|
-| existing decision files, not yet moved into topics | `_meta/decisions/decision__*.md` |
