@@ -1,3 +1,6 @@
+---
+description: the 2026 profile page: goal, tech, look, devices, editing, growth, SEO, priorities. Read for any change to the profile page
+---
 ## 2026 profile page (`2026/`)
 
 - [GOAL] Personal profile page that shows, not tells: Ming Huang, Software Architect / AI Engineer, "making AI-assisted development work at scale".

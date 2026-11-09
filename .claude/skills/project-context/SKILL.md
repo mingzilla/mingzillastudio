@@ -12,12 +12,13 @@ description: read before changing code or docs in mingzillastudio - conventions 
 
 ## Editing Order
 
-`context md -> content -> context md`. Follow `flow__requirement`, section `SOP`.
+`context md -> content -> context md`. Follow `flow__requirement`, section `Write`.
 
 ## Convention
 
 `_meta/convention.md` holds how work is done in the project, in groups. Defined in `flow__requirement`, section `Convention`.
 
+- [LIST] to choose what to read, list what each file covers and when to read it: `grep -m1 '^description:' _meta/*.md _meta/requirement__*/*.md`. Every file starts with a `description:`.
 - [ADOPT] when work should follow the project, read the index of `_meta/convention.md`, then the groups whose `Read when` matches the task. Nothing else.
 - [PROPOSE] when a solution differs from a rule, check the group's Exceptions first: an option may already be approved or rejected.
 - [EDIT] when changing a rule, change it and its Exceptions together. A new decision that conflicts with an earlier one: alert the author, resolve it, mark the earlier `(overridden)`.
