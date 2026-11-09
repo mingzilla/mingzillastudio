@@ -12,10 +12,7 @@ description: read before changing code or docs in mingzillastudio - conventions 
 
 ## Editing Order
 
-`context md -> content -> context md`. Detail: `flow__requirement`, section `Editing Order`.
-
-- [BEFORE] read the context md that covers the change: `convention.md` of the topic, or the requirement
-- [AFTER] update it in the same change, or the change is not done. Nothing to update: say so
+`context md -> content -> context md`. Follow `flow__requirement`, section `SOP`.
 
 ## Convention by Topic
 
