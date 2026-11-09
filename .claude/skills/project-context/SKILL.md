@@ -6,7 +6,7 @@ description: read before changing code or docs in mingzillastudio - conventions 
 ## Rule
 
 - [TEXT] Write the absolute minimum text, in bullet points. `Do x -> Do y -> Do z` beats many words.
-- [ALLOWED CONTENT] Forward desired content only. Ban duplication. Ban history.
+- [ALLOWED CONTENT] Consolidate, do not append: edit the existing text so it states the forward desired content. Ban duplication. Ban history.
 - [ORGANISING] Group in H2. Each bullet has a `[LABEL]` prefix.
 - [POINT] Point to the project's own documents. Do not copy them.
 
