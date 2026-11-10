@@ -1,6 +1,6 @@
 ---
 name: project-context
-description: read before changing code or docs in mingzillastudio - conventions by topic, the agreements behind them, and requirements
+description: read before changing code or docs in mingzillastudio - the convention (how work is done here) and the requirements
 ---
 
 ## Rule
