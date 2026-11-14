@@ -57,7 +57,7 @@
               <div class="item"><span class="name" title="unit__rule__make_concise">unit__rule__make_concise</span><button>share</button></div>
               <div class="item"><span class="name" title="unit__skill__create_flow_skill">unit__skill__create_flow_skill</span><button>share</button></div>
               <div class="item"><span class="name" title="unit__skill__create_unit_skill">unit__skill__create_unit_skill</span><button>share</button></div>
-              <div class="item"><span class="name" title="unit__skill__promote">unit__skill__promote</span><button>share</button></div>
+              <div class="item"><span class="name" title="unit__skill__add_usage">unit__skill__add_usage</span><button>share</button></div>
             </div>
             <div class="sub">
               <div class="gh sub-h" title="skills__core__on_demand">on_demand</div>
@@ -311,7 +311,7 @@ flowchart LR
 
   var people = [
     { name: 'Mingzilla', net: 'ok',
-      network: [{ n: 'unit__skill__create_unit_skill', v: '1' }, { n: 'unit__skill__promote', v: '2' }, { n: 'unit__coding__python', v: '1' }],
+      network: [{ n: 'unit__skill__create_unit_skill', v: '1' }, { n: 'unit__skill__add_usage', v: '2' }, { n: 'unit__coding__python', v: '1' }],
       pub: [{ n: 'unit__response_to_user', v: '1' }, { n: 'unit__rule__make_concise', v: '1' }] },
     { name: 'SmoggiKen', net: 'no access', network: [],
       pub: [{ n: 'unit__coding__sh', v: '1' }, { n: 'unit__diagram__flowchart', v: '1' }, { n: 'unit__coding__python', v: '2' }] },
@@ -325,7 +325,7 @@ flowchart LR
   var sandbox = [
     { n: 'askKenny', from: '', v: '1' },
     { n: 'unit__skill__create_unit_skill', from: 'Ming', v: '1' },
-    { n: 'unit__skill__promote', from: 'Ming', v: '1' },
+    { n: 'unit__skill__add_usage', from: 'Ming', v: '1' },
     { n: 'unit__coding__python', from: 'Ming', v: '1' }
   ];
   var current = null;
