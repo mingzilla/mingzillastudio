@@ -4,7 +4,7 @@ roots:
 
 links:
   skills__core:
-    - unit__coding__sh
+    - unit__coding__script
     - content_presentation_style:
         type: merge
         list:
